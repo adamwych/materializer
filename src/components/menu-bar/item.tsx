@@ -6,7 +6,7 @@ interface Props {
     onClick?(): void;
 }
 
-export default function UIMenuBarItem(props: Props) {
+export default function MenuBarItem(props: Props) {
     const context = useMenuBarContext();
 
     function onClick() {

@@ -7,7 +7,7 @@ interface Props {
     stacked: boolean;
 }
 
-export default function UIMaterialGraphNodeOutputImage(props: Props) {
+export default function MaterialNodeBoxImage(props: Props) {
     return (
         <canvas
             ref={(canvas) => {

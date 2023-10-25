@@ -3,7 +3,7 @@ import { For } from "solid-js";
 import UIMaterialGraphNodeConnectionCurve from "./connection-curve.tsx";
 import { useEditorMaterialContext } from "./material-context.ts";
 
-export default function UIMaterialGraphNodeConnections() {
+export default function MaterialGraphEditorConnectionsOverlay() {
     const editorCtx = useEditorRuntimeContext();
     const material = useEditorMaterialContext()!.getMaterial();
 

@@ -1,7 +1,7 @@
 import { useEditorRuntimeContext } from "../graph-editor/runtime-context.tsx";
 import { createEffect } from "solid-js";
 
-export default function UIMaterialPreviewWindow() {
+export default function MaterialPreviewPanel() {
     const runtimeContext = useEditorRuntimeContext();
     const previewOutputTexture = runtimeContext.getPreviewOutputTexture();
     let canvasElement: HTMLCanvasElement;

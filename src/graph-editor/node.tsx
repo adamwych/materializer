@@ -1,9 +1,9 @@
 import { MaterialNode } from "../types/material.ts";
 import { DeepReadonly } from "ts-essentials";
 import { Accessor, For, Show } from "solid-js";
-import UIMaterialGraphNodeSocket from "./node-socket.tsx";
+import MaterialNodeSocketBox from "./node-socket.tsx";
 import { useEditorRuntimeContext } from "./runtime-context.tsx";
-import UIMaterialGraphNodeOutputImage from "./node-output-image.tsx";
+import MaterialNodeBoxImage from "./node-output-image.tsx";
 import { useConnectionBuilder } from "./connection-builder.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 
@@ -11,7 +11,7 @@ interface Props {
     node: Accessor<MaterialNode>;
 }
 
-export default function UIMaterialGraphNode(props: DeepReadonly<Props>) {
+export default function MaterialNodeBox(props: DeepReadonly<Props>) {
     const editorCtx = useEditorRuntimeContext();
     const selectionManager = useEditorSelectionManager()!;
     const connectionBuilder = useConnectionBuilder();
@@ -49,7 +49,7 @@ export default function UIMaterialGraphNode(props: DeepReadonly<Props>) {
         >
             <For each={outputTextures()}>
                 {(bitmap, index) => (
-                    <UIMaterialGraphNodeOutputImage
+                    <MaterialNodeBoxImage
                         index={index() - outputTextures().length / 2 + 0.5}
                         stacked={outputTextures().length > 1}
                         size={size}
@@ -75,7 +75,7 @@ export default function UIMaterialGraphNode(props: DeepReadonly<Props>) {
                         <div class="flex flex-col justify-center gap-2">
                             <For each={runtimeInfo()!.inputSockets}>
                                 {(socket) => (
-                                    <UIMaterialGraphNodeSocket
+                                    <MaterialNodeSocketBox
                                         id={socket.id}
                                         alignment="left"
                                         socket={socket}
@@ -100,7 +100,7 @@ export default function UIMaterialGraphNode(props: DeepReadonly<Props>) {
                         <div class="flex flex-col justify-center gap-2">
                             <For each={runtimeInfo()!.outputSockets}>
                                 {(socket) => (
-                                    <UIMaterialGraphNodeSocket
+                                    <MaterialNodeSocketBox
                                         id={socket.id}
                                         alignment="right"
                                         socket={socket}

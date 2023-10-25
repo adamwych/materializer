@@ -1,20 +1,20 @@
 import { Material } from "../types/material.ts";
 import { DeepReadonly } from "ts-essentials";
 import { EditorRuntimeContextProvider } from "./runtime-context.tsx";
-import UIMaterialNodeInspectorPanel from "./inspector/inspector.tsx";
-import UIMaterialNodesGraph from "./graph.tsx";
+import MaterialNodeInspectorPanel from "./inspector/inspector.tsx";
+import MaterialGraphEditorNodes from "./graph.tsx";
 import { EditorConnectionBuilderProvider } from "./connection-builder.tsx";
 import { EditorSelectionManagerProvider } from "./selection/manager.ts";
 import { EditorMaterialContextProvider } from "./material-context.ts";
 import { EditorDiagnosticsContextProvider } from "./diagnostics-context.ts";
-import UIMaterialPreviewWindow from "../preview/window.tsx";
+import MaterialPreviewPanel from "../preview/window.tsx";
 import { MultiProvider } from "@solid-primitives/context";
 
 interface Props {
     material: Material;
 }
 
-export default function UIMaterialGraphEditor(props: DeepReadonly<Props>) {
+export default function MaterialGraphEditor(props: DeepReadonly<Props>) {
     return (
         <MultiProvider
             values={[
@@ -26,10 +26,11 @@ export default function UIMaterialGraphEditor(props: DeepReadonly<Props>) {
             ]}
         >
             <div class="w-full h-full flex">
-                <UIMaterialNodesGraph />
+                <MaterialGraphEditorNodes />
+
                 <div class="flex flex-col">
-                    <UIMaterialNodeInspectorPanel />
-                    <UIMaterialPreviewWindow />
+                    <MaterialNodeInspectorPanel />
+                    <MaterialPreviewPanel />
                 </div>
             </div>
         </MultiProvider>

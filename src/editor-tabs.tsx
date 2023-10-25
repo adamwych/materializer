@@ -1,8 +1,8 @@
 import { useAppContext } from "./app-context.ts";
-import UIMaterialGraphEditor from "./graph-editor/editor.tsx";
+import MaterialGraphEditor from "./graph-editor/editor.tsx";
 import { For } from "solid-js";
 
-export default function UIEditorTabs() {
+export default function EditorTabs() {
     const context = useAppContext()!;
 
     return (
@@ -23,7 +23,7 @@ export default function UIEditorTabs() {
             </div>
 
             <div class="w-full h-full">
-                <UIMaterialGraphEditor
+                <MaterialGraphEditor
                     material={context.activeEditorTabMaterial()!}
                 />
             </div>

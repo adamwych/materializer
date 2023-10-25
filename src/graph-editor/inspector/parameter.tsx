@@ -1,5 +1,5 @@
-import UIMaterialNodeInspectorRGBInput from "./input-rgb.tsx";
-import {Accessor} from "solid-js";
+import MaterialNodeInspectorRGBInput from "./input-rgb.tsx";
+import { Accessor } from "solid-js";
 
 interface Props {
     name: string;
@@ -8,11 +8,11 @@ interface Props {
     onChange(value: unknown): void;
 }
 
-export default function UIMaterialNodeInspectorParameter(props: Props) {
+export default function MaterialNodeInspectorParameter(props: Props) {
     return (
         <div>
             <h1 class="font-semibold">{props.name}</h1>
-            <UIMaterialNodeInspectorRGBInput
+            <MaterialNodeInspectorRGBInput
                 value={props.value as Accessor<[number, number, number]>}
                 onChange={props.onChange}
             />

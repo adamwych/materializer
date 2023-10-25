@@ -6,7 +6,7 @@ interface Props {
     onClick(): void;
 }
 
-export default function UIButton(props: Props) {
+export default function Button(props: Props) {
     return (
         <button
             class="px-4 py-2 bg-gray-300-0 hover:bg-gray-200-0 active:bg-gray-100-0 rounded-md cursor-default"

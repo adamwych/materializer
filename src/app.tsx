@@ -2,9 +2,9 @@
 import "./styles.scss";
 import {render} from "solid-js/web";
 import {Material, MaterialNodeOutputTarget, MaterialNodeType,} from "./types/material.ts";
-import UIAppMenuBar from "./app-menu-bar.tsx";
+import AppMenuBar from "./app-menu-bar.tsx";
 import {AppContextProvider} from "./app-context.ts";
-import UIEditorTabs from "./editor-tabs.tsx";
+import EditorTabs from "./editor-tabs.tsx";
 
 const DEFAULT_MATERIAL: Material = {
     name: "Default",
@@ -50,8 +50,8 @@ export default function App() {
     return (
         <AppContextProvider initialMaterial={DEFAULT_MATERIAL}>
             <div class="w-full h-full flex flex-col">
-                <UIAppMenuBar />
-                <UIEditorTabs />
+                <AppMenuBar />
+                <EditorTabs />
             </div>
         </AppContextProvider>
     );

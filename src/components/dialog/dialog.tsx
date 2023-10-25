@@ -1,6 +1,6 @@
 import { For, JSX } from "solid-js";
 import { Portal } from "solid-js/web";
-import UIButton from "../button/button.tsx";
+import Button from "../button/button.tsx";
 
 interface Props {
     title: string;
@@ -11,7 +11,7 @@ interface Props {
     children?: JSX.Element;
 }
 
-export default function UIDialog(props: Props) {
+export default function Dialog(props: Props) {
     return (
         <Portal>
             <div
@@ -24,9 +24,9 @@ export default function UIDialog(props: Props) {
                     <div class="p-4 flex gap-4">
                         <For each={props.buttons}>
                             {(button) => (
-                                <UIButton onClick={button.onClick}>
+                                <Button onClick={button.onClick}>
                                     {button.label}
-                                </UIButton>
+                                </Button>
                             )}
                         </For>
                     </div>

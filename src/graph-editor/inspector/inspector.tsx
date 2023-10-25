@@ -1,9 +1,9 @@
 import { useEditorRuntimeContext } from "../runtime-context.tsx";
 import { createMemo, For, Show } from "solid-js";
-import UIMaterialNodeInspectorParameter from "./parameter.tsx";
+import MaterialNodeInspectorParameter from "./parameter.tsx";
 import { useEditorMaterialContext } from "../material-context.ts";
 
-export default function UIMaterialNodeInspectorPanel() {
+export default function MaterialNodeInspectorPanel() {
     const editorCtx = useEditorRuntimeContext();
     const materialCtx = useEditorMaterialContext()!;
     const node = editorCtx.getInspectedNode();
@@ -31,7 +31,7 @@ export default function UIMaterialNodeInspectorPanel() {
 
                 <For each={parameterInfos()}>
                     {(parameter) => (
-                        <UIMaterialNodeInspectorParameter
+                        <MaterialNodeInspectorParameter
                             name={parameter.id}
                             value={() => node()?.parameters[parameter.id]}
                             onChange={(value) =>

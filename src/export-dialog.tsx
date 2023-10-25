@@ -1,4 +1,4 @@
-import UIDialog from "./components/dialog/dialog.tsx";
+import Dialog from "./components/dialog/dialog.tsx";
 import { useAppContext } from "./app-context.ts";
 import { MaterialNode, MaterialNodeType } from "./types/material.ts";
 import { createSignal, For } from "solid-js";
@@ -11,7 +11,7 @@ interface Props {
     onClose(): void;
 }
 
-export default function UIExportDialog(props: Props) {
+export default function ExportDialog(props: Props) {
     const context = useAppContext()!;
     const activeMaterial = context.activeEditorTabMaterial;
     const outputNodes = () =>
@@ -89,7 +89,7 @@ export default function UIExportDialog(props: Props) {
     }
 
     return (
-        <UIDialog
+        <Dialog
             title={`Exporting ${activeMaterial().name}`}
             buttons={[
                 {
@@ -114,6 +114,6 @@ export default function UIExportDialog(props: Props) {
                     </div>
                 )}
             </For>
-        </UIDialog>
+        </Dialog>
     );
 }

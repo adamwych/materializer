@@ -4,7 +4,7 @@ type Props = {
     onClose(): void;
 };
 
-const [UIMenuBarContextProvider, useMenuBarContext] = createContextProvider(
+const [MenuBarContextProvider, useMenuBarContext] = createContextProvider(
     (props: Props) => {
         return {
             closeMenu() {
@@ -14,4 +14,4 @@ const [UIMenuBarContextProvider, useMenuBarContext] = createContextProvider(
     },
 );
 
-export { UIMenuBarContextProvider, useMenuBarContext };
+export { MenuBarContextProvider, useMenuBarContext };

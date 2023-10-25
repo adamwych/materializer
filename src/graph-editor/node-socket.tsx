@@ -10,7 +10,7 @@ interface Props {
     onMouseUp(ev: MouseEvent): void;
 }
 
-export default function UIMaterialGraphNodeSocket(props: Props) {
+export default function MaterialNodeSocketBox(props: Props) {
     return (
         <div
             data-socket={props.id}

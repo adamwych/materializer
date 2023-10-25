@@ -6,7 +6,7 @@ interface Props {
     onChange(value: [number, number, number]): void;
 }
 
-export default function UIMaterialNodeInspectorRGBInput(props: Props) {
+export default function MaterialNodeInspectorRGBInput(props: Props) {
     function SliderInput({
         label,
         value,

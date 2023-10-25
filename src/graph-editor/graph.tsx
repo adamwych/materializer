@@ -1,12 +1,12 @@
 import { createSignal, For, Show } from "solid-js";
-import UIMaterialGraphNode from "./node.tsx";
-import UIMaterialGraphNodeConnections from "./connections.tsx";
+import MaterialNodeBox from "./node.tsx";
+import MaterialGraphEditorConnectionsOverlay from "./connections.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { Point2D } from "../types/point.ts";
-import UIMaterialGraphNewNodePopover from "./new-node-popover.tsx";
+import MaterialGraphEditorAddNodePopover from "./new-node-popover.tsx";
 import { useEditorMaterialContext } from "./material-context.ts";
 
-export default function UIMaterialNodesGraph() {
+export default function MaterialGraphEditorNodes() {
     const selectionManager = useEditorSelectionManager()!;
     const material = useEditorMaterialContext()!.getMaterial();
     const [lastMousePosition, setLastMousePosition] = createSignal<Point2D>({
@@ -40,7 +40,7 @@ export default function UIMaterialNodesGraph() {
             }}
         >
             <Show when={newNodePopoverCoords()}>
-                <UIMaterialGraphNewNodePopover
+                <MaterialGraphEditorAddNodePopover
                     x={newNodePopoverCoords()!.x}
                     y={newNodePopoverCoords()!.y}
                     onClose={() => setNewNodePopoverCoords(undefined)}
@@ -49,10 +49,10 @@ export default function UIMaterialNodesGraph() {
 
             {selectionManager.renderMultiselectBox()}
 
-            <UIMaterialGraphNodeConnections />
+            <MaterialGraphEditorConnectionsOverlay />
 
             <For each={material().nodes}>
-                {(node) => <UIMaterialGraphNode node={() => node} />}
+                {(node) => <MaterialNodeBox node={() => node} />}
             </For>
         </div>
     );

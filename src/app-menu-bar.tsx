@@ -1,31 +1,29 @@
-/* @refresh reload */
-import "./styles.scss";
-import UIMenuBar from "./components/menu-bar/menu-bar.tsx";
-import UIMenuBarItem from "./components/menu-bar/item.tsx";
-import {createSignal, Show} from "solid-js";
-import UIExportDialog from "./export-dialog.tsx";
-import UIMenuBarSubmenu from "./components/menu-bar/submenu.tsx";
+import MenuBar from "./components/menu-bar/menu-bar.tsx";
+import MenuBarItem from "./components/menu-bar/item.tsx";
+import { createSignal, Show } from "solid-js";
+import ExportDialog from "./export-dialog.tsx";
+import MenuBarSubmenu from "./components/menu-bar/submenu.tsx";
 
-export default function UIAppMenuBar() {
+export default function AppMenuBar() {
     const [exportDialogVisible, setExportDialogVisible] = createSignal(false);
 
     return (
-        <UIMenuBar>
+        <MenuBar>
             <Show when={exportDialogVisible()}>
-                <UIExportDialog onClose={() => setExportDialogVisible(false)} />
+                <ExportDialog onClose={() => setExportDialogVisible(false)} />
             </Show>
 
-            <UIMenuBarSubmenu label="File">
-                <UIMenuBarItem label="New" />
-                <UIMenuBarItem label="Open" />
-                <UIMenuBarItem label="Save" />
-                <UIMenuBarItem label="Save as" />
-                <UIMenuBarItem
+            <MenuBarSubmenu label="File">
+                <MenuBarItem label="New" />
+                <MenuBarItem label="Open" />
+                <MenuBarItem label="Save" />
+                <MenuBarItem label="Save as" />
+                <MenuBarItem
                     label="Export"
                     onClick={() => setExportDialogVisible(true)}
                 />
-            </UIMenuBarSubmenu>
-            <UIMenuBarSubmenu label="Help" />
-        </UIMenuBar>
+            </MenuBarSubmenu>
+            <MenuBarSubmenu label="Help" />
+        </MenuBar>
     );
 }

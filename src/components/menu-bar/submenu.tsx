@@ -1,16 +1,16 @@
 import { createSignal, JSX, Show } from "solid-js";
-import { UIMenuBarContextProvider } from "./context.ts";
+import { MenuBarContextProvider } from "./context.ts";
 
 interface Props {
     label: string;
     children?: JSX.Element;
 }
 
-export default function UIMenuBarSubmenu(props: Props) {
+export default function MenuBarSubmenu(props: Props) {
     const [open, setOpen] = createSignal(false);
 
     return (
-        <UIMenuBarContextProvider onClose={() => setOpen(false)}>
+        <MenuBarContextProvider onClose={() => setOpen(false)}>
             <div class="relative">
                 <div
                     class="px-3 py-2 hover:bg-gray-300-0 active:bg-gray-200-0"
@@ -28,6 +28,6 @@ export default function UIMenuBarSubmenu(props: Props) {
                     </div>
                 </Show>
             </div>
-        </UIMenuBarContextProvider>
+        </MenuBarContextProvider>
     );
 }
