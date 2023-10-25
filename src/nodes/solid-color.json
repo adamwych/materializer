@@ -1,0 +1,22 @@
+{
+  "name": "Solid Color",
+  "type": 0,
+  "parameters": [
+    {
+      "id": "color",
+      "type": "rgb",
+      "default": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "inputSockets": [
+  ],
+  "outputSockets": [
+    {
+      "id": "color"
+    }
+  ]
+}

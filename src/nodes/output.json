@@ -1,0 +1,15 @@
+{
+  "name": "Output",
+  "type": 3,
+  "parameters": [],
+  "inputSockets": [
+    {
+      "id": "color"
+    }
+  ],
+  "outputSockets": [
+    {
+      "id": "output"
+    }
+  ]
+}

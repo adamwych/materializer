@@ -1,0 +1,12 @@
+{
+  "name": "Noise",
+  "type": 2,
+  "parameters": [],
+  "inputSockets": [
+  ],
+  "outputSockets": [
+    {
+      "id": "color"
+    }
+  ]
+}

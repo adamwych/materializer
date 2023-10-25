@@ -1,0 +1,18 @@
+{
+  "name": "Blend",
+  "type": 1,
+  "parameters": [],
+  "inputSockets": [
+    {
+      "id": "foreground"
+    },
+    {
+      "id": "background"
+    }
+  ],
+  "outputSockets": [
+    {
+      "id": "color"
+    }
+  ]
+}

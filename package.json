@@ -1,0 +1,31 @@
+{
+    "name": "nodemania",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@solid-primitives/context": "^0.2.1",
+        "@solid-primitives/map": "^0.4.8",
+        "@typescript-eslint/eslint-plugin": "^6.7.4",
+        "@typescript-eslint/parser": "^6.7.4",
+        "autoprefixer": "^10.4.16",
+        "cssnano": "^6.0.1",
+        "eslint": "^8.51.0",
+        "gl-matrix": "3.3",
+        "postcss": "^8.4.31",
+        "prettier": "^3.0.3",
+        "sass": "^1.69.0",
+        "scss": "^0.2.4",
+        "solid-js": "^1.7.12",
+        "tailwindcss": "^3.3.3",
+        "ts-essentials": "^9.4.1",
+        "typescript": "^5.2.2",
+        "vite": "^4.4.11",
+        "vite-plugin-solid": "^2.7.0"
+    }
+}

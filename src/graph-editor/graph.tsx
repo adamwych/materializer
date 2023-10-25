@@ -1,0 +1,59 @@
+import { createSignal, For, Show } from "solid-js";
+import UIMaterialGraphNode from "./node.tsx";
+import UIMaterialGraphNodeConnections from "./connections.tsx";
+import { useEditorSelectionManager } from "./selection/manager.ts";
+import { Point2D } from "../types/point.ts";
+import UIMaterialGraphNewNodePopover from "./new-node-popover.tsx";
+import { useEditorMaterialContext } from "./material-context.ts";
+
+export default function UIMaterialNodesGraph() {
+    const selectionManager = useEditorSelectionManager()!;
+    const material = useEditorMaterialContext()!.getMaterial();
+    const [lastMousePosition, setLastMousePosition] = createSignal<Point2D>({
+        x: 0,
+        y: 0,
+    });
+    const [newNodePopoverCoords, setNewNodePopoverCoords] =
+        createSignal<Point2D>();
+
+    window.addEventListener("mousemove", (ev) => {
+        setLastMousePosition({ x: ev.pageX, y: ev.pageY });
+    });
+
+    window.addEventListener("keyup", (ev) => {
+        if (ev.key === " ") {
+            setNewNodePopoverCoords({ ...lastMousePosition() });
+        } else if (ev.key === "Escape") {
+            setNewNodePopoverCoords(undefined);
+        }
+    });
+
+    return (
+        <div
+            class="relative w-full h-full overflow-hidden"
+            style={{
+                "background-image": "url(grid-bg.svg)",
+            }}
+            onMouseDown={(ev) => {
+                selectionManager.onMainAreaMouseDown(ev);
+                setNewNodePopoverCoords(undefined);
+            }}
+        >
+            <Show when={newNodePopoverCoords()}>
+                <UIMaterialGraphNewNodePopover
+                    x={newNodePopoverCoords()!.x}
+                    y={newNodePopoverCoords()!.y}
+                    onClose={() => setNewNodePopoverCoords(undefined)}
+                />
+            </Show>
+
+            {selectionManager.renderMultiselectBox()}
+
+            <UIMaterialGraphNodeConnections />
+
+            <For each={material().nodes}>
+                {(node) => <UIMaterialGraphNode node={() => node} />}
+            </For>
+        </div>
+    );
+}
