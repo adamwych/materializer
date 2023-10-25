@@ -85,7 +85,7 @@ export default function UIExportDialog(props: Props) {
             }
         }
 
-        scheduler.processOnce();
+        scheduler.runOnce();
     }
 
     return (

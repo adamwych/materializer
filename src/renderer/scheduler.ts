@@ -1,39 +1,43 @@
-import {
-    Material,
-    MaterialNode,
-    MaterialNodeRuntimeInfo,
-    MaterialNodeType,
-} from "../types/material.ts";
-import { DeepReadonly } from "ts-essentials";
-import {
-    NodeRenderJobInfo,
-    NodeRenderJobResult,
-    PreviewRenderJobResult,
-    RenderJobInfo,
-} from "./job.ts";
+import {Material, MaterialNode, MaterialNodeRuntimeInfo, MaterialNodeType,} from "../types/material.ts";
+import {DeepReadonly} from "ts-essentials";
+import {NodeRenderJobInfo, NodeRenderJobResult, PreviewRenderJobResult, RenderJobInfo,} from "./job.ts";
 import RenderingEngine from "./engine.ts";
-import { RenderJobResult } from "./job-result.ts";
-import { MaterialNodeOutputBitmap } from "./output.ts";
+import {RenderJobResult} from "./job-result.ts";
+import {MaterialNodeOutputBitmap} from "./output.ts";
 
+/**
+ * Scheduler takes care of preparing a list of jobs for the {@link RenderingEngine} to run.
+ *
+ * Jobs can be scheduled at any time, but they are ran in a fixed timeframe to prevent
+ * freezing the UI if there's a lot of work to do at once and to detect unnecessary
+ * back-to-back re-renders. In the future it should also contain logic to split the work
+ * into multiple animation frames to further prevent freezing.
+ */
 export default class RenderingScheduler {
     private jobs: Array<RenderJobInfo> = [];
 
+    /**
+     * Constructs a new scheduler for given engine.
+     * To start processing queued jobs call {@link RenderingScheduler#run}.
+     *
+     * @param engine
+     */
     constructor(private readonly engine: RenderingEngine) {}
 
-    public process() {
-        this.processOnce();
+    /**
+     * Starts an infinite loop during which queued jobs will be run.
+     * This method is not blocking, jobs are processed during an animation frame.
+     */
+    public run() {
+        this.runOnce();
 
-        // Artificially delay processing because WebGL context might get lost
-        // if updates are too frequent. Target roughly 60 frames per second.
-        setTimeout(
-            () => {
-                requestAnimationFrame(() => this.process());
-            },
-            (1 / 60) * 1000,
-        );
+        requestAnimationFrame(() => this.run());
     }
 
-    public processOnce() {
+    /**
+     * Runs all queued jobs and clears the queue.
+     */
+    public runOnce() {
         for (const job of this.jobs) {
             this.engine.runJob(job);
         }
@@ -42,10 +46,14 @@ export default class RenderingScheduler {
     }
 
     /**
-     * Schedules a new rendering job for specified node.
-     * This does not automatically schedule re-renders for nodes
-     * whose input sockets are connected to this node's output sockets,
-     * for this use {@link RenderingScheduler#scheduleChain}.
+     * Schedules a new rendering job for given node.
+     *
+     * Note that this will only render this exact node, it will not schedule
+     * re-renders for inputs of this node, so the result might be outdated if
+     * for example parameters of this node's inputs have changed since the last
+     * time they were rendered.
+     *
+     * To also re-render the inputs use {@link RenderingScheduler#scheduleChain} instead.
      *
      * @param material
      * @param node
@@ -56,6 +64,7 @@ export default class RenderingScheduler {
         node: DeepReadonly<MaterialNode>,
         info: DeepReadonly<MaterialNodeRuntimeInfo>,
     ): NodeRenderJobResult {
+        // Prevent scheduling multiple render jobs for the same node.
         const existingJob = this.jobs.find(
             (job) => job.type === "node" && job.node.id === node.id,
         );
@@ -77,8 +86,10 @@ export default class RenderingScheduler {
     }
 
     /**
-     * Schedules a new rendering job for specified node and all nodes
-     * connected to this node (recursively).
+     * Evaluates inputs and outputs of given node and schedules rendering
+     * jobs for all of them.
+     *
+     * To only render a specific node use {@link RenderingScheduler#schedule} instead.
      *
      * @param material
      * @param startNode

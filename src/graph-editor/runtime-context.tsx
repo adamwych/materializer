@@ -234,7 +234,7 @@ export function EditorRuntimeContextProvider(props: { children: JSX.Element }) {
         context.scheduleNodeRender(node);
     });
 
-    scheduler.process();
+    scheduler.run();
 
     appCtx.registerRuntimeContext(materialCtx.getMaterial()(), context);
 
