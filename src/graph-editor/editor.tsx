@@ -3,11 +3,12 @@ import { DeepReadonly } from "ts-essentials";
 import { EditorRuntimeContextProvider } from "./runtime-context.tsx";
 import UIMaterialNodeInspectorPanel from "./inspector/inspector.tsx";
 import UIMaterialNodesGraph from "./graph.tsx";
-import { ConnectionBuilderProvider } from "./connection-builder.tsx";
+import { EditorConnectionBuilderProvider } from "./connection-builder.tsx";
 import { EditorSelectionManagerProvider } from "./selection/manager.ts";
 import { EditorMaterialContextProvider } from "./material-context.ts";
 import { EditorDiagnosticsContextProvider } from "./diagnostics-context.ts";
 import UIMaterialPreviewWindow from "../preview/window.tsx";
+import { MultiProvider } from "@solid-primitives/context";
 
 interface Props {
     material: Material;
@@ -15,24 +16,22 @@ interface Props {
 
 export default function UIMaterialGraphEditor(props: DeepReadonly<Props>) {
     return (
-        <EditorDiagnosticsContextProvider>
-            <EditorMaterialContextProvider
-                material={props.material as Material}
-            >
-                <EditorRuntimeContextProvider>
-                    <EditorSelectionManagerProvider>
-                        <ConnectionBuilderProvider>
-                            <div class="w-full h-full flex">
-                                <UIMaterialNodesGraph />
-                                <div class="flex flex-col">
-                                    <UIMaterialNodeInspectorPanel />
-                                    <UIMaterialPreviewWindow />
-                                </div>
-                            </div>
-                        </ConnectionBuilderProvider>
-                    </EditorSelectionManagerProvider>
-                </EditorRuntimeContextProvider>
-            </EditorMaterialContextProvider>
-        </EditorDiagnosticsContextProvider>
+        <MultiProvider
+            values={[
+                EditorDiagnosticsContextProvider,
+                [EditorMaterialContextProvider, { material: props.material }],
+                EditorRuntimeContextProvider,
+                EditorSelectionManagerProvider,
+                EditorConnectionBuilderProvider,
+            ]}
+        >
+            <div class="w-full h-full flex">
+                <UIMaterialNodesGraph />
+                <div class="flex flex-col">
+                    <UIMaterialNodeInspectorPanel />
+                    <UIMaterialPreviewWindow />
+                </div>
+            </div>
+        </MultiProvider>
     );
 }

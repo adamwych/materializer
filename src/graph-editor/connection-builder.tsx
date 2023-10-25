@@ -23,7 +23,9 @@ const ConnectionBuilder = createContext<IConnectionBuilder>(
     undefined as unknown as IConnectionBuilder,
 );
 
-export function ConnectionBuilderProvider(props: { children: JSX.Element }) {
+export function EditorConnectionBuilderProvider(props: {
+    children: JSX.Element;
+}) {
     const editorCtx = useEditorRuntimeContext();
     const materialCtx = useEditorMaterialContext()!;
     const selectionManager = useEditorSelectionManager()!;

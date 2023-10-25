@@ -12,9 +12,9 @@ type Props = {
 };
 
 const [EditorMaterialContextProvider, useEditorMaterialContext] =
-    createContextProvider((props: Props) => {
+    createContextProvider(({ value }: { value: Props }) => {
         const diagnostics = useEditorDiagnosticsContext()!;
-        const [material, setMaterial] = createSignal(props.material);
+        const [material, setMaterial] = createSignal(value.material);
 
         return {
             addNode(node: MaterialNode) {
