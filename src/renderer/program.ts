@@ -40,11 +40,7 @@ export default class MaterialNodeShaderProgram {
             `.trim(),
         );
 
-        const fragmentShader = createAndCompileShader(
-            gl,
-            gl.FRAGMENT_SHADER,
-            code,
-        );
+        const fragmentShader = createAndCompileShader(gl, gl.FRAGMENT_SHADER, code);
 
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -74,19 +70,14 @@ export default class MaterialNodeShaderProgram {
 
     public setInputTexture(name: string, texture: WebGLTexture | null) {
         this.gl.useProgram(this.program);
-        const location = this.gl.getUniformLocation(
-            this.program,
-            PREFIX_INPUT_TEXTURE + name,
-        );
+        const location = this.gl.getUniformLocation(this.program, PREFIX_INPUT_TEXTURE + name);
         if (location) {
             this.gl.uniform1i(location, this.inputTextures.length);
             if (texture) {
                 this.inputTextures.push(texture);
             }
         } else {
-            console.warn(
-                `Input texture '${name}' was not found in the fragment shader.`,
-            );
+            console.warn(`Input texture '${name}' was not found in the fragment shader.`);
         }
     }
 
@@ -109,10 +100,7 @@ export default class MaterialNodeShaderProgram {
     }
 
     public setVecParameter(name: string, value: Array<number>) {
-        const location = this.gl.getUniformLocation(
-            this.program,
-            PREFIX_PARAMETER + name,
-        );
+        const location = this.gl.getUniformLocation(this.program, PREFIX_PARAMETER + name);
         if (location) {
             if (value.length === 1) {
                 this.gl.uniform1fv(location, value);
@@ -123,23 +111,15 @@ export default class MaterialNodeShaderProgram {
             } else if (value.length === 4) {
                 this.gl.uniform4fv(location, value);
             } else {
-                console.warn(
-                    `Parameter '${name}' has too many values (${value.length})`,
-                );
+                console.warn(`Parameter '${name}' has too many values (${value.length})`);
             }
         } else {
-            console.warn(
-                `Parameter '${name}' was not found in the fragment shader.`,
-            );
+            console.warn(`Parameter '${name}' was not found in the fragment shader.`);
         }
     }
 }
 
-function createAndCompileShader(
-    gl: WebGL2RenderingContext,
-    type: number,
-    code: string,
-) {
+function createAndCompileShader(gl: WebGL2RenderingContext, type: number, code: string) {
     const shader = gl.createShader(type)!;
     gl.shaderSource(shader, code);
     gl.compileShader(shader);

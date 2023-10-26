@@ -1,24 +1,7 @@
-export enum MaterialNodeType {
-    SolidColor = 0,
-    Blend = 1,
-    Noise = 2,
-    Output = 3,
-}
-
 export enum MaterialNodeOutputTarget {
     Albedo = "albedo",
     Normal = "normal",
 }
-
-/**
- * Stores information about a node that can only be evaluated during runtime.
- */
-export type MaterialNodeRuntimeInfo = {
-    parameters: Array<MaterialNodeParameterInfo>;
-    inputSockets: Array<MaterialNodeSocketInfo>;
-    outputSockets: Array<MaterialNodeSocketInfo>;
-    element?: HTMLElement;
-};
 
 /**
  * Describes a parameter that can be passed to a {@link MaterialNode}.
@@ -47,7 +30,8 @@ export type MaterialNodeParametersMap = { [k: string]: unknown };
 
 export type MaterialNode = {
     readonly id: number;
-    readonly type: MaterialNodeType;
+    readonly path: string;
+    spec?: MaterialNodeSpec;
     label: string;
     x: number;
     y: number;
@@ -64,4 +48,19 @@ export type Material = {
         from: MaterialNodeSocketAddr;
         to: MaterialNodeSocketAddr;
     }>;
+};
+
+/**
+ * Describes a material node of specific kind.
+ */
+export type MaterialNodeSpec = {
+    name: string;
+    parameters: Array<MaterialNodeParameterInfo>;
+    inputSockets: Array<MaterialNodeSocketInfo>;
+    outputSockets: Array<MaterialNodeSocketInfo>;
+    glsl: string;
+};
+
+export type MaterialNodesPackage = {
+    nodes: Map<string, MaterialNodeSpec>;
 };

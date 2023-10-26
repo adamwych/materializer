@@ -1,9 +1,9 @@
 import { createContext, createSignal, JSX, Show, useContext } from "solid-js";
-import UIMaterialGraphNodeConnectionCurve from "./connection-curve.tsx";
-import { useEditorRuntimeContext } from "./runtime-context.tsx";
+import MaterialGraphNodeConnectionCurve from "./connection-curve.tsx";
+import { useEditorContext } from "./editor-context.ts";
 import { MaterialNodeSocketAddr } from "../types/material.ts";
 import { useEditorSelectionManager } from "./selection/manager.ts";
-import { useEditorMaterialContext } from "./material-context.ts";
+import { useMaterialContext } from "./material-context.ts";
 
 type UpcomingConnectionInfo = {
     from: MaterialNodeSocketAddr;
@@ -23,15 +23,11 @@ const ConnectionBuilder = createContext<IConnectionBuilder>(
     undefined as unknown as IConnectionBuilder,
 );
 
-export function EditorConnectionBuilderProvider(props: {
-    children: JSX.Element;
-}) {
-    const editorCtx = useEditorRuntimeContext();
-    const materialCtx = useEditorMaterialContext()!;
+export function EditorConnectionBuilderProvider(props: { children: JSX.Element }) {
+    const editorCtx = useEditorContext()!;
+    const materialCtx = useMaterialContext()!;
     const selectionManager = useEditorSelectionManager()!;
-    const [upcomingInfo, setUpcomingInfo] = createSignal<
-        UpcomingConnectionInfo | undefined
-    >();
+    const [upcomingInfo, setUpcomingInfo] = createSignal<UpcomingConnectionInfo | undefined>();
 
     function onWindowMouseMove(ev: MouseEvent) {
         setUpcomingInfo((value) => ({
@@ -78,23 +74,21 @@ export function EditorConnectionBuilderProvider(props: {
                 return;
             }
 
-            const nodeInfo = editorCtx.getNodeInfo(nodeId)()!;
-            const isInputSocket = nodeInfo.inputSockets.some(
-                (x) => x.id === socketId,
-            );
+            const isInputSocket = materialCtx
+                .getNodeById(nodeId)!
+                .spec!.inputSockets.some((x) => x.id === socketId);
 
             if (!isInputSocket || upcoming.from.nodeId === nodeId) {
                 setUpcomingInfo(undefined);
                 return;
             }
 
-            materialCtx.addConnection(upcoming.from, {
+            materialCtx.addSocketConnection(upcoming.from, {
                 nodeId,
                 socketId,
             });
 
             setUpcomingInfo(undefined);
-            editorCtx.scheduleNodeRender(materialCtx.getNodeById(nodeId)!);
         },
 
         isBuildingConnectionFrom(nodeId): boolean {
@@ -105,7 +99,7 @@ export function EditorConnectionBuilderProvider(props: {
     return (
         <ConnectionBuilder.Provider value={context}>
             <Show when={upcomingInfo()}>
-                <UIMaterialGraphNodeConnectionCurve
+                <MaterialGraphNodeConnectionCurve
                     fromCoords={upcomingInfo()!.fromCoords}
                     toCoords={upcomingInfo()!.toCoords}
                 />

@@ -20,10 +20,7 @@ export default function MenuBarSubmenu(props: Props) {
                 </div>
 
                 <Show when={open()}>
-                    <div
-                        class="absolute z-10 bg-gray-400-0 shadow-lg"
-                        style={{ width: "144px" }}
-                    >
+                    <div class="absolute z-10 bg-gray-400-0 shadow-lg" style={{ width: "144px" }}>
                         {props.children}
                     </div>
                 </Show>

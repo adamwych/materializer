@@ -5,7 +5,7 @@ type Props = {
     height: number;
 };
 
-export default function UIMaterialGraphEditorMultiselectBox(props: Props) {
+export default function MaterialGraphEditorMultiselectBox(props: Props) {
     return (
         <div
             style={{
@@ -16,8 +16,7 @@ export default function UIMaterialGraphEditorMultiselectBox(props: Props) {
                 height: props.height + "px",
                 border: "1px solid var(--color-gray-400)",
                 background: "rgba(var(--color-white-rgb), 0.1)",
-                visibility:
-                    props.width + props.height === 0 ? "hidden" : "visible",
+                visibility: props.width + props.height === 0 ? "hidden" : "visible",
                 "z-index": Number.MAX_SAFE_INTEGER,
             }}
         ></div>

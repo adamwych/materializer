@@ -1,20 +1,19 @@
 import { createSignal, For, Show } from "solid-js";
 import MaterialNodeBox from "./node.tsx";
-import MaterialGraphEditorConnectionsOverlay from "./connections.tsx";
+import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { Point2D } from "../types/point.ts";
 import MaterialGraphEditorAddNodePopover from "./new-node-popover.tsx";
-import { useEditorMaterialContext } from "./material-context.ts";
+import { useMaterialContext } from "./material-context.ts";
 
 export default function MaterialGraphEditorNodes() {
     const selectionManager = useEditorSelectionManager()!;
-    const material = useEditorMaterialContext()!.getMaterial();
+    const materialCtx = useMaterialContext()!;
     const [lastMousePosition, setLastMousePosition] = createSignal<Point2D>({
         x: 0,
         y: 0,
     });
-    const [newNodePopoverCoords, setNewNodePopoverCoords] =
-        createSignal<Point2D>();
+    const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
 
     window.addEventListener("mousemove", (ev) => {
         setLastMousePosition({ x: ev.pageX, y: ev.pageY });
@@ -51,9 +50,7 @@ export default function MaterialGraphEditorNodes() {
 
             <MaterialGraphEditorConnectionsOverlay />
 
-            <For each={material().nodes}>
-                {(node) => <MaterialNodeBox node={() => node} />}
-            </For>
+            <For each={materialCtx.getNodes()}>{(node) => <MaterialNodeBox node={() => node} />}</For>
         </div>
     );
 }

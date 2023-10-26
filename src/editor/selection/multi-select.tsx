@@ -1,18 +1,16 @@
-import { useEditorRuntimeContext } from "../runtime-context.tsx";
+import { useEditorContext } from "../editor-context.ts";
 import { createSignal } from "solid-js";
 import { Point2D } from "../../types/point.ts";
-import UIMaterialGraphEditorMultiselectBox from "./multi-select-box.tsx";
+import MaterialGraphEditorMultiselectBox from "./multi-select-box.tsx";
 import { MaterialNode } from "../../types/material.ts";
-import { useEditorMaterialContext } from "../material-context.ts";
+import { useMaterialContext } from "../material-context.ts";
 
-export default function createMultiSelectHandler() {
-    const editorCtx = useEditorRuntimeContext();
-    const materialCtx = useEditorMaterialContext()!;
+export default function createMultiSelectManager() {
+    const editorCtx = useEditorContext()!;
+    const materialCtx = useMaterialContext()!;
     const [touchDownPoint, setTouchDownPoint] = createSignal<Point2D>();
     const [boxRect, setBoxRect] = createSignal<DOMRect>();
-    const [highlightedNodes, setHighlightedNodes] = createSignal<
-        Array<MaterialNode>
-    >([]);
+    const [highlightedNodes, setHighlightedNodes] = createSignal<Array<MaterialNode>>([]);
 
     function onMouseMove(ev: MouseEvent) {
         ev.stopPropagation();
@@ -47,8 +45,7 @@ export default function createMultiSelectHandler() {
         ev.stopPropagation();
 
         const point = touchDownPoint()!;
-        const movedDistance =
-            Math.abs(ev.pageX - point.x) + Math.abs(ev.pageY - point.y);
+        const movedDistance = Math.abs(ev.pageX - point.x) + Math.abs(ev.pageY - point.y);
         if (movedDistance <= 10) {
             editorCtx.inspectNode(undefined);
             editorCtx.setHighlightedNodes([]);
@@ -65,7 +62,7 @@ export default function createMultiSelectHandler() {
 
         const nodes = highlightedNodes();
         for (const node of nodes) {
-            materialCtx.translateNode(node.id, ev.movementX, ev.movementY);
+            materialCtx.moveNode(node.id, ev.movementX, ev.movementY);
         }
     }
 
@@ -78,7 +75,7 @@ export default function createMultiSelectHandler() {
     return {
         renderMultiselectBox() {
             return (
-                <UIMaterialGraphEditorMultiselectBox
+                <MaterialGraphEditorMultiselectBox
                     x={boxRect()?.left || 0}
                     y={boxRect()?.top || 0}
                     width={boxRect()?.width || 0}

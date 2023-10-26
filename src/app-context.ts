@@ -1,44 +1,108 @@
 import { createContextProvider } from "@solid-primitives/context";
-import { createSignal } from "solid-js";
-import { Material } from "./types/material.ts";
-import { IEditorRuntimeContext } from "./graph-editor/runtime-context.tsx";
+import { MaterialNodeSpec, MaterialNodesPackage } from "./types/material.ts";
 import { ReactiveMap } from "@solid-primitives/map";
+import solidColorGlsl from "../glsl/solid-color.glsl?raw";
+import outputGlsl from "../glsl/output.glsl?raw";
+import blendGlsl from "../glsl/blend.glsl?raw";
+import noiseGlsl from "../glsl/noise.glsl?raw";
 
-type Props = {
-    initialMaterial: Material;
+const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
+    nodes: new Map<string, MaterialNodeSpec>([
+        [
+            "solid-color",
+            {
+                name: "Solid color",
+                parameters: [
+                    {
+                        id: "color",
+                        default: [1, 0, 0],
+                        type: "rgb",
+                    },
+                ],
+                inputSockets: [],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                glsl: solidColorGlsl,
+            },
+        ],
+        [
+            "noise",
+            {
+                name: "Noise",
+                parameters: [],
+                inputSockets: [],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                glsl: noiseGlsl,
+            },
+        ],
+        [
+            "blend",
+            {
+                name: "Blend",
+                parameters: [],
+                inputSockets: [
+                    {
+                        id: "foreground",
+                    },
+                    {
+                        id: "background",
+                    },
+                ],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                glsl: blendGlsl,
+            },
+        ],
+        [
+            "output",
+            {
+                name: "Output",
+                parameters: [],
+                inputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                outputSockets: [
+                    {
+                        id: "output",
+                    },
+                ],
+                glsl: outputGlsl,
+            },
+        ],
+    ]),
 };
 
-const [AppContextProvider, useAppContext] = createContextProvider(
-    (props: Props) => {
-        const [editorTabs, setEditorTabs] = createSignal<Array<Material>>([
-            props.initialMaterial,
-        ]);
-        const [activeEditorTab, setActiveEditorTab] = createSignal<number>(0);
-        const runtimeContexts = new ReactiveMap<
-            Material,
-            IEditorRuntimeContext
-        >();
+export const [AppContextProvider, useAppContext] = createContextProvider(() => {
+    const nodesPackages = new ReactiveMap<string, MaterialNodesPackage>();
+    nodesPackages.set("@materializer", BUILTIN_NODES_PACKAGE);
 
-        return {
-            registerRuntimeContext(
-                material: Material,
-                context: IEditorRuntimeContext,
-            ) {
-                runtimeContexts.set(material, context);
-            },
+    return {
+        addNodesPackage(name: string, pkg: MaterialNodesPackage) {
+            nodesPackages.set(name, pkg);
+        },
 
-            getRuntimeContext(material: Material) {
-                return runtimeContexts.get(material);
-            },
+        getNodeSpec(path: string) {
+            const parts = path.split("/");
+            const pkg = nodesPackages.get(parts[0]);
+            if (!pkg || !pkg.nodes.has(parts[1])) {
+                throw new Error(`Node '${path}' was not found within the registry.`);
+            }
 
-            editorTabs,
-            activeEditorTab,
+            return structuredClone(pkg.nodes.get(parts[1]))!;
+        },
 
-            get activeEditorTabMaterial() {
-                return () => editorTabs()[activeEditorTab()];
-            },
-        };
-    },
-);
-
-export { AppContextProvider, useAppContext };
+        getNodesPackages: () => nodesPackages,
+    };
+});

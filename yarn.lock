@@ -526,10 +526,31 @@
   resolved "https://registry.yarnpkg.com/@solid-primitives/context/-/context-0.2.1.tgz#ebbc423baa14bb5f6150d979c0945e486d790af5"
   integrity sha512-XIIwCOWpRKDersgkR9LNFXaJHIV8QlCFo/tq5bV0cAOZklcwOFcqi2bN+uWgEIQSWGjWXU2kc1H1/TzgYzVDlg==
 
+"@solid-primitives/event-bus@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/event-bus/-/event-bus-1.0.8.tgz#9ac1566574a2528e476615679380e487c8af2bcc"
+  integrity sha512-vw9Q8oHL8h3WOxFiFFBE8lwJ1oOmCEdtFsOck3i66GPaJbmzHwBtQxTkAgF+DtpeSpSyCHlxKE7ojHnL4nl1Ww==
+  dependencies:
+    "@solid-primitives/utils" "^6.2.1"
+
 "@solid-primitives/map@^0.4.8":
   version "0.4.8"
   resolved "https://registry.yarnpkg.com/@solid-primitives/map/-/map-0.4.8.tgz#876a60d3cc10bf9e9769ead0f7ebef4a85a4860d"
   integrity sha512-p9zhIaIWOQVxLaUEjg6nzrBLZUOzozJFHatdKqISSIq7iJhVXX1M1MPzDHHqKyJw/nSENoKgvZehnG3HErnamw==
+  dependencies:
+    "@solid-primitives/trigger" "^1.0.8"
+
+"@solid-primitives/raf@^2.1.13":
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/raf/-/raf-2.1.13.tgz#1dc16ee6c0c3aecca581914ace15f4a6e5610078"
+  integrity sha512-BEDmFTiA80UHaZFdVcb2w4kFQioh3D/5KR6yAAVBiCMCb/XCI0ChDr9F8MX45BKZYFThwxLKTyjAjBkFMk2trg==
+  dependencies:
+    "@solid-primitives/utils" "^6.2.1"
+
+"@solid-primitives/set@^0.4.8":
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/set/-/set-0.4.8.tgz#08943376153c90bcc71a84be7486d8254bde8b63"
+  integrity sha512-kYZ5o4w2oeaDBvQyBeBB7gmGWeR4MWIP36SuMqRwOPzOWyxA2QFlwQr+iL4zo8lNJVssvBhSdm5HwFzWbob/hA==
   dependencies:
     "@solid-primitives/trigger" "^1.0.8"
 

@@ -1,7 +1,7 @@
 import { Point2D } from "../../types/point.ts";
-import { useEditorRuntimeContext } from "../runtime-context.tsx";
+import { useEditorContext } from "../editor-context.ts";
 import { createSignal } from "solid-js";
-import { useEditorMaterialContext } from "../material-context.ts";
+import { useMaterialContext } from "../material-context.ts";
 
 type TouchDownInfo = {
     nodeId: number;
@@ -9,14 +9,14 @@ type TouchDownInfo = {
 };
 
 export default function createSingleSelectHandler() {
-    const editorCtx = useEditorRuntimeContext();
-    const materialCtx = useEditorMaterialContext()!;
+    const editorCtx = useEditorContext()!;
+    const materialCtx = useMaterialContext()!;
     const [touchDownInfo, setTouchDownInfo] = createSignal<TouchDownInfo>();
 
     function onMouseMove(ev: MouseEvent) {
         ev.stopPropagation();
         const info = touchDownInfo()!;
-        materialCtx.translateNode(info.nodeId, ev.movementX, ev.movementY);
+        materialCtx.moveNode(info.nodeId, ev.movementX, ev.movementY);
     }
 
     function onMouseUp(ev: MouseEvent) {
@@ -25,9 +25,7 @@ export default function createSingleSelectHandler() {
         // If we've not moved far from the initial touch down position, then
         // interpret it as a click.
         const info = touchDownInfo()!;
-        const movedDistance =
-            Math.abs(ev.pageX - info.coords.x) +
-            Math.abs(ev.pageY - info.coords.y);
+        const movedDistance = Math.abs(ev.pageX - info.coords.x) + Math.abs(ev.pageY - info.coords.y);
         if (movedDistance <= 10) {
             editorCtx.inspectNode(info.nodeId);
         }

@@ -23,11 +23,7 @@ export default function Dialog(props: Props) {
                     <div class="p-4">{props.children}</div>
                     <div class="p-4 flex gap-4">
                         <For each={props.buttons}>
-                            {(button) => (
-                                <Button onClick={button.onClick}>
-                                    {button.label}
-                                </Button>
-                            )}
+                            {(button) => <Button onClick={button.onClick}>{button.label}</Button>}
                         </For>
                     </div>
                 </div>

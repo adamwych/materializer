@@ -1,15 +1,13 @@
-import { useEditorRuntimeContext } from "../graph-editor/runtime-context.tsx";
 import { createEffect } from "solid-js";
+import { useRenderingEngine } from "../../renderer/engine.ts";
 
 export default function MaterialPreviewPanel() {
-    const runtimeContext = useEditorRuntimeContext();
-    const previewOutputTexture = runtimeContext.getPreviewOutputTexture();
+    const renderingEngine = useRenderingEngine()!;
     let canvasElement: HTMLCanvasElement;
 
     function onWheel(ev: WheelEvent) {
-        runtimeContext.getRenderingEngine().getPreviewCameraController().zoom +=
-            ev.deltaY / 200;
-        runtimeContext.schedulePreviewRender();
+        renderingEngine.previewCamera.zoom += ev.deltaY / 200;
+        renderingEngine.renderPreview();
     }
 
     function onMouseDown() {
@@ -18,13 +16,9 @@ export default function MaterialPreviewPanel() {
     }
 
     function onMouseMove(ev: MouseEvent) {
-        runtimeContext
-            .getRenderingEngine()
-            .getPreviewCameraController().rotationX += ev.movementX / 50.0;
-        runtimeContext
-            .getRenderingEngine()
-            .getPreviewCameraController().rotationY += ev.movementY / 50.0;
-        runtimeContext.schedulePreviewRender();
+        renderingEngine.previewCamera.rotationX += ev.movementX / 50.0;
+        renderingEngine.previewCamera.rotationY += ev.movementY / 50.0;
+        renderingEngine.renderPreview();
     }
 
     function onMouseUp() {
@@ -39,13 +33,13 @@ export default function MaterialPreviewPanel() {
         }
 
         try {
-            const texture = previewOutputTexture();
+            const texture = renderingEngine.previewTexture();
             if (texture) {
                 const context = canvasElement.getContext("bitmaprenderer");
                 context?.transferFromImageBitmap(texture);
             }
-        } catch (exception) {
-            console.error(exception);
+        } catch (error) {
+            console.error(error);
         }
     });
 

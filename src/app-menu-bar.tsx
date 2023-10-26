@@ -18,10 +18,7 @@ export default function AppMenuBar() {
                 <MenuBarItem label="Open" />
                 <MenuBarItem label="Save" />
                 <MenuBarItem label="Save as" />
-                <MenuBarItem
-                    label="Export"
-                    onClick={() => setExportDialogVisible(true)}
-                />
+                <MenuBarItem label="Export" onClick={() => setExportDialogVisible(true)} />
             </MenuBarSubmenu>
             <MenuBarSubmenu label="Help" />
         </MenuBar>

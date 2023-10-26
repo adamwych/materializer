@@ -1,4 +1,4 @@
-import PreviewCameraController from "../preview/camera.ts";
+import PreviewCameraController from "../editor/preview/camera.ts";
 
 export default class PreviewShaderProgram {
     private readonly program: WebGLProgram;
@@ -10,17 +10,9 @@ export default class PreviewShaderProgram {
     ) {
         const program = gl.createProgram()!;
 
-        const vertexShader = createAndCompileShader(
-            gl,
-            gl.VERTEX_SHADER,
-            vertexShaderCode,
-        );
+        const vertexShader = createAndCompileShader(gl, gl.VERTEX_SHADER, vertexShaderCode);
 
-        const fragmentShader = createAndCompileShader(
-            gl,
-            gl.FRAGMENT_SHADER,
-            fragmentShaderCode,
-        );
+        const fragmentShader = createAndCompileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderCode);
 
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -35,16 +27,9 @@ export default class PreviewShaderProgram {
     }
 
     public setCamera(camera: PreviewCameraController) {
-        const location = this.gl.getUniformLocation(
-            this.program,
-            "u_viewProjection",
-        );
+        const location = this.gl.getUniformLocation(this.program, "u_viewProjection");
         if (location) {
-            this.gl.uniformMatrix4fv(
-                location,
-                false,
-                camera.getCombinedMatrix(),
-            );
+            this.gl.uniformMatrix4fv(location, false, camera.getCombinedMatrix());
         }
     }
 
@@ -53,11 +38,7 @@ export default class PreviewShaderProgram {
     }
 }
 
-function createAndCompileShader(
-    gl: WebGL2RenderingContext,
-    type: number,
-    code: string,
-) {
+function createAndCompileShader(gl: WebGL2RenderingContext, type: number, code: string) {
     const shader = gl.createShader(type)!;
     gl.shaderSource(shader, code);
     gl.compileShader(shader);
