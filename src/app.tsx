@@ -100,7 +100,7 @@ const DEFAULT_MATERIAL: Material = {
 
 export default function App() {
     return (
-        <AppContextProvider initialMaterial={DEFAULT_MATERIAL}>
+        <AppContextProvider>
             <WorkspaceContextProvider initialMaterial={DEFAULT_MATERIAL}>
                 <div class="w-full h-full flex flex-col">
                     <AppMenuBar />
