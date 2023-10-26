@@ -4,6 +4,7 @@ import {
     MaterialNode,
     MaterialNodeOutputTarget,
     MaterialNodeParametersMap,
+    isOutputNodePath,
 } from "../types/material";
 import MaterialNodeShaderProgram from "./program";
 import { createSignal } from "solid-js";
@@ -32,6 +33,12 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
     const bitmaps = new ReactiveMap<string, NodeBitmapStorageEntry>();
     const previewCamera = new PreviewCameraController();
     const [previewTexture, setPreviewTexture] = createSignal<ImageBitmap>();
+
+    materialCtx.events.on("removed", (node) => {
+        node.spec?.outputSockets.forEach((output) => {
+            textures.delete(`${node.id}-${output.id}`);
+        });
+    });
 
     function createFramebuffer(node: MaterialNode) {
         const fbo = gl.createFramebuffer()!;
@@ -110,6 +117,8 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
                 }
             }
 
+            gl.bindTexture(gl.TEXTURE_2D, null);
+
             shader.bind();
 
             const parameters: MaterialNodeParametersMap = {};
@@ -165,8 +174,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
                         .getNodes()
                         .find(
                             (node) =>
-                                node.path === "@materializer/output" &&
-                                node.parameters["target"] == target,
+                                isOutputNodePath(node.path) && node.parameters["target"] == target,
                         );
                     if (!outputNode) {
                         return;

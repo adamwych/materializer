@@ -5,10 +5,12 @@ import { useEditorSelectionManager } from "./selection/manager.ts";
 import { Point2D } from "../types/point.ts";
 import MaterialGraphEditorAddNodePopover from "./new-node-popover.tsx";
 import { useMaterialContext } from "./material-context.ts";
+import { useEditorContext } from "./editor-context.ts";
 
 export default function MaterialGraphEditorNodes() {
     const selectionManager = useEditorSelectionManager()!;
     const materialCtx = useMaterialContext()!;
+    const editorCtx = useEditorContext()!;
     const [lastMousePosition, setLastMousePosition] = createSignal<Point2D>({
         x: 0,
         y: 0,
@@ -20,15 +22,28 @@ export default function MaterialGraphEditorNodes() {
     });
 
     window.addEventListener("keyup", (ev) => {
+        const hoveredElements = document.querySelectorAll(":hover");
+        if (
+            hoveredElements.length === 0 ||
+            hoveredElements[hoveredElements.length - 1].id !== "editor-root"
+        ) {
+            return;
+        }
+
         if (ev.key === " ") {
             setNewNodePopoverCoords({ ...lastMousePosition() });
         } else if (ev.key === "Escape") {
             setNewNodePopoverCoords(undefined);
+        } else if (ev.key === "Delete") {
+            [...editorCtx.getHighlightedNodes(), editorCtx.getInspectedNode()()?.id]
+                .filter((x) => typeof x !== "undefined")
+                .forEach((node) => materialCtx.removeNode(node!));
         }
     });
 
     return (
         <div
+            id="editor-root"
             class="relative w-full h-full overflow-hidden"
             style={{
                 "background-image": "url(grid-bg.svg)",
@@ -50,7 +65,9 @@ export default function MaterialGraphEditorNodes() {
 
             <MaterialGraphEditorConnectionsOverlay />
 
-            <For each={materialCtx.getNodes()}>{(node) => <MaterialNodeBox node={() => node} />}</For>
+            <For each={materialCtx.getNodes()}>
+                {(node) => <MaterialNodeBox node={() => node} />}
+            </For>
         </div>
     );
 }

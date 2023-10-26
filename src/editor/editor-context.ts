@@ -23,6 +23,10 @@ export const [EditorContextProvider, useEditorContext] = createContextProvider((
             setHighlightedNodes(ids);
         },
 
+        getHighlightedNodes() {
+            return highlightedNodes();
+        },
+
         isNodeHighlighted(id: number) {
             return highlightedNodes().includes(id);
         },

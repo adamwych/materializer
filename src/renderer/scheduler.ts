@@ -2,7 +2,7 @@ import { createContextProvider } from "@solid-primitives/context";
 import { useRenderingEngine } from "./engine";
 import { useMaterialContext } from "../editor/material-context";
 import createRAF from "@solid-primitives/raf";
-import { MaterialNode } from "../types/material";
+import { MaterialNode, isOutputNodePath } from "../types/material";
 import { DeepReadonly } from "ts-essentials";
 
 /**
@@ -18,7 +18,7 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
     const engine = useRenderingEngine()!;
 
     let queue: Array<number> = [];
-    let willRenderOutputNode = false;
+    let shouldRenderPreview = false;
 
     const [_, start, __] = createRAF(() => {
         for (const job of queue) {
@@ -29,12 +29,12 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
             }
         }
 
-        if (willRenderOutputNode) {
+        if (shouldRenderPreview) {
             engine.renderPreview();
         }
 
         queue = [];
-        willRenderOutputNode = false;
+        shouldRenderPreview = false;
     });
 
     /**
@@ -55,8 +55,8 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
             return;
         }
 
-        if (node.path === "@materializer/output") {
-            willRenderOutputNode = true;
+        if (isOutputNodePath(node.path)) {
+            shouldRenderPreview = true;
         }
 
         queue.push(node.id);
@@ -104,6 +104,13 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
     // so we need to use events to communicate when a change was made.
     materialCtx.events.on("added", scheduleChain);
     materialCtx.events.on("changed", scheduleChain);
+
+    // Re-render preview after an output node is removed.
+    materialCtx.events.on("removed", (node) => {
+        if (isOutputNodePath(node.path)) {
+            shouldRenderPreview = true;
+        }
+    });
 
     start();
 

@@ -19,6 +19,7 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
         const [material, setMaterial] = createStore(value);
         const events = createEmitter<{
             added: DeepReadonly<MaterialNode>;
+            removed: DeepReadonly<MaterialNode>;
             changed: DeepReadonly<MaterialNode>;
         }>();
 
@@ -97,6 +98,46 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                         node.parameters[parameterName] = newValue;
 
                         events.emit("changed", node);
+                    }),
+                );
+            },
+
+            removeNode(id: number) {
+                setMaterial(
+                    produce((material) => {
+                        const index = material.nodes.findIndex((node) => node.id === id);
+                        if (index === -1) {
+                            throw new Error("Failed to remove node: Node does not exist.");
+                        }
+
+                        const nodesToRefresh: Array<number> = [];
+
+                        material.connections
+                            .filter((connection) => {
+                                return connection.from.nodeId === id || connection.to.nodeId === id;
+                            })
+                            .forEach((connection) => {
+                                if (connection.from.nodeId === id) {
+                                    nodesToRefresh.push(connection.to.nodeId);
+                                } else if (connection.to.nodeId === id) {
+                                    nodesToRefresh.push(connection.from.nodeId);
+                                }
+
+                                material.connections.splice(
+                                    material.connections.indexOf(connection),
+                                    1,
+                                );
+                            });
+
+                        const node = material.nodes[index];
+
+                        material.nodes.splice(index, 1);
+
+                        events.emit("removed", node);
+
+                        nodesToRefresh.forEach((id) => {
+                            events.emit("changed", material.nodes.find((x) => x.id === id)!);
+                        });
                     }),
                 );
             },

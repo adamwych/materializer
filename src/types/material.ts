@@ -64,3 +64,7 @@ export type MaterialNodeSpec = {
 export type MaterialNodesPackage = {
     nodes: Map<string, MaterialNodeSpec>;
 };
+
+export function isOutputNodePath(path: string) {
+    return path === "@materializer/output";
+}
