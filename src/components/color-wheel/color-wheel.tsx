@@ -1,7 +1,7 @@
 import * as culori from "culori";
 import { clamp, distance2d, toDegrees, toRadians } from "../../utils/math";
-import VerticalSlider from "../slider/vertical-slider";
 import makeMouseMoveListener from "../../utils/makeMouseMoveListener";
+import ColorWheelChannelValueSlider from "./channel-slider";
 
 interface Props {
     size?: number;
@@ -11,7 +11,7 @@ interface Props {
 
 export default function ColorWheel(props: Props) {
     let wheelElementRef: HTMLElement | undefined;
-    const wheelSize = props.size ?? 256;
+    const wheelSize = props.size ?? 194;
     const hsv = () =>
         culori.convertRgbToHsv({
             r: props.value[0],
@@ -57,6 +57,12 @@ export default function ColorWheel(props: Props) {
         props.onChange([rgb.r, rgb.g, rgb.b]);
     }
 
+    function onRGBChannelChange(index: number, value: number) {
+        const newValue = [...props.value] as [number, number, number];
+        newValue[index] = value;
+        props.onChange(newValue);
+    }
+
     return (
         <div class="flex items-center justify-center gap-8" style={{ height: wheelSize + "px" }}>
             <div class="relative">
@@ -82,7 +88,32 @@ export default function ColorWheel(props: Props) {
                 />
             </div>
 
-            <VerticalSlider min={0} max={1} value={hsv().v} onChange={onBrightnessChange} />
+            <div class="h-full flex gap-2">
+                <ColorWheelChannelValueSlider
+                    label="V"
+                    color="gray"
+                    value={hsv().v}
+                    onChange={onBrightnessChange}
+                />
+                <ColorWheelChannelValueSlider
+                    label="R"
+                    color="washed-red"
+                    value={props.value[0]}
+                    onChange={(v) => onRGBChannelChange(0, v)}
+                />
+                <ColorWheelChannelValueSlider
+                    label="G"
+                    color="washed-green"
+                    value={props.value[1]}
+                    onChange={(v) => onRGBChannelChange(1, v)}
+                />
+                <ColorWheelChannelValueSlider
+                    label="B"
+                    color="washed-blue"
+                    value={props.value[2]}
+                    onChange={(v) => onRGBChannelChange(2, v)}
+                />
+            </div>
         </div>
     );
 }
