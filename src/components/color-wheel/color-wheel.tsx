@@ -1,6 +1,5 @@
 import * as culori from "culori";
-import { createEffect, createSignal } from "solid-js";
-import { clamp, distance2d } from "../../utils/math";
+import { clamp, distance2d, toDegrees, toRadians } from "../../utils/math";
 import VerticalSlider from "../slider/vertical-slider";
 import makeMouseMoveListener from "../../utils/makeMouseMoveListener";
 
@@ -13,42 +12,50 @@ interface Props {
 export default function ColorWheel(props: Props) {
     let wheelElementRef: HTMLElement | undefined;
     const wheelSize = props.size ?? 256;
-    const initialHSV = culori.convertRgbToHsv({
-        r: props.value[0],
-        g: props.value[1],
-        b: props.value[2],
-    });
-    const [brightness, setBrightness] = createSignal(initialHSV.v);
-    const [angle, setAngle] = createSignal(initialHSV.h ?? 0);
-    const [distanceToCenter, setDistanceToCenter] = createSignal(initialHSV.s * (wheelSize / 2));
-    const angleRadians = () => (angle() - 90) * (Math.PI / 180);
-    const boxCoords = () => ({
-        x: Math.cos(angleRadians()) * clamp(distanceToCenter(), 0, wheelSize / 2) + wheelSize / 2,
-        y: Math.sin(angleRadians()) * clamp(distanceToCenter(), 0, wheelSize / 2) - wheelSize / 2,
-    });
+    const hsv = () =>
+        culori.convertRgbToHsv({
+            r: props.value[0],
+            g: props.value[1],
+            b: props.value[2],
+        });
+    const boxCoords = () => {
+        const { h, s } = hsv();
+        const angle = toRadians((h ?? 0) - 90);
+        return {
+            x: Math.cos(angle) * ((s * wheelSize) / 2) + wheelSize / 2,
+            y: Math.sin(angle) * ((s * wheelSize) / 2) - wheelSize / 2,
+        };
+    };
 
-    createEffect(() => {
-        const saturation = distanceToCenter() / (wheelSize / 2);
-        const rgb = culori.convertHsvToRgb({ h: angle(), s: saturation, v: brightness() });
+    const onMouseDown = makeMouseMoveListener((ev) => {
+        const wheelRect = wheelElementRef!.getBoundingClientRect()!;
+        const wheelCenter = {
+            x: wheelRect.x + wheelRect.width / 2,
+            y: wheelRect.y + wheelRect.height / 2,
+        };
+
+        // Distance from the center of the circle to current mouse position is
+        // the saturation, but it must be within [0..1] range.
+        const distance = distance2d(ev.pageX, ev.pageY, wheelCenter.x, wheelCenter.y);
+        const saturation = clamp(distance / (wheelSize / 2), 0, 1);
+
+        // Hue is the angle between mouse position and the center of the wheel.
+        let hue = toDegrees(Math.atan2(ev.pageY - wheelCenter.y, ev.pageX - wheelCenter.x)) + 90;
+
+        // Map it from [-180..180] to [0..360] range.
+        if (hue < 0) {
+            hue += 360;
+        }
+
+        const rgb = culori.convertHsvToRgb({ h: hue, s: saturation, v: hsv().v });
         props.onChange([rgb.r, rgb.g, rgb.b]);
     });
 
-    const onMouseDown = makeMouseMoveListener((ev) => {
-        const wheelBoundingBox = wheelElementRef!.getBoundingClientRect()!;
-        const wheelCenter = {
-            x: wheelBoundingBox.x + wheelBoundingBox.width / 2,
-            y: wheelBoundingBox.y + wheelBoundingBox.height / 2,
-        };
-
-        let angle =
-            Math.atan2(ev.pageY - wheelCenter.y, ev.pageX - wheelCenter.x) * (180 / Math.PI) + 90;
-        if (angle < 0) {
-            angle += 360;
-        }
-
-        setAngle(angle);
-        setDistanceToCenter(distance2d(ev.pageX, ev.pageY, wheelCenter.x, wheelCenter.y));
-    });
+    function onBrightnessChange(value: number) {
+        const { h, s } = hsv();
+        const rgb = culori.convertHsvToRgb({ h, s, v: value });
+        props.onChange([rgb.r, rgb.g, rgb.b]);
+    }
 
     return (
         <div class="flex items-center justify-center gap-8" style={{ height: wheelSize + "px" }}>
@@ -61,7 +68,7 @@ export default function ColorWheel(props: Props) {
                         background: "url(color-circle.png)",
                         "background-size": "contain",
                         "background-repeat": "no-repeat",
-                        filter: `brightness(${brightness()})`,
+                        filter: `brightness(${hsv().v})`,
                     }}
                     onMouseDown={onMouseDown}
                 />
@@ -70,12 +77,12 @@ export default function ColorWheel(props: Props) {
                     style={{
                         width: "12px",
                         height: "12px",
-                        transform: `translate(${boxCoords()?.x - 6}px, ${boxCoords()?.y - 6}px)`,
+                        transform: `translate(${boxCoords().x - 6}px, ${boxCoords().y - 6}px)`,
                     }}
                 />
             </div>
 
-            <VerticalSlider min={0} max={1} value={brightness()} onChange={setBrightness} />
+            <VerticalSlider min={0} max={1} value={hsv().v} onChange={onBrightnessChange} />
         </div>
     );
 }
