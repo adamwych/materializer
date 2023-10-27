@@ -22,7 +22,7 @@ export default function MaterialNodeInspectorPanel() {
             <Show when={node()}>
                 <PanelSection label="Name">
                     <input
-                        class="w-full bg-gray-100-0 p-2 rounded-sm"
+                        class="w-full bg-gray-100-0 px-4 py-2 rounded-sm"
                         type="text"
                         value={node()!.label}
                         onInput={(ev) => onNameChange(ev.target.value)}
@@ -30,15 +30,17 @@ export default function MaterialNodeInspectorPanel() {
                 </PanelSection>
 
                 <PanelSection label="Parameters">
-                    <For each={node()!.spec!.parameters}>
-                        {(parameter) => (
-                            <MaterialNodeInspectorParameter
-                                parameter={parameter}
-                                value={() => node()?.parameters[parameter.id]}
-                                onChange={(value) => onParameterChange(parameter.id, value)}
-                            />
-                        )}
-                    </For>
+                    <div class="-m-4">
+                        <For each={node()!.spec!.parameters}>
+                            {(parameter) => (
+                                <MaterialNodeInspectorParameter
+                                    parameter={parameter}
+                                    value={() => node()?.parameters[parameter.id]}
+                                    onChange={(value) => onParameterChange(parameter.id, value)}
+                                />
+                            )}
+                        </For>
+                    </div>
                 </PanelSection>
             </Show>
         </div>

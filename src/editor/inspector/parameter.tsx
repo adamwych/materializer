@@ -34,7 +34,7 @@ export default function MaterialNodeInspectorParameter(props: Props) {
     const InputComponent = getInputComponent(props.parameter.type)!;
 
     return (
-        <div class="-m-4 p-4 border-b border-gray-300-0">
+        <div class="p-4 border-b border-gray-300-0">
             <div class="font-semibold">{props.parameter.label}</div>
             <div class="pt-2">
                 <Show when={InputComponent}>
