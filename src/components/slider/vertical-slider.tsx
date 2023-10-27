@@ -1,9 +1,10 @@
 import makeMouseMoveListener from "../../utils/makeMouseMoveListener";
 import { clamp } from "../../utils/math";
 import { SliderProps } from "./props";
-import styles from "./styles";
+import defaultStyles from "./styles";
 
 export default function VerticalSlider(props: SliderProps) {
+    const styles = defaultStyles(props.color ?? "gray");
     let trackElementRef: HTMLElement | undefined;
     const clampedValue = () => clamp(props.value, props.min, props.max);
 

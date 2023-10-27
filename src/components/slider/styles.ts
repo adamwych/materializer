@@ -1,11 +1,13 @@
-const styles = {
-    thickness: 5,
-    track: "bg-gray-500-0 rounded-sm",
-    handle: "bg-gray-700-0 hover:bg-gray-800-0 active:bg-gray-600-0 rounded-sm",
-    handleSize: [20, 10],
-};
+import { TailwindColorName } from "../../types/tailwind";
 
-export default {
-    ...styles,
-    handleOffset: [(styles.handleSize[0] - styles.thickness) / 2, styles.handleSize[1] / 2],
+export default (color: TailwindColorName) => {
+    const thickness = 5;
+    const handleSize = [20, 10];
+    return {
+        thickness,
+        track: `bg-${color}-500-0 rounded-sm`,
+        handle: `bg-${color}-700-0 hover:bg-${color}-800-0 active:bg-${color}-600-0 rounded-sm`,
+        handleSize,
+        handleOffset: [(handleSize[0] - thickness) / 2, handleSize[1] / 2],
+    };
 };
