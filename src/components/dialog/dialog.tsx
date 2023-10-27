@@ -18,7 +18,7 @@ export default function Dialog(props: Props) {
                 class="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50"
                 style={{ background: "rgba(0, 0, 0, 0.5)" }}
             >
-                <div class="bg-gray-400-0 w-[320px]">
+                <div class="bg-gray-400 w-[320px]">
                     <div class="p-4">{props.title}</div>
                     <div class="p-4">{props.children}</div>
                     <div class="p-4 flex gap-4">

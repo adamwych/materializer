@@ -5,5 +5,5 @@ interface Props {
 }
 
 export default function MenuBar(props: Props) {
-    return <div class="flex bg-gray-400-0">{props.children}</div>;
+    return <div class="flex bg-gray-400">{props.children}</div>;
 }

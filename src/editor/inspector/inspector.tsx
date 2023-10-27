@@ -19,7 +19,7 @@ export default function MaterialNodeInspectorPanel() {
     }
 
     return (
-        <div class="bg-gray-200-0 overflow-auto flex-1">
+        <div class="bg-gray-200 overflow-auto flex-1">
             <Show when={node()}>
                 <PanelSection label="Name">
                     <TextInput value={node()!.label} onInput={onNameChange} />

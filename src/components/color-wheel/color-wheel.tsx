@@ -79,7 +79,7 @@ export default function ColorWheel(props: Props) {
                     onMouseDown={onMouseDown}
                 />
                 <div
-                    class="absolute bg-opacity-25 bg-white-0 rounded-full border border-white-0"
+                    class="absolute bg-opacity-25 bg-white rounded-full border border-white"
                     style={{
                         width: "12px",
                         height: "12px",

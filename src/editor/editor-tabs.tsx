@@ -11,8 +11,8 @@ export default function EditorTabs() {
                 <For each={workspace.openedMaterials()}>
                     {(material, index) => (
                         <div
-                            class={`px-3 py-2 hover:bg-gray-300-0 active:bg-gray-200-0 ${
-                                index() === workspace.activeEditorTab() && "bg-gray-400-0"
+                            class={`px-3 py-2 hover:bg-gray-300 active:bg-gray-200 ${
+                                index() === workspace.activeEditorTab() && "bg-gray-400"
                             }`}
                         >
                             {material.name}

@@ -27,16 +27,16 @@ export default function UIMaterialGraphNewNodePopover(props: Props) {
             }}
             onMouseDown={(ev) => ev.stopPropagation()}
         >
-            <h1 class="p-4 font-semibold uppercase text-sm bg-gray-500-0">Add new node</h1>
+            <h1 class="p-4 font-semibold uppercase text-sm bg-gray-500">Add new node</h1>
             <For each={Array.from(appCtx.getNodesPackages().entries())}>
                 {([id, pkg]) => (
-                    <div class="bg-gray-400-0 py-2">
+                    <div class="bg-gray-400 py-2">
                         <div class="font-semibold px-2">{id}</div>
                         <ul>
                             <For each={Array.from(pkg.nodes.entries())}>
                                 {([typeId, spec]) => (
                                     <li
-                                        class="px-4 py-2 hover:bg-gray-500-0 active:bg-gray-600-0"
+                                        class="px-4 py-2 hover:bg-gray-500 active:bg-gray-600"
                                         onClick={() => onItemClick(`${id}/${typeId}`)}
                                     >
                                         {spec.name}

@@ -34,7 +34,7 @@ export default function MaterialNodeInspectorParameter(props: Props) {
     const InputComponent = getInputComponent(props.parameter.type)!;
 
     return (
-        <div class="p-4 border-b border-gray-300-0">
+        <div class="p-4 border-b border-gray-300">
             <div class="font-semibold">{props.parameter.label}</div>
             <div class="pt-2">
                 <Show when={InputComponent}>
@@ -45,7 +45,7 @@ export default function MaterialNodeInspectorParameter(props: Props) {
                     />
                 </Show>
                 <Show when={!InputComponent}>
-                    <span class="text-gray-800-0">
+                    <span class="text-gray-800">
                         Unsupported parameter type: {props.parameter.type}
                     </span>
                 </Show>

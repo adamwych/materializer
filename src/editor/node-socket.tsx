@@ -14,7 +14,7 @@ export default function MaterialNodeSocketBox(props: Props) {
     return (
         <div
             data-socket={props.id}
-            class="relative w-[16px] h-[16px] rounded-full bg-gray-200-0 outline outline-2 outline-gray-400-0 hover:bg-gray-300-0 hover:outline-gray-600-0"
+            class="relative w-[16px] h-[16px] rounded-full bg-gray-200 outline outline-2 outline-gray-400 hover:bg-gray-300 hover:outline-gray-600"
             style={
                 props.alignment === "left"
                     ? { left: "-8px", transition: "all 70ms" }

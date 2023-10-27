@@ -26,10 +26,10 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
     return (
         <div
             ref={(e) => editorCtx.updateNodeBoxElement(props.node().id, e)}
-            class={`group absolute bg-gray-200-0 rounded-md outline ${
+            class={`group absolute bg-gray-200 rounded-md outline ${
                 isHighlighted()
-                    ? "outline-gray-500-0 active:outline-gray-300-0"
-                    : "outline-transparent hover:outline-gray-300-0"
+                    ? "outline-gray-500 active:outline-gray-300"
+                    : "outline-transparent hover:outline-gray-300"
             }`}
             style={{
                 transition: "outline-color 70ms",
@@ -55,7 +55,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
 
             <div class="relative z-10 w-full h-full flex flex-col">
                 <div
-                    class={` backdrop-blur group-hover:backdrop-blur-0 bg-opacity-50 bg-black-0 p-2 text-center font-semibold group-hover:bg-transparent rounded-t-md ${
+                    class={`backdrop-blur group-hover:backdrop-blur-0 bg-opacity-50 bg-black p-2 text-center font-semibold group-hover:bg-transparent rounded-t-md ${
                         isHighlighted() ? "bg-transparent" : ""
                     }`}
                     style={{
