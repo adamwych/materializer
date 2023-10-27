@@ -1,7 +1,7 @@
 import * as culori from "culori";
 import { clamp, distance2d, toDegrees, toRadians } from "../../utils/math";
 import makeMouseMoveListener from "../../utils/makeMouseMoveListener";
-import ColorWheelChannelValueSlider from "./channel-slider";
+import ColorWheelChannelSliders from "./channel-sliders";
 
 interface Props {
     size?: number;
@@ -11,19 +11,19 @@ interface Props {
 
 export default function ColorWheel(props: Props) {
     let wheelElementRef: HTMLElement | undefined;
-    const wheelSize = props.size ?? 194;
+    const size = () => props.size ?? 240;
     const hsv = () =>
         culori.convertRgbToHsv({
             r: props.value[0],
             g: props.value[1],
             b: props.value[2],
         });
-    const boxCoords = () => {
+    const draggerCoords = () => {
         const { h, s } = hsv();
         const angle = toRadians((h ?? 0) - 90);
         return {
-            x: Math.cos(angle) * ((s * wheelSize) / 2) + wheelSize / 2,
-            y: Math.sin(angle) * ((s * wheelSize) / 2) - wheelSize / 2,
+            x: Math.cos(angle) * ((s * size()) / 2) + size() / 2,
+            y: Math.sin(angle) * ((s * size()) / 2) - size() / 2,
         };
     };
 
@@ -37,7 +37,7 @@ export default function ColorWheel(props: Props) {
         // Distance from the center of the circle to current mouse position is
         // the saturation, but it must be within [0..1] range.
         const distance = distance2d(ev.pageX, ev.pageY, wheelCenter.x, wheelCenter.y);
-        const saturation = clamp(distance / (wheelSize / 2), 0, 1);
+        const saturation = clamp(distance / (size() / 2), 0, 1);
 
         // Hue is the angle between mouse position and the center of the wheel.
         let hue = toDegrees(Math.atan2(ev.pageY - wheelCenter.y, ev.pageX - wheelCenter.x)) + 90;
@@ -51,26 +51,14 @@ export default function ColorWheel(props: Props) {
         props.onChange([rgb.r, rgb.g, rgb.b]);
     });
 
-    function onBrightnessChange(value: number) {
-        const { h, s } = hsv();
-        const rgb = culori.convertHsvToRgb({ h, s, v: value });
-        props.onChange([rgb.r, rgb.g, rgb.b]);
-    }
-
-    function onRGBChannelChange(index: number, value: number) {
-        const newValue = [...props.value] as [number, number, number];
-        newValue[index] = value;
-        props.onChange(newValue);
-    }
-
     return (
-        <div class="flex items-center justify-center gap-8" style={{ height: wheelSize + "px" }}>
+        <div class="flex items-center justify-center gap-8" style={{ height: size() + "px" }}>
             <div class="relative">
                 <div
                     ref={(e) => (wheelElementRef = e)}
                     style={{
-                        width: wheelSize + "px",
-                        height: wheelSize + "px",
+                        width: size() + "px",
+                        height: size() + "px",
                         background: "url(color-circle.png)",
                         "background-size": "contain",
                         "background-repeat": "no-repeat",
@@ -83,37 +71,14 @@ export default function ColorWheel(props: Props) {
                     style={{
                         width: "12px",
                         height: "12px",
-                        transform: `translate(${boxCoords().x - 6}px, ${boxCoords().y - 6}px)`,
+                        transform: `translate(${draggerCoords().x - 6}px, ${
+                            draggerCoords().y - 6
+                        }px)`,
                     }}
                 />
             </div>
 
-            <div class="h-full flex gap-2">
-                <ColorWheelChannelValueSlider
-                    label="V"
-                    color="gray"
-                    value={hsv().v}
-                    onChange={onBrightnessChange}
-                />
-                <ColorWheelChannelValueSlider
-                    label="R"
-                    color="washed-red"
-                    value={props.value[0]}
-                    onChange={(v) => onRGBChannelChange(0, v)}
-                />
-                <ColorWheelChannelValueSlider
-                    label="G"
-                    color="washed-green"
-                    value={props.value[1]}
-                    onChange={(v) => onRGBChannelChange(1, v)}
-                />
-                <ColorWheelChannelValueSlider
-                    label="B"
-                    color="washed-blue"
-                    value={props.value[2]}
-                    onChange={(v) => onRGBChannelChange(2, v)}
-                />
-            </div>
+            <ColorWheelChannelSliders value={props.value} onChange={props.onChange} />
         </div>
     );
 }

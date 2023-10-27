@@ -1,9 +1,11 @@
 import { TailwindColorName } from "../../types/tailwind";
 import VerticalSlider from "../slider/vertical-slider";
 
-export default function ColorWheelChannelValueSlider(props: {
+export default function ColorWheelChannelSlider(props: {
     label: string;
     value: number;
+    min: number;
+    max: number;
     color: TailwindColorName;
     onChange(value: number): void;
 }) {
@@ -12,15 +14,15 @@ export default function ColorWheelChannelValueSlider(props: {
             <span class="text-sm">{props.label}</span>
 
             <VerticalSlider
-                min={0}
-                max={1}
+                min={props.min}
+                max={props.max}
                 value={props.value}
                 onChange={props.onChange}
                 color={props.color}
             />
 
             <span class="text-center text-sm" style={{ width: "30px" }}>
-                {Math.round(props.value * 255)}
+                {props.max <= 1 ? props.value.toFixed(2) : Math.round(props.value)}
             </span>
         </div>
     );
