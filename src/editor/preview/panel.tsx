@@ -1,5 +1,6 @@
 import { createEffect } from "solid-js";
 import { useRenderingEngine } from "../../renderer/engine.ts";
+import makeMouseMoveListener from "../../utils/makeMouseMoveListener.ts";
 
 export default function MaterialPreviewPanel() {
     const renderingEngine = useRenderingEngine()!;
@@ -10,21 +11,11 @@ export default function MaterialPreviewPanel() {
         renderingEngine.renderPreview();
     }
 
-    function onMouseDown() {
-        window.addEventListener("mousemove", onMouseMove);
-        window.addEventListener("mouseup", onMouseUp);
-    }
-
-    function onMouseMove(ev: MouseEvent) {
+    const onMouseDown = makeMouseMoveListener((ev) => {
         renderingEngine.previewCamera.rotationX += ev.movementX / 50.0;
         renderingEngine.previewCamera.rotationY += ev.movementY / 50.0;
         renderingEngine.renderPreview();
-    }
-
-    function onMouseUp() {
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-    }
+    });
 
     createEffect(() => {
         if (!canvasElement) {
@@ -45,8 +36,8 @@ export default function MaterialPreviewPanel() {
 
     return (
         <canvas
-            width={448}
-            height={448}
+            width={400}
+            height={400}
             ref={(canvas) => {
                 canvasElement = canvas;
             }}

@@ -6,7 +6,13 @@ export default class PreviewCameraController {
     public zoom = 4;
 
     public getProjectionMatrix(): glMatrix.mat4 {
-        return glMatrix.mat4.perspective(glMatrix.mat4.create(), 40.0 * (Math.PI / 180), 448.0 / 448.0, 0.01, 1000);
+        return glMatrix.mat4.perspective(
+            glMatrix.mat4.create(),
+            40.0 * (Math.PI / 180),
+            400.0 / 400.0,
+            0.01,
+            1000,
+        );
     }
 
     public getViewMatrix(): glMatrix.mat4 {
@@ -23,6 +29,10 @@ export default class PreviewCameraController {
     }
 
     public getCombinedMatrix(): glMatrix.mat4 {
-        return glMatrix.mat4.mul(glMatrix.mat4.create(), this.getProjectionMatrix(), this.getViewMatrix());
+        return glMatrix.mat4.mul(
+            glMatrix.mat4.create(),
+            this.getProjectionMatrix(),
+            this.getViewMatrix(),
+        );
     }
 }

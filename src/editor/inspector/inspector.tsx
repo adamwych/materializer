@@ -14,7 +14,7 @@ export default function MaterialNodeInspectorPanel() {
     }
 
     return (
-        <div class="h-full bg-gray-200-0 p-4" style={{ width: "448px" }}>
+        <div class="h-full bg-gray-200-0 p-4" style={{ width: "400px" }}>
             <Show when={node()}>
                 <h1 class="font-semibold uppercase text-gray-700-0">Parameters</h1>
 
