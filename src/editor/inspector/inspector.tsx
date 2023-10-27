@@ -9,19 +9,21 @@ export default function MaterialNodeInspectorPanel() {
     const node = editorCtx.getInspectedNode();
 
     function onParameterChange(id: string, value: unknown) {
-        const n = node()!;
-        materialCtx.setNodeParameter(n.id, id, value);
+        materialCtx.setNodeParameter(node()!.id, id, value);
     }
 
     return (
-        <div class="h-full bg-gray-200-0 p-4" style={{ width: "400px" }}>
+        <div class="bg-gray-200-0 overflow-auto flex-1" style={{ width: "400px" }}>
             <Show when={node()}>
-                <h1 class="font-semibold uppercase text-gray-700-0">Parameters</h1>
+                <div class="px-4 py-2 text-sm flex items-center justify-between bg-gray-300-0 border-b border-gray-400-0 font-semibold uppercase text-gray-800-0">
+                    Parameters
+                </div>
 
                 <For each={node()!.spec!.parameters}>
                     {(parameter) => (
                         <MaterialNodeInspectorParameter
-                            name={parameter.id}
+                            label={parameter.label}
+                            type={parameter.type}
                             value={() => node()?.parameters[parameter.id]}
                             onChange={(value) => onParameterChange(parameter.id, value)}
                         />

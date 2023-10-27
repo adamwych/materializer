@@ -55,14 +55,16 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
 
             <div class="relative z-10 w-full h-full flex flex-col">
                 <div
-                    class={`backdrop-blur group-hover:backdrop-blur-0 bg-opacity-50 bg-black-0 p-2 text-center font-semibold group-hover:bg-transparent rounded-t-md ${
+                    class={` backdrop-blur group-hover:backdrop-blur-0 bg-opacity-50 bg-black-0 p-2 text-center font-semibold group-hover:bg-transparent rounded-t-md ${
                         isHighlighted() ? "bg-transparent" : ""
                     }`}
                     style={{
                         transition: "all 70ms, backdrop-filter 0ms",
                     }}
                 >
-                    {props.node().label}
+                    <div class="whitespace-nowrap text-ellipsis overflow-hidden">
+                        {props.node().label}
+                    </div>
                 </div>
 
                 <div class="flex justify-between h-full">
@@ -74,10 +76,18 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
                                     alignment="left"
                                     socket={socket}
                                     onMouseDown={(ev) =>
-                                        connectionBuilder.onSocketMouseDown(ev, props.node().id, socket.id)
+                                        connectionBuilder.onSocketMouseDown(
+                                            ev,
+                                            props.node().id,
+                                            socket.id,
+                                        )
                                     }
                                     onMouseUp={(ev) =>
-                                        connectionBuilder.onSocketMouseUp(ev, props.node().id, socket.id)
+                                        connectionBuilder.onSocketMouseUp(
+                                            ev,
+                                            props.node().id,
+                                            socket.id,
+                                        )
                                     }
                                 />
                             )}
@@ -91,10 +101,18 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
                                     alignment="right"
                                     socket={socket}
                                     onMouseDown={(ev) =>
-                                        connectionBuilder.onSocketMouseDown(ev, props.node().id, socket.id)
+                                        connectionBuilder.onSocketMouseDown(
+                                            ev,
+                                            props.node().id,
+                                            socket.id,
+                                        )
                                     }
                                     onMouseUp={(ev) =>
-                                        connectionBuilder.onSocketMouseUp(ev, props.node().id, socket.id)
+                                        connectionBuilder.onSocketMouseUp(
+                                            ev,
+                                            props.node().id,
+                                            socket.id,
+                                        )
                                     }
                                 />
                             )}

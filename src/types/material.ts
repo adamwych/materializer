@@ -10,6 +10,7 @@ export enum MaterialNodeOutputTarget {
  */
 export type MaterialNodeParameterInfo = {
     id: string;
+    label: string;
     type: string;
     default: unknown;
 };

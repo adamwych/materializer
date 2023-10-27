@@ -1,5 +1,9 @@
 import { createContextProvider } from "@solid-primitives/context";
-import { MaterialNodeSpec, MaterialNodesPackage } from "./types/material.ts";
+import {
+    MaterialNodeOutputTarget,
+    MaterialNodeSpec,
+    MaterialNodesPackage,
+} from "./types/material.ts";
 import { ReactiveMap } from "@solid-primitives/map";
 import solidColorGlsl from "../glsl/solid-color.glsl?raw";
 import outputGlsl from "../glsl/output.glsl?raw";
@@ -15,6 +19,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                 parameters: [
                     {
                         id: "color",
+                        label: "Color",
                         default: [1, 0, 0],
                         type: "rgb",
                     },
@@ -67,7 +72,14 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "output",
             {
                 name: "Output",
-                parameters: [],
+                parameters: [
+                    {
+                        id: "target",
+                        label: "Texture type",
+                        default: MaterialNodeOutputTarget.Albedo,
+                        type: "select",
+                    },
+                ],
                 inputSockets: [
                     {
                         id: "color",

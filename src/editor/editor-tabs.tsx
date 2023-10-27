@@ -6,7 +6,7 @@ export default function EditorTabs() {
     const workspace = useWorkspaceContext()!;
 
     return (
-        <div class="w-full h-full flex flex-col">
+        <div class="w-full h-full flex flex-col flex-1">
             <div class="flex items-center">
                 <For each={workspace.openedMaterials()}>
                     {(material, index) => (
@@ -21,9 +21,7 @@ export default function EditorTabs() {
                 </For>
             </div>
 
-            <div class="w-full h-full">
-                <MaterialGraphEditor material={workspace.activeEditorTabMaterial()!} />
-            </div>
+            <MaterialGraphEditor material={workspace.activeEditorTabMaterial()!} />
         </div>
     );
 }

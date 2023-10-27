@@ -1,12 +1,6 @@
-import { Accessor } from "solid-js";
 import ColorWheel from "../../components/color-wheel/color-wheel";
+import { InputProps } from "./parameter";
 
-interface Props {
-    value: Accessor<[number, number, number]>;
-
-    onChange(value: [number, number, number]): void;
-}
-
-export default function MaterialNodeInspectorRGBInput(props: Props) {
+export default function MaterialNodeInspectorRGBInput(props: InputProps<[number, number, number]>) {
     return <ColorWheel value={props.value()} onChange={props.onChange} />;
 }

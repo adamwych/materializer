@@ -44,7 +44,7 @@ export default function MaterialGraphEditorNodes() {
     return (
         <div
             id="editor-root"
-            class="relative w-full h-full overflow-hidden"
+            class="relative h-full flex-1 overflow-hidden"
             style={{
                 "background-image": "url(grid-bg.svg)",
             }}

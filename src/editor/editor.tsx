@@ -27,10 +27,15 @@ export default function MaterialGraphEditor(props: DeepReadonly<Props>) {
                 EditorConnectionBuilderProvider,
             ]}
         >
-            <div class="w-full h-full flex">
+            <div
+                class="flex w-full"
+                style={{
+                    height: "calc(100vh - 35px - 35px)",
+                }}
+            >
                 <MaterialGraphEditorNodes />
 
-                <div class="flex flex-col">
+                <div class="flex flex-col" style={{ "flex-basis": "400px" }}>
                     <MaterialNodeInspectorPanel />
                     <MaterialPreviewPanel />
                 </div>

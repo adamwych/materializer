@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
 body,
 html {
     width: 100%;
@@ -10,7 +12,7 @@ html {
     background: var(--color-gray-100);
     color: var(--color-white);
 
-    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    font-family: "Noto Sans", Arial, Helvetica, sans-serif;
     font-size: 14px;
     font-weight: 300;
 
