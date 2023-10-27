@@ -22,8 +22,7 @@ export default function MaterialNodeInspectorPanel() {
                 <For each={node()!.spec!.parameters}>
                     {(parameter) => (
                         <MaterialNodeInspectorParameter
-                            label={parameter.label}
-                            type={parameter.type}
+                            parameter={parameter}
                             value={() => node()?.parameters[parameter.id]}
                             onChange={(value) => onParameterChange(parameter.id, value)}
                         />

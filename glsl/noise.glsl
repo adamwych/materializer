@@ -3,6 +3,9 @@ precision highp float;
 
 in vec2 a_texCoord;
 
+uniform float p_blur;
+uniform float p_scale;
+
 out vec4 out_color;
 
 vec2 fade(vec2 t) {return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);}
@@ -38,10 +41,10 @@ float cnoise(vec2 P) {
     vec2 fade_xy = fade(Pf.xy);
     vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
     float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-    return 200.0 * n_xy;
+    return p_blur * n_xy;
 }
 
 void main(void) {
-    float n = cnoise(a_texCoord * 64.0);
+    float n = cnoise(a_texCoord * p_scale);
     out_color = vec4(0.5 + 0.5 * vec3(n, n, n), 1.0);
 }

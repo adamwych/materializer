@@ -91,6 +91,9 @@ export default class MaterialNodeShaderProgram {
                         this.setVecParameter(name, value);
                     }
                     break;
+                case "number":
+                    this.setFloatParameter(name, value);
+                    break;
                 default:
                     console.warn(
                         `Type of node parameter '${name}' (${typeof value}) is not supported.`,
@@ -113,6 +116,15 @@ export default class MaterialNodeShaderProgram {
             } else {
                 console.warn(`Parameter '${name}' has too many values (${value.length})`);
             }
+        } else {
+            console.warn(`Parameter '${name}' was not found in the fragment shader.`);
+        }
+    }
+
+    public setFloatParameter(name: string, value: number) {
+        const location = this.gl.getUniformLocation(this.program, PREFIX_PARAMETER + name);
+        if (location) {
+            this.gl.uniform1f(location, value);
         } else {
             console.warn(`Parameter '${name}' was not found in the fragment shader.`);
         }

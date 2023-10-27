@@ -37,7 +37,24 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "noise",
             {
                 name: "Noise",
-                parameters: [],
+                parameters: [
+                    {
+                        id: "scale",
+                        label: "Scale",
+                        default: 64,
+                        type: "number",
+                        min: 1,
+                        max: 256,
+                    },
+                    {
+                        id: "blur",
+                        label: "Blur",
+                        default: 4,
+                        type: "number",
+                        min: 1,
+                        max: 64,
+                    },
+                ],
                 inputSockets: [],
                 outputSockets: [
                     {

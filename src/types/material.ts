@@ -13,6 +13,8 @@ export type MaterialNodeParameterInfo = {
     label: string;
     type: string;
     default: unknown;
+    min?: number;
+    max?: number;
 };
 
 /**
