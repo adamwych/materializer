@@ -604,6 +604,11 @@
   dependencies:
     "@babel/types" "^7.20.7"
 
+"@types/culori@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/culori/-/culori-2.0.3.tgz#5606eeb4d45ca91336cc0a96cd51d3726a869c03"
+  integrity sha512-kpW5coysXK3hwCY76W0Z4QuctvMZ25TWNzBVykpFekhGs+WDHOJGoF8hclts5AcIbSrL6f1IW/HsdS0k9lkEmA==
+
 "@types/json-schema@^7.0.12":
   version "7.0.13"
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.13.tgz"
@@ -902,7 +907,7 @@ color-convert@^1.9.0:
 
 color-convert@^2.0.1:
   version "2.0.1"
-  resolved "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-2.0.1.tgz#72d3a68d598c9bdb3af2ad1e84f21d896abd4de3"
   integrity sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==
   dependencies:
     color-name "~1.1.4"
@@ -1052,6 +1057,11 @@ csstype@^3.1.0:
   version "3.1.2"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
+
+culori@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/culori/-/culori-3.2.0.tgz#df6561503f0cc20e8e1c029f086466666c0ac62f"
+  integrity sha512-HIEbTSP7vs1mPq/2P9In6QyFE0Tkpevh0k9a+FkjhD+cwsYm9WRSbn4uMdW9O0yXlNYC3ppxL3gWWPOcvEl57w==
 
 debug@^4.1.0, debug@^4.1.1, debug@^4.3.2, debug@^4.3.4:
   version "4.3.4"

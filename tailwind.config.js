@@ -22,9 +22,7 @@ function exportColorsAsCSSVariables({ addBase, theme }) {
                 properties[`--color-${name}-${weight}-contrast`] = value[1];
 
                 if (value[0].startsWith("#")) {
-                    properties[`--color-${name}-${weight}-rgb`] = hexToRGB(
-                        value[0],
-                    );
+                    properties[`--color-${name}-${weight}-rgb`] = hexToRGB(value[0]);
                 }
             });
         } else {
@@ -42,8 +40,7 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     safelist: [
         {
-            pattern:
-                /(text|bg|border)-(primary|purple|gold)-(100|200|300|400|500|600|700)/,
+            pattern: /(text|bg|border)-(primary|purple|gold)-(100|200|300|400|500|600|700)/,
             variants: ["hover", "active", "group-hover"],
         },
     ],
@@ -61,6 +58,7 @@ module.exports = {
                 500: ["#6c6c6c", "#ffffff"],
                 600: ["#7c7c7c", "#ffffff"],
                 700: ["#8c8c8c", "#ffffff"],
+                800: ["#9c9c9c", "#ffffff"],
             },
             green: {
                 0: ["#00ff00", "#ffffff"],
