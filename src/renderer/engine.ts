@@ -1,11 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { useMaterialContext } from "../editor/material-context";
-import {
-    MaterialNode,
-    MaterialNodeOutputTarget,
-    MaterialNodeParametersMap,
-    isOutputNodePath,
-} from "../types/material";
+import { MaterialNode, MaterialNodeOutputTarget, isOutputNodePath } from "../types/material";
 import MaterialNodeShaderProgram from "./program";
 import { createSignal } from "solid-js";
 import PreviewShaderProgram from "./preview-program";
@@ -121,11 +116,10 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
 
             shader.bind();
 
-            const parameters: MaterialNodeParametersMap = {};
-            for (const parameter of node.spec.parameters) {
-                parameters[parameter.id] = node.parameters[parameter.id];
-            }
-            shader.setParameters(parameters);
+            node.spec.parameters.forEach((parameter) => {
+                shader.setParameter(parameter, node.parameters[parameter.id]);
+            });
+
             shaders.set(node.id, shader);
 
             gl.viewport(0, 0, canvas.width, canvas.height);

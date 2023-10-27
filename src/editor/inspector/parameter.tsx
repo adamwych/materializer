@@ -2,6 +2,7 @@ import { MaterialNodeParameterInfo } from "../../types/material.ts";
 import MaterialNodeInspectorNumberInput from "./input-number.tsx";
 import MaterialNodeInspectorRGBInput from "./input-rgb.tsx";
 import { Accessor, Component, Show } from "solid-js";
+import MaterialNodeInspectorSelectInput from "./input-select.tsx";
 
 export type InputProps<T = any> = {
     parameter: MaterialNodeParameterInfo;
@@ -21,6 +22,8 @@ function getInputComponent(type: string): Component<InputProps> | undefined {
             return MaterialNodeInspectorRGBInput;
         case "number":
             return MaterialNodeInspectorNumberInput;
+        case "select":
+            return MaterialNodeInspectorSelectInput;
         default:
             console.error(`Parameter of type '${type}' is not supported.`);
             return undefined;

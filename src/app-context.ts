@@ -9,6 +9,7 @@ import solidColorGlsl from "../glsl/solid-color.glsl?raw";
 import outputGlsl from "../glsl/output.glsl?raw";
 import blendGlsl from "../glsl/blend.glsl?raw";
 import noiseGlsl from "../glsl/noise.glsl?raw";
+import BlendMode from "./types/blend-mode.ts";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
     nodes: new Map<string, MaterialNodeSpec>([
@@ -22,6 +23,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         label: "Color",
                         default: [1, 0, 0],
                         type: "rgb",
+                        valueType: "vec3",
                     },
                 ],
                 inputSockets: [],
@@ -43,6 +45,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         label: "Scale",
                         default: 64,
                         type: "number",
+                        valueType: "float",
                         min: 1,
                         max: 256,
                     },
@@ -51,6 +54,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         label: "Blur",
                         default: 4,
                         type: "number",
+                        valueType: "float",
                         min: 1,
                         max: 64,
                     },
@@ -68,7 +72,30 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "blend",
             {
                 name: "Blend",
-                parameters: [],
+                parameters: [
+                    {
+                        id: "mode",
+                        label: "Mode",
+                        default: BlendMode.Add,
+                        type: "select",
+                        valueType: "int",
+                        options: [
+                            { label: "Add", value: BlendMode.Add },
+                            { label: "Subtract", value: BlendMode.Subtract },
+                            { label: "Multiply", value: BlendMode.Multiply },
+                            { label: "Divide", value: BlendMode.Divide },
+                        ],
+                    },
+                    {
+                        id: "intensity",
+                        label: "Intensity",
+                        default: 1,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                ],
                 inputSockets: [
                     {
                         id: "foreground",
@@ -95,6 +122,11 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         label: "Texture type",
                         default: MaterialNodeOutputTarget.Albedo,
                         type: "select",
+                        valueType: "int",
+                        options: [
+                            { label: "Albedo", value: MaterialNodeOutputTarget.Albedo },
+                            { label: "Normal", value: MaterialNodeOutputTarget.Normal },
+                        ],
                     },
                 ],
                 inputSockets: [

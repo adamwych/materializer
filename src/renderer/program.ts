@@ -1,4 +1,4 @@
-import { MaterialNodeParametersMap } from "../types/material.ts";
+import { MaterialNodeParameterInfo } from "../types/material.ts";
 
 const PREFIX_PARAMETER = "p_";
 const PREFIX_INPUT_TEXTURE = "i_";
@@ -81,33 +81,32 @@ export default class MaterialNodeShaderProgram {
         }
     }
 
-    public setParameters(parameters: MaterialNodeParametersMap) {
+    public setParameter(info: MaterialNodeParameterInfo, value: any) {
         this.gl.useProgram(this.program);
 
-        for (const [name, value] of Object.entries(parameters)) {
-            switch (typeof value) {
-                case "object":
-                    if (Array.isArray(value)) {
-                        this.setVecParameter(name, value);
-                    }
-                    break;
-                case "number":
-                    this.setFloatParameter(name, value);
-                    break;
-                default:
-                    console.warn(
-                        `Type of node parameter '${name}' (${typeof value}) is not supported.`,
-                    );
-            }
+        switch (info.valueType) {
+            case "vec2":
+            case "vec3":
+            case "vec4":
+                this.setVecParameter(info.id, value);
+                break;
+            case "float":
+                this.setFloatParameter(info.id, value);
+                break;
+            case "int":
+                this.setIntParameter(info.id, value);
+                break;
+            default:
+                console.warn(
+                    `Type of node parameter '${name}' (${typeof value}) is not supported.`,
+                );
         }
     }
 
     public setVecParameter(name: string, value: Array<number>) {
         const location = this.gl.getUniformLocation(this.program, PREFIX_PARAMETER + name);
         if (location) {
-            if (value.length === 1) {
-                this.gl.uniform1fv(location, value);
-            } else if (value.length === 2) {
+            if (value.length === 2) {
                 this.gl.uniform2fv(location, value);
             } else if (value.length === 3) {
                 this.gl.uniform3fv(location, value);
@@ -116,6 +115,15 @@ export default class MaterialNodeShaderProgram {
             } else {
                 console.warn(`Parameter '${name}' has too many values (${value.length})`);
             }
+        } else {
+            console.warn(`Parameter '${name}' was not found in the fragment shader.`);
+        }
+    }
+
+    public setIntParameter(name: string, value: number) {
+        const location = this.gl.getUniformLocation(this.program, PREFIX_PARAMETER + name);
+        if (location) {
+            this.gl.uniform1i(location, value);
         } else {
             console.warn(`Parameter '${name}' was not found in the fragment shader.`);
         }
