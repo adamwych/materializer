@@ -18,7 +18,7 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
     const engine = useRenderingEngine()!;
 
     let queue: Array<number> = [];
-    let shouldRenderPreview = false;
+    let shouldRenderPreview = true;
 
     const [_, start, __] = createRAF(() => {
         for (const job of queue) {
