@@ -22,4 +22,6 @@ void main(void) {
     } else if (p_mode == 3) {
         out_color /= texture(i_background, a_texCoord) * p_intensity;
     }
+    
+    out_color.a = 1.0;
 }
