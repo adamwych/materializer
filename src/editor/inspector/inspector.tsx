@@ -3,6 +3,7 @@ import { For, Show } from "solid-js";
 import MaterialNodeInspectorParameter from "./parameter.tsx";
 import { useMaterialContext } from "../material-context.ts";
 import PanelSection from "../../components/panel/section.tsx";
+import TextInput from "../../components/input/text-input.tsx";
 
 export default function MaterialNodeInspectorPanel() {
     const editorCtx = useEditorContext()!;
@@ -21,12 +22,7 @@ export default function MaterialNodeInspectorPanel() {
         <div class="bg-gray-200-0 overflow-auto flex-1">
             <Show when={node()}>
                 <PanelSection label="Name">
-                    <input
-                        class="w-full bg-gray-100-0 px-4 py-2 rounded-sm"
-                        type="text"
-                        value={node()!.label}
-                        onInput={(ev) => onNameChange(ev.target.value)}
-                    />
+                    <TextInput value={node()!.label} onInput={onNameChange} />
                 </PanelSection>
 
                 <PanelSection label="Parameters">
