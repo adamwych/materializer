@@ -25,7 +25,7 @@ export default function MaterialNodeInspectorNumberInput(props: InputProps<numbe
                 style={{ width: "54px" }}
                 class="border-none outline-none bg-transparent text-center"
                 type="number"
-                value={props.value().toFixed(1)}
+                value={props.value().toFixed(2)}
                 onChange={(ev) => props.onChange(parseFloat(ev.target.value))}
             />
         </div>
