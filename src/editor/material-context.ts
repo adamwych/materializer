@@ -47,7 +47,7 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                 const id = Math.max(...material.nodes.map((x) => x.id)) + 1;
                 const node: MaterialNode = {
                     id,
-                    label: typePath,
+                    label: spec.name,
                     parameters: parameters,
                     x,
                     y,
@@ -81,6 +81,19 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
 
                         node.x += x;
                         node.y += y;
+                    }),
+                );
+            },
+
+            setNodeLabel(id: number, label: string) {
+                setMaterial(
+                    produce((material) => {
+                        const node = material.nodes.find((x) => x.id === id);
+                        if (!node) {
+                            throw new Error(`Failed to change node label: Node does not exist.`);
+                        }
+
+                        node.label = label;
                     }),
                 );
             },

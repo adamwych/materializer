@@ -30,6 +30,11 @@ export default function MaterialGraphEditorNodes() {
             return;
         }
 
+        const focusedElements = document.querySelectorAll(":focus");
+        if (focusedElements.length > 0) {
+            return;
+        }
+
         if (ev.key === " ") {
             setNewNodePopoverCoords({ ...lastMousePosition() });
         } else if (ev.key === "Escape") {

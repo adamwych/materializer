@@ -1,6 +1,7 @@
 import { createEffect } from "solid-js";
 import { useRenderingEngine } from "../../renderer/engine.ts";
 import makeMouseMoveListener from "../../utils/makeMouseMoveListener.ts";
+import PanelSection from "../../components/panel/section.tsx";
 
 export default function MaterialPreviewPanel() {
     const renderingEngine = useRenderingEngine()!;
@@ -35,12 +36,9 @@ export default function MaterialPreviewPanel() {
     });
 
     return (
-        <div>
-            <div class="px-4 py-2 text-sm flex items-center justify-between bg-gray-300-0 border-b border-gray-400-0 font-semibold uppercase text-gray-800-0">
-                Preview
-            </div>
+        <PanelSection label="Preview">
             <canvas
-                class="flex-shrink-0"
+                class="-m-4 flex-shrink-0"
                 width={400}
                 height={400}
                 ref={(canvas) => {
@@ -49,6 +47,6 @@ export default function MaterialPreviewPanel() {
                 onMouseDown={onMouseDown}
                 onWheel={onWheel}
             ></canvas>
-        </div>
+        </PanelSection>
     );
 }
