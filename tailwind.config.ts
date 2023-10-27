@@ -1,14 +1,16 @@
-function hexToRGB(hex) {
+import { PluginAPI } from "tailwindcss/types/config";
+
+function hexToRGB(hex: string) {
     const r = parseInt(hex.substr(1, 2), 16);
     const g = parseInt(hex.substr(3, 2), 16);
     const b = parseInt(hex.substr(5, 2), 16);
     return `${r}, ${g}, ${b}`;
 }
 
-function exportColorsAsCSSVariables({ addBase, theme }) {
-    const properties = {};
+function exportColorsAsCSSVariables(api: PluginAPI) {
+    const properties: { [k: string]: any } = {};
 
-    Object.entries(theme("colors")).forEach(([name, values]) => {
+    Object.entries(api.theme("colors")!).forEach(([name, values]) => {
         if (Array.isArray(values)) {
             properties[`--color-${name}`] = values[0];
             properties[`--color-${name}-contrast`] = values[1];
@@ -17,7 +19,9 @@ function exportColorsAsCSSVariables({ addBase, theme }) {
                 properties[`--color-${name}-rgb`] = hexToRGB(values[0]);
             }
         } else if (typeof values === "object") {
-            Object.entries(values).forEach(([weight, value]) => {
+            Object.entries(values!).forEach((entry) => {
+                const weight = entry[0] as unknown as number;
+                const value = entry[1] as [string, string];
                 properties[`--color-${name}-${weight}`] = value[0];
                 properties[`--color-${name}-${weight}-contrast`] = value[1];
 
@@ -30,17 +34,17 @@ function exportColorsAsCSSVariables({ addBase, theme }) {
         }
     });
 
-    addBase({
+    api.addBase({
         ":root": properties,
     });
 }
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     safelist: [
         {
-            pattern: /(text|bg|border)-(primary|purple|gold)-(100|200|300|400|500|600|700)/,
+            pattern:
+                /(text|bg|border)-(white|black|gray|washed-red|washed-green|washed-blue)-(100|200|300|400|500|600|700|800)/,
             variants: ["hover", "active", "group-hover"],
         },
     ],
@@ -60,8 +64,20 @@ module.exports = {
                 700: ["#8c8c8c", "#ffffff"],
                 800: ["#9c9c9c", "#ffffff"],
             },
-            green: {
-                0: ["#00ff00", "#ffffff"],
+            "washed-red": {
+                500: ["#6e4646", "#ffffff"],
+                700: ["#a46363", "#ffffff"],
+                800: ["#c17878", "#ffffff"],
+            },
+            "washed-green": {
+                500: ["#536e46", "#ffffff"],
+                700: ["#64a463", "#ffffff"],
+                800: ["#78c184", "#ffffff"],
+            },
+            "washed-blue": {
+                500: ["#46556e", "#ffffff"],
+                700: ["#637ea4", "#ffffff"],
+                800: ["#788dc1", "#ffffff"],
             },
         },
     },
