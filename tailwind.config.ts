@@ -25,6 +25,10 @@ function exportColorsAsCSSVariables(api: PluginAPI) {
             });
         } else {
             properties[`--color-${name}`] = values;
+
+            if (values.startsWith("#")) {
+                properties[`--color-${name}-rgb`] = hexToRGB(values);
+            }
         }
     });
 
