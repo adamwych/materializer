@@ -9,6 +9,7 @@ import solidColorGlsl from "../glsl/solid-color.glsl?raw";
 import outputGlsl from "../glsl/output.glsl?raw";
 import blendGlsl from "../glsl/blend.glsl?raw";
 import noiseGlsl from "../glsl/noise.glsl?raw";
+import shapeGlsl from "../glsl/shape.glsl?raw";
 import BlendMode from "./types/blend-mode.ts";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
@@ -151,6 +152,76 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                 painter: {
                     type: "glsl",
                     glsl: outputGlsl,
+                },
+            },
+        ],
+        [
+            "shape",
+            {
+                name: "Shape",
+                parameters: [
+                    {
+                        id: "shape",
+                        label: "Shape",
+                        default: 0,
+                        type: "select",
+                        valueType: "int",
+                        options: [
+                            { label: "Rectangle", value: 0 },
+                            { label: "Circle", value: 1 },
+                            { label: "Triangle", value: 2 },
+                        ],
+                    },
+                    {
+                        id: "rectWidth",
+                        label: "Width",
+                        default: 0.5,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                        when: "params.shape === 0",
+                    },
+                    {
+                        id: "rectHeight",
+                        label: "Height",
+                        default: 0.5,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                        when: "params.shape === 0",
+                    },
+                    {
+                        id: "circleRadius",
+                        label: "Radius",
+                        default: 0.5,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                        when: "params.shape === 1",
+                    },
+                    {
+                        id: "triangleSize",
+                        label: "Size",
+                        default: 0.5,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                        when: "params.shape === 2",
+                    },
+                ],
+                inputSockets: [],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                painter: {
+                    type: "glsl",
+                    glsl: shapeGlsl,
                 },
             },
         ],
