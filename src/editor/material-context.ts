@@ -25,6 +25,12 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
 
         value.nodes.forEach((node) => {
             node.spec = appContext.getNodeSpec(node.path);
+            node.spec.parameters.forEach((info) => {
+                const hasValue = info.id in node.parameters;
+                if (!hasValue) {
+                    node.parameters[info.id] = info.default;
+                }
+            });
         });
 
         return {
