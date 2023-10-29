@@ -9,6 +9,17 @@ export default function MaterialNodeInspectorPanel() {
     const editorCtx = useEditorContext()!;
     const materialCtx = useMaterialContext()!;
     const node = editorCtx.getInspectedNode();
+    const visibleParameters = () => {
+        const n = node()!;
+        const allParameters = n.spec!.parameters;
+        return allParameters.filter((info) => {
+            if (info.when) {
+                // FIXME: Don't use eval()!
+                return eval?.(`((params) => ${info.when})(${JSON.stringify(n.parameters)});`);
+            }
+            return true;
+        });
+    };
 
     function onNameChange(name: string) {
         materialCtx.setNodeLabel(node()!.id, name);
@@ -27,7 +38,7 @@ export default function MaterialNodeInspectorPanel() {
 
                 <PanelSection label="Parameters">
                     <div class="-m-4">
-                        <For each={node()!.spec!.parameters}>
+                        <For each={visibleParameters()}>
                             {(parameter) => (
                                 <MaterialNodeInspectorParameter
                                     parameter={parameter}

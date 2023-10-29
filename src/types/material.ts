@@ -17,6 +17,7 @@ export type MaterialNodeParameterInfo = {
     min?: number;
     max?: number;
     options?: Array<{ label: string; value: any }>;
+    when?: string;
 };
 
 /**
