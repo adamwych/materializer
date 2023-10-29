@@ -35,8 +35,10 @@ textarea {
     user-select: initial;
 }
 
+input,
+textarea,
 select {
-    color: var(--color-gray-100);
+    font-family: "Noto Sans", Arial, Helvetica, sans-serif;
 }
 
 .animate-fade-in {

@@ -1,3 +1,4 @@
+import { DeepReadonly } from "ts-essentials";
 import { MaterialNodeParameterInfo } from "../types/material.ts";
 
 const PREFIX_PARAMETER = "p_";
@@ -12,42 +13,28 @@ export default class MaterialNodeShaderProgram {
      * vertex shader and given fragment shader.
      *
      * @param gl
-     * @param code
+     * @param vsCode
+     * @param fsCode
      * @returns
      */
     constructor(
         private readonly gl: WebGL2RenderingContext,
-        code: string,
+        vsCode: string,
+        fsCode: string,
     ) {
         const program = gl.createProgram()!;
-
-        const vertexShader = createAndCompileShader(
-            gl,
-            gl.VERTEX_SHADER,
-            `
-            #version 300 es
-            precision highp float;
-            
-            out vec2 a_texCoord;
-            
-            void main(void) {
-                float x = float((gl_VertexID & 1) << 2);
-                float y = float((gl_VertexID & 2) << 1);
-                a_texCoord.x = x * 0.5;
-                a_texCoord.y = y * 0.5;
-                gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);
-            }
-            `.trim(),
-        );
-
-        const fragmentShader = createAndCompileShader(gl, gl.FRAGMENT_SHADER, code);
-
+        const vertexShader = createAndCompileShader(gl, gl.VERTEX_SHADER, vsCode);
+        const fragmentShader = createAndCompileShader(gl, gl.FRAGMENT_SHADER, fsCode);
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
         gl.deleteShader(vertexShader);
         gl.deleteShader(fragmentShader);
         this.program = program;
+    }
+
+    public getAttributeLocation(name: string) {
+        return this.gl.getAttribLocation(this.program, name);
     }
 
     public bind() {
@@ -81,7 +68,7 @@ export default class MaterialNodeShaderProgram {
         }
     }
 
-    public setParameter(info: MaterialNodeParameterInfo, value: any) {
+    public setParameter(info: DeepReadonly<MaterialNodeParameterInfo>, value: any) {
         this.gl.useProgram(this.program);
 
         switch (info.valueType) {

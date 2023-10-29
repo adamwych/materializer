@@ -1,6 +1,6 @@
 export enum MaterialNodeOutputTarget {
     Albedo = "albedo",
-    Normal = "normal",
+    Height = "height",
 }
 
 /**
@@ -55,15 +55,33 @@ export type Material = {
     }>;
 };
 
+export type MaterialNodePainterInfo =
+    | {
+          type: "glsl";
+          glsl: string;
+      }
+    | {
+          type: "scatter";
+      };
+
 /**
  * Describes a material node of specific kind.
  */
 export type MaterialNodeSpec = {
+    /** Human-readable name of this node kind. */
     name: string;
+
+    /** List of user-editable parameters that this node accepts. */
     parameters: Array<MaterialNodeParameterInfo>;
+
+    /** Inputs that this node accepts. */
     inputSockets: Array<MaterialNodeSocketInfo>;
+
+    /** Outputs that this node exposes. */
     outputSockets: Array<MaterialNodeSocketInfo>;
-    glsl: string;
+
+    /** Painter to use to draw this node. */
+    painter: MaterialNodePainterInfo;
 };
 
 export type MaterialNodesPackage = {

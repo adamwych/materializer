@@ -1,13 +1,15 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { useMaterialContext } from "../editor/material-context";
 import { MaterialNode, MaterialNodeOutputTarget, isOutputNodePath } from "../types/material";
-import MaterialNodeShaderProgram from "./program";
 import { createSignal } from "solid-js";
 import PreviewShaderProgram from "./preview-program";
 import pbrVertexShader from "./pbr.vertex.glsl?raw";
 import pbrFragmentShader from "./pbr.fragment.glsl?raw";
 import PreviewCameraController from "../editor/preview/camera";
 import { ReactiveMap } from "@solid-primitives/map";
+import MaterialNodePainter, { MaterialNodePainterType } from "./painters/painter";
+import GLSLMaterialNodePainter from "./painters/glsl";
+import ScatterMaterialNodePainter from "./painters/scatter";
 
 type NodeBitmapStorageEntry = {
     bitmap?: ImageBitmap;
@@ -24,7 +26,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
         antialias: false,
     })!;
     const textures = new Map<string, WebGLTexture>();
-    const shaders = new Map<number, MaterialNodeShaderProgram>();
+    const painters = new Map<number, MaterialNodePainter>();
     const bitmaps = new ReactiveMap<string, NodeBitmapStorageEntry>();
     const previewCamera = new PreviewCameraController();
     const [previewTexture, setPreviewTexture] = createSignal<ImageBitmap>();
@@ -80,6 +82,15 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
         return texture;
     }
 
+    function getPainterConstructor(type: MaterialNodePainterType) {
+        switch (type) {
+            case "glsl":
+                return GLSLMaterialNodePainter;
+            case "scatter":
+                return ScatterMaterialNodePainter;
+        }
+    }
+
     return {
         renderNode(nodeId: number) {
             const node = materialCtx.getNodeById(nodeId);
@@ -91,10 +102,19 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
                 throw new Error(`Cannot run render job: Node has no outputs.`);
             }
 
-            const fbo = createFramebuffer(node);
-            const shader =
-                shaders.get(node.id) ?? new MaterialNodeShaderProgram(gl, node.spec.glsl);
+            if (!painters.has(node.id)) {
+                const painterCtor = getPainterConstructor(node.spec.painter.type);
+                if (!painterCtor) {
+                    throw new Error(
+                        `Cannot run render job: Painter '${node.spec.painter.type}' it not supported.`,
+                    );
+                }
+                painters.set(node.id, new painterCtor(gl, node.spec.painter));
+            }
 
+            const fbo = createFramebuffer(node);
+
+            const inputTextures = new Map<string, WebGLTexture>();
             for (const input of node.spec.inputSockets) {
                 const connection = materialCtx
                     .getSocketConnections()
@@ -103,7 +123,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
                     const textureCachePath = `${connection.from.nodeId}-${connection.from.socketId}`;
                     const texture = textures.get(textureCachePath);
                     if (texture) {
-                        shader.setInputTexture(input.id, texture);
+                        inputTextures.set(input.id, texture);
                     } else {
                         console.warn(
                             `Texture for input socket '${input.id}' of node '${node.label}' has not been rendered yet.`,
@@ -114,21 +134,13 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
 
             gl.bindTexture(gl.TEXTURE_2D, null);
 
-            shader.bind();
-
-            node.spec.parameters.forEach((parameter) => {
-                shader.setParameter(parameter, node.parameters[parameter.id]);
-            });
-
-            shaders.set(node.id, shader);
-
+            gl.enable(gl.DEPTH_TEST);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0, 0, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            gl.drawBuffers(node.spec.outputSockets.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
-            gl.drawArrays(gl.TRIANGLE_FAN, 0, 3);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-            shader.reset();
+            const painter = painters.get(node.id)!;
+            painter.render(gl, node, inputTextures);
 
             gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fbo);
             gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
@@ -162,7 +174,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
             shader.bind();
             shader.setCamera(previewCamera);
 
-            [MaterialNodeOutputTarget.Albedo, MaterialNodeOutputTarget.Normal].forEach(
+            [MaterialNodeOutputTarget.Albedo, MaterialNodeOutputTarget.Height].forEach(
                 (target, index) => {
                     const outputNode = materialCtx
                         .getNodes()
@@ -241,7 +253,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
             gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 20, 3 * 4);
             gl.enableVertexAttribArray(1);
 
-            gl.clearColor(0.1, 0.1, 0.1, 1);
+            gl.clearColor(0.05, 0.05, 0.05, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 

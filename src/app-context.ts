@@ -32,7 +32,10 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         id: "color",
                     },
                 ],
-                glsl: solidColorGlsl,
+                painter: {
+                    type: "glsl",
+                    glsl: solidColorGlsl,
+                },
             },
         ],
         [
@@ -65,7 +68,10 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         id: "color",
                     },
                 ],
-                glsl: noiseGlsl,
+                painter: {
+                    type: "glsl",
+                    glsl: noiseGlsl,
+                },
             },
         ],
         [
@@ -109,7 +115,10 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         id: "color",
                     },
                 ],
-                glsl: blendGlsl,
+                painter: {
+                    type: "glsl",
+                    glsl: blendGlsl,
+                },
             },
         ],
         [
@@ -125,7 +134,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         valueType: "int",
                         options: [
                             { label: "Albedo", value: MaterialNodeOutputTarget.Albedo },
-                            { label: "Normal", value: MaterialNodeOutputTarget.Normal },
+                            { label: "Height", value: MaterialNodeOutputTarget.Height },
                         ],
                     },
                 ],
@@ -139,7 +148,106 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         id: "output",
                     },
                 ],
-                glsl: outputGlsl,
+                painter: {
+                    type: "glsl",
+                    glsl: outputGlsl,
+                },
+            },
+        ],
+        [
+            "scatter",
+            {
+                name: "Scatter",
+                parameters: [
+                    {
+                        id: "amount",
+                        label: "Amount",
+                        default: 10,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 200,
+                    },
+                    {
+                        id: "size",
+                        label: "Size",
+                        default: 0.25,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                    {
+                        id: "spreadX",
+                        label: "Spread X",
+                        default: 1,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 4,
+                    },
+                    {
+                        id: "spreadY",
+                        label: "Spread Y",
+                        default: 1,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 4,
+                    },
+                    {
+                        id: "randomRotation",
+                        label: "Random Rotation",
+                        default: 0,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 360,
+                    },
+                    {
+                        id: "randomScale",
+                        label: "Random Scale",
+                        default: 0,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 512,
+                    },
+                    {
+                        id: "seed",
+                        label: "Random Seed",
+                        default: 1,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                    {
+                        id: "blendMode",
+                        label: "Blending",
+                        default: BlendMode.Add,
+                        type: "select",
+                        valueType: "int",
+                        options: [
+                            { label: "Add", value: BlendMode.Add },
+                            { label: "Subtract", value: BlendMode.Subtract },
+                            { label: "None", value: 255 },
+                        ],
+                    },
+                ],
+                inputSockets: [
+                    {
+                        id: "shape",
+                    },
+                ],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                painter: {
+                    type: "scatter",
+                },
             },
         ],
     ]),
