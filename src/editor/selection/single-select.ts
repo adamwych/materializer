@@ -16,7 +16,11 @@ export default function createSingleSelectHandler() {
     function onMouseMove(ev: MouseEvent) {
         ev.stopPropagation();
         const info = touchDownInfo()!;
-        materialCtx.moveNode(info.nodeId, ev.movementX, ev.movementY);
+        materialCtx.moveNode(
+            info.nodeId,
+            ev.movementX / editorCtx.zoom(),
+            ev.movementY / editorCtx.zoom(),
+        );
     }
 
     function onMouseUp(ev: MouseEvent) {
@@ -25,7 +29,8 @@ export default function createSingleSelectHandler() {
         // If we've not moved far from the initial touch down position, then
         // interpret it as a click.
         const info = touchDownInfo()!;
-        const movedDistance = Math.abs(ev.pageX - info.coords.x) + Math.abs(ev.pageY - info.coords.y);
+        const movedDistance =
+            Math.abs(ev.pageX - info.coords.x) + Math.abs(ev.pageY - info.coords.y);
         if (movedDistance <= 10) {
             editorCtx.inspectNode(info.nodeId);
         }

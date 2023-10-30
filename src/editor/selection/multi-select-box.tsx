@@ -10,7 +10,7 @@ export default function MaterialGraphEditorMultiselectBox(props: Props) {
         <div
             style={{
                 position: "absolute",
-                top: props.y + "px",
+                top: props.y - 70 + "px",
                 left: props.x + "px",
                 width: props.width + "px",
                 height: props.height + "px",

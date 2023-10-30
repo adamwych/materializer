@@ -1,9 +1,10 @@
-import { useEditorContext } from "../editor-context.ts";
 import { createSignal } from "solid-js";
-import { Point2D } from "../../types/point.ts";
-import MaterialGraphEditorMultiselectBox from "./multi-select-box.tsx";
 import { MaterialNode } from "../../types/material.ts";
+import { Point2D } from "../../types/point.ts";
+import { rectIntersects } from "../../utils/math.ts";
+import { useEditorContext } from "../editor-context.ts";
 import { useMaterialContext } from "../material-context.ts";
+import MaterialGraphEditorMultiselectBox from "./multi-select-box.tsx";
 
 export default function createMultiSelectManager() {
     const editorCtx = useEditorContext()!;
@@ -12,29 +13,29 @@ export default function createMultiSelectManager() {
     const [boxRect, setBoxRect] = createSignal<DOMRect>();
     const [highlightedNodes, setHighlightedNodes] = createSignal<Array<MaterialNode>>([]);
 
+    function calculateSelectionBoxRect(mouseX: number, mouseY: number) {
+        const startPoint = touchDownPoint()!;
+        return new DOMRect(
+            mouseX < startPoint.x ? mouseX : startPoint.x,
+            mouseY < startPoint.y ? mouseY : startPoint.y,
+            Math.abs(mouseX - startPoint.x),
+            Math.abs(mouseY - startPoint.y),
+        );
+    }
+
     function onMouseMove(ev: MouseEvent) {
         ev.stopPropagation();
 
-        const menuBarHeight = 70;
-        const startPoint = touchDownPoint()!;
-        const rect = new DOMRect(
-            startPoint.x,
-            startPoint.y - menuBarHeight,
-            ev.pageX - startPoint.x,
-            ev.pageY - startPoint.y,
-        );
+        const rect = calculateSelectionBoxRect(ev.pageX, ev.pageY);
+        const intersectingNodes = materialCtx.getNodes().filter((node) => {
+            const element = editorCtx.getNodeElement(node.id);
+            if (!element) {
+                return false;
+            }
 
-        const intersectingNodes = materialCtx
-            .getNodes()
-            .filter((node) => {
-                return (
-                    node.x >= rect.x &&
-                    node.x <= rect.x + rect.width &&
-                    node.y >= rect.y &&
-                    node.y <= rect.y + rect.height
-                );
-            })
-            .map((x) => x);
+            const elementRect = element.getBoundingClientRect();
+            return rectIntersects(elementRect, rect);
+        });
 
         setHighlightedNodes(intersectingNodes);
         editorCtx.setHighlightedNodes(intersectingNodes.map((x) => x.id));
@@ -62,7 +63,11 @@ export default function createMultiSelectManager() {
 
         const nodes = highlightedNodes();
         for (const node of nodes) {
-            materialCtx.moveNode(node.id, ev.movementX, ev.movementY);
+            materialCtx.moveNode(
+                node.id,
+                ev.movementX / editorCtx.zoom(),
+                ev.movementY / editorCtx.zoom(),
+            );
         }
     }
 

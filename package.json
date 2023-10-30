@@ -15,6 +15,7 @@
         "@solid-primitives/map": "^0.4.8",
         "@solid-primitives/raf": "^2.1.13",
         "@solid-primitives/set": "^0.4.8",
+        "@solid-primitives/tween": "^1.2.6",
         "@types/culori": "^2.0.3",
         "@types/seedrandom": "^3.0.7",
         "@typescript-eslint/eslint-plugin": "^6.7.4",

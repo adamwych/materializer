@@ -2,6 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import { useAppContext } from "../app-context.ts";
 import { Point2D } from "../types/point.ts";
 import makeMouseMoveListener from "../utils/makeMouseMoveListener.ts";
+import { clamp } from "../utils/math.ts";
 import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorContext } from "./editor-context.ts";
 import MaterialGraphEditorControls from "./graph-controls.tsx";
@@ -15,15 +16,26 @@ export default function MaterialGraphEditorNodes() {
     const selectionManager = useEditorSelectionManager()!;
     const materialCtx = useMaterialContext()!;
     const editorCtx = useEditorContext()!;
-    const [dragOffset, setDragOffset] = createSignal<Point2D>({ x: 0, y: 0 });
     const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
+    const dragOffset = editorCtx.dragOffset;
+    const zoom = editorCtx.zoom;
 
-    const onMouseDown = makeMouseMoveListener((ev) => {
-        setDragOffset((offset) => ({
-            x: offset.x + ev.movementX,
-            y: offset.y + ev.movementY,
+    const registerPanMoveHandler = makeMouseMoveListener((ev) => {
+        editorCtx.setDragOffset((offset) => ({
+            x: Math.round(offset.x + ev.movementX / editorCtx.zoom()),
+            y: Math.round(offset.y + ev.movementY / editorCtx.zoom()),
         }));
     });
+
+    function setTargetZoom(callback: (zoom: number) => number) {
+        editorCtx.setTargetZoom((zoom) => {
+            return clamp(callback(zoom), 0.2, 2);
+        });
+    }
+
+    function onWheel(ev: WheelEvent) {
+        setTargetZoom((z) => z - ev.deltaY / 100 / 5);
+    }
 
     window.addEventListener("keyup", (ev) => {
         const hoveredElements = document.querySelectorAll(":hover");
@@ -54,16 +66,12 @@ export default function MaterialGraphEditorNodes() {
 
     return (
         <div
-            class="relative h-full flex-1 overflow-hidden"
-            style={{
-                width: "100%",
-                height: "100%",
-                "background-image": "url(grid-bg.svg)",
-                "background-position": `${dragOffset().x}px ${dragOffset().y}px`,
-            }}
+            id="editor-root"
+            class="relative w-full h-full flex-1 overflow-hidden bg-gray-100"
+            onWheel={onWheel}
             onMouseDown={(ev) => {
                 if (ev.button === 1) {
-                    onMouseDown(ev);
+                    registerPanMoveHandler(ev);
                 } else {
                     selectionManager.onMainAreaMouseDown(ev);
                 }
@@ -81,13 +89,31 @@ export default function MaterialGraphEditorNodes() {
 
             {selectionManager.renderMultiselectBox()}
 
-            <MaterialGraphEditorControls onCenter={() => setDragOffset({ x: 0, y: 0 })} />
+            <MaterialGraphEditorControls
+                zoom={zoom()}
+                onZoomIn={() => setTargetZoom((s) => s + 0.2)}
+                onZoomOut={() => setTargetZoom((s) => s - 0.2)}
+                onZoomReset={() => setTargetZoom((_) => 1)}
+                onCenter={() => editorCtx.setDragOffset({ x: 0, y: 0 })}
+            />
+
+            <div
+                class="absolute w-full h-full top-0 left-0 pointer-events-none"
+                style={{
+                    "background-image": "url(grid-bg.svg)",
+                    "background-position": `${dragOffset().x * zoom()}px ${
+                        dragOffset().y * zoom()
+                    }px`,
+                }}
+            />
 
             <div
                 id="editor-root"
                 class="w-full h-full"
                 style={{
-                    transform: `translate(${dragOffset().x}px, ${dragOffset().y}px)`,
+                    transform: `scale(${zoom()}) translate(${dragOffset().x}px, ${
+                        dragOffset().y
+                    }px)`,
                 }}
             >
                 <MaterialGraphEditorConnectionsOverlay />

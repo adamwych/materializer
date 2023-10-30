@@ -561,6 +561,11 @@
   dependencies:
     "@solid-primitives/utils" "^6.2.1"
 
+"@solid-primitives/tween@^1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/tween/-/tween-1.2.6.tgz#7c75ae97be6d1127823921e25845525feadbe09f"
+  integrity sha512-sxsGirwdSMX+ZNepvpr6JVaRjGQfl0OXAelixc1CmLYktEM9biZtIb0GhwFJlo52Gx2vROXatop6fvdeBgbdOQ==
+
 "@solid-primitives/utils@^6.2.1":
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/@solid-primitives/utils/-/utils-6.2.1.tgz#320fb2180743031622b40fc43b0e63bf55686cfb"
