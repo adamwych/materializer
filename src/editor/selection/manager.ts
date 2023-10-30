@@ -16,6 +16,10 @@ const [EditorSelectionManagerProvider, useEditorSelectionManager] = createContex
         },
 
         onNodeMouseDown(ev: MouseEvent, nodeId: number) {
+            if (ev.button !== 0) {
+                return;
+            }
+
             if (multiSelect.isNodeSelected(nodeId)) {
                 multiSelect.onNodeMouseDown(ev);
             } else {

@@ -1,24 +1,28 @@
 import { createSignal, For, Show } from "solid-js";
-import MaterialNodeBox from "./node.tsx";
-import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
-import { useEditorSelectionManager } from "./selection/manager.ts";
+import { useAppContext } from "../app-context.ts";
 import { Point2D } from "../types/point.ts";
-import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
-import { useMaterialContext } from "./material-context.ts";
+import makeMouseMoveListener from "../utils/makeMouseMoveListener.ts";
+import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorContext } from "./editor-context.ts";
+import MaterialGraphEditorControls from "./graph-controls.tsx";
+import { useMaterialContext } from "./material-context.ts";
+import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
+import MaterialNodeBox from "./node.tsx";
+import { useEditorSelectionManager } from "./selection/manager.ts";
 
 export default function MaterialGraphEditorNodes() {
+    const appCtx = useAppContext()!;
     const selectionManager = useEditorSelectionManager()!;
     const materialCtx = useMaterialContext()!;
     const editorCtx = useEditorContext()!;
-    const [lastMousePosition, setLastMousePosition] = createSignal<Point2D>({
-        x: 0,
-        y: 0,
-    });
+    const [dragOffset, setDragOffset] = createSignal<Point2D>({ x: 0, y: 0 });
     const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
 
-    window.addEventListener("mousemove", (ev) => {
-        setLastMousePosition({ x: ev.pageX, y: ev.pageY });
+    const onMouseDown = makeMouseMoveListener((ev) => {
+        setDragOffset((offset) => ({
+            x: offset.x + ev.movementX,
+            y: offset.y + ev.movementY,
+        }));
     });
 
     window.addEventListener("keyup", (ev) => {
@@ -36,7 +40,9 @@ export default function MaterialGraphEditorNodes() {
         }
 
         if (ev.key === " ") {
-            setNewNodePopoverCoords((coords) => (coords ? undefined : { ...lastMousePosition() }));
+            setNewNodePopoverCoords((coords) =>
+                coords ? undefined : { ...appCtx.mousePosition() },
+            );
         } else if (ev.key === "Escape") {
             setNewNodePopoverCoords(undefined);
         } else if (ev.key === "Delete") {
@@ -48,13 +54,20 @@ export default function MaterialGraphEditorNodes() {
 
     return (
         <div
-            id="editor-root"
             class="relative h-full flex-1 overflow-hidden"
             style={{
+                width: "100%",
+                height: "100%",
                 "background-image": "url(grid-bg.svg)",
+                "background-position": `${dragOffset().x}px ${dragOffset().y}px`,
             }}
             onMouseDown={(ev) => {
-                selectionManager.onMainAreaMouseDown(ev);
+                if (ev.button === 1) {
+                    onMouseDown(ev);
+                } else {
+                    selectionManager.onMainAreaMouseDown(ev);
+                }
+
                 setNewNodePopoverCoords(undefined);
             }}
         >
@@ -68,11 +81,21 @@ export default function MaterialGraphEditorNodes() {
 
             {selectionManager.renderMultiselectBox()}
 
-            <MaterialGraphEditorConnectionsOverlay />
+            <MaterialGraphEditorControls onCenter={() => setDragOffset({ x: 0, y: 0 })} />
 
-            <For each={materialCtx.getNodes()}>
-                {(node) => <MaterialNodeBox node={() => node} />}
-            </For>
+            <div
+                id="editor-root"
+                class="w-full h-full"
+                style={{
+                    transform: `translate(${dragOffset().x}px, ${dragOffset().y}px)`,
+                }}
+            >
+                <MaterialGraphEditorConnectionsOverlay />
+
+                <For each={materialCtx.getNodes()}>
+                    {(node) => <MaterialNodeBox node={() => node} />}
+                </For>
+            </div>
         </div>
     );
 }

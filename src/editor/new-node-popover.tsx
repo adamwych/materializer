@@ -37,7 +37,7 @@ export default function MaterialGraphNewNodePopover(props: Props) {
                 <RiSystemCloseFill size={16} onClick={props.onClose} />
             </div>
 
-            <For each={Array.from(appCtx.getNodesPackages().entries())}>
+            <For each={Array.from(appCtx.nodesPackages.entries())}>
                 {([id, pkg]) => (
                     <MaterialGraphNewNodePopoverPackage
                         id={id}

@@ -11,6 +11,8 @@ import blendGlsl from "../glsl/blend.glsl?raw";
 import noiseGlsl from "../glsl/noise.glsl?raw";
 import shapeGlsl from "../glsl/shape.glsl?raw";
 import BlendMode from "./types/blend-mode.ts";
+import { createSignal } from "solid-js";
+import { Point2D } from "./types/point.ts";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
     nodes: new Map<string, MaterialNodeSpec>([
@@ -389,8 +391,13 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
 };
 
 export const [AppContextProvider, useAppContext] = createContextProvider(() => {
+    const [mousePosition, setMousePosition] = createSignal<Point2D>({ x: 0, y: 0 });
     const nodesPackages = new ReactiveMap<string, MaterialNodesPackage>();
     nodesPackages.set("@materializer", BUILTIN_NODES_PACKAGE);
+
+    window.addEventListener("mousemove", (ev) => {
+        setMousePosition({ x: ev.pageX, y: ev.pageY });
+    });
 
     return {
         addNodesPackage(name: string, pkg: MaterialNodesPackage) {
@@ -407,6 +414,7 @@ export const [AppContextProvider, useAppContext] = createContextProvider(() => {
             return structuredClone(pkg.nodes.get(parts[1]))!;
         },
 
-        getNodesPackages: () => nodesPackages,
+        nodesPackages,
+        mousePosition,
     };
 });
