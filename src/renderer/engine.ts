@@ -33,8 +33,10 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
     const [previewTexture, setPreviewTexture] = createSignal<ImageBitmap>();
 
     materialCtx.events.on("removed", (node) => {
+        painters.delete(node.id);
         node.spec?.outputSockets.forEach((output) => {
             textures.delete(`${node.id}-${output.id}`);
+            bitmaps.delete(`${node.id}-${output.id}`);
         });
     });
 
