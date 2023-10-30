@@ -50,7 +50,10 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                     parameters[parameter.id] = parameter.default;
                 });
 
-                const id = Math.max(...material.nodes.map((x) => x.id)) + 1;
+                const id =
+                    material.nodes.length === 0
+                        ? 0
+                        : Math.max(...material.nodes.map((x) => x.id)) + 1;
                 const node: MaterialNode = {
                     id,
                     label: spec.name,
