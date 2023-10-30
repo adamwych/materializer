@@ -18,6 +18,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "solid-color",
             {
                 name: "Solid color",
+                groupName: "Base",
                 parameters: [
                     {
                         id: "color",
@@ -43,6 +44,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "noise",
             {
                 name: "Noise",
+                groupName: "Noises",
                 parameters: [
                     {
                         id: "scale",
@@ -79,6 +81,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "blend",
             {
                 name: "Blend",
+                groupName: "Base",
                 parameters: [
                     {
                         id: "mode",
@@ -126,6 +129,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "output",
             {
                 name: "Output",
+                groupName: "Base",
                 parameters: [
                     {
                         id: "target",
@@ -159,6 +163,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "shape",
             {
                 name: "Shape",
+                groupName: "Shapes",
                 parameters: [
                     {
                         id: "shape",
@@ -229,6 +234,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "scatter",
             {
                 name: "Scatter",
+                groupName: "Layout",
                 parameters: [
                     {
                         id: "amount",
@@ -325,6 +331,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
             "tile",
             {
                 name: "Tile",
+                groupName: "Layout",
                 parameters: [
                     {
                         id: "amountX",

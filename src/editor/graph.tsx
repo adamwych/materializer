@@ -3,7 +3,7 @@ import MaterialNodeBox from "./node.tsx";
 import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { Point2D } from "../types/point.ts";
-import MaterialGraphEditorAddNodePopover from "./new-node-popover.tsx";
+import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
 import { useMaterialContext } from "./material-context.ts";
 import { useEditorContext } from "./editor-context.ts";
 
@@ -36,7 +36,7 @@ export default function MaterialGraphEditorNodes() {
         }
 
         if (ev.key === " ") {
-            setNewNodePopoverCoords({ ...lastMousePosition() });
+            setNewNodePopoverCoords((coords) => (coords ? undefined : { ...lastMousePosition() }));
         } else if (ev.key === "Escape") {
             setNewNodePopoverCoords(undefined);
         } else if (ev.key === "Delete") {
@@ -59,7 +59,7 @@ export default function MaterialGraphEditorNodes() {
             }}
         >
             <Show when={newNodePopoverCoords()}>
-                <MaterialGraphEditorAddNodePopover
+                <MaterialGraphNewNodePopover
                     x={newNodePopoverCoords()!.x}
                     y={newNodePopoverCoords()!.y}
                     onClose={() => setNewNodePopoverCoords(undefined)}

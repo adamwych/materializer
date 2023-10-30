@@ -1,6 +1,8 @@
 import { For } from "solid-js";
 import { useAppContext } from "../app-context.ts";
 import { useMaterialContext } from "./material-context.ts";
+import { RiSystemAddFill, RiSystemCloseFill } from "solid-icons/ri";
+import MaterialGraphNewNodePopoverPackage from "./new-node-popover-package.tsx";
 
 type Props = {
     x: number;
@@ -8,18 +10,18 @@ type Props = {
     onClose(): void;
 };
 
-export default function UIMaterialGraphNewNodePopover(props: Props) {
+export default function MaterialGraphNewNodePopover(props: Props) {
     const appCtx = useAppContext()!;
     const materialCtx = useMaterialContext()!;
 
     function onItemClick(typePath: string) {
-        materialCtx.instantiateNode(typePath, props.x, props.y);
+        materialCtx.instantiateNode(typePath, props.x, props.y - 70);
         props.onClose();
     }
 
     return (
         <div
-            class="fixed w-[256px] rounded-md overflow-hidden"
+            class="animate-fade-in origin-top-left fixed w-[224px] rounded-md overflow-hidden bg-gray-300"
             style={{
                 top: props.y + "px",
                 left: props.x + "px",
@@ -27,24 +29,21 @@ export default function UIMaterialGraphNewNodePopover(props: Props) {
             }}
             onMouseDown={(ev) => ev.stopPropagation()}
         >
-            <h1 class="p-4 font-semibold uppercase text-sm bg-gray-500">Add new node</h1>
+            <div class="p-2 text-sm text-gray-800 flex justify-between items-center border-b border-gray-200">
+                <div class="flex items-center gap-1">
+                    <RiSystemAddFill size={16} />
+                    <span class="font-semibold">Add node</span>
+                </div>
+                <RiSystemCloseFill size={16} onClick={props.onClose} />
+            </div>
+
             <For each={Array.from(appCtx.getNodesPackages().entries())}>
                 {([id, pkg]) => (
-                    <div class="bg-gray-400 py-2">
-                        <div class="font-semibold px-2">{id}</div>
-                        <ul>
-                            <For each={Array.from(pkg.nodes.entries())}>
-                                {([typeId, spec]) => (
-                                    <li
-                                        class="px-4 py-2 hover:bg-gray-500 active:bg-gray-600"
-                                        onClick={() => onItemClick(`${id}/${typeId}`)}
-                                    >
-                                        {spec.name}
-                                    </li>
-                                )}
-                            </For>
-                        </ul>
-                    </div>
+                    <MaterialGraphNewNodePopoverPackage
+                        id={id}
+                        package={pkg}
+                        onItemClick={onItemClick}
+                    />
                 )}
             </For>
         </div>

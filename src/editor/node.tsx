@@ -28,7 +28,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
             ref={(e) => editorCtx.updateNodeBoxElement(props.node().id, e)}
             class={`animate-fade-in group absolute bg-gray-200 rounded-md outline ${
                 isHighlighted()
-                    ? "outline-gray-500 active:outline-gray-300"
+                    ? "outline-blue-500 active:outline-gray-300"
                     : "outline-transparent hover:outline-gray-300"
             }`}
             style={{
@@ -73,6 +73,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
                             {(socket) => (
                                 <MaterialNodeSocketBox
                                     id={socket.id}
+                                    nodeId={props.node()!.id}
                                     alignment="left"
                                     socket={socket}
                                     onMouseDown={(ev) =>
@@ -98,6 +99,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
                             {(socket) => (
                                 <MaterialNodeSocketBox
                                     id={socket.id}
+                                    nodeId={props.node()!.id}
                                     alignment="right"
                                     socket={socket}
                                     onMouseDown={(ev) =>

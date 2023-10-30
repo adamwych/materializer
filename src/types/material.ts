@@ -75,6 +75,9 @@ export type MaterialNodeSpec = {
     /** Human-readable name of this node kind. */
     name: string;
 
+    /** Name of the group to put this node in. */
+    groupName: string;
+
     /** List of user-editable parameters that this node accepts. */
     parameters: Array<MaterialNodeParameterInfo>;
 
