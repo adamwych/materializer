@@ -18,17 +18,18 @@ export default function MaterialGraphEditorConnectionsOverlay() {
         toNodeId: number;
         toSocketId: string;
     }) {
-        const menuBarHeight = 70;
         const fromCoords = () => {
             // Update fromCoords whenever X or Y of the node change.
             const node = materialCtx.getNodeById(fromNodeId);
             node?.x;
             node?.y;
 
+            const nodeElement = editorCtx.getNodeElement(fromNodeId);
             const element = editorCtx.getNodeSocketElement(fromNodeId, fromSocketId);
-            if (element) {
-                const rect = element.getBoundingClientRect();
-                return [rect.x + 8, rect.y + 8 - menuBarHeight];
+            if (nodeElement && element) {
+                const top = nodeElement.offsetTop + element.offsetTop;
+                const left = nodeElement.offsetLeft + element.offsetLeft;
+                return [left + 8, top + 8];
             }
             return [0, 0];
         };
@@ -39,10 +40,12 @@ export default function MaterialGraphEditorConnectionsOverlay() {
             node?.x;
             node?.y;
 
+            const nodeElement = editorCtx.getNodeElement(toNodeId);
             const element = editorCtx.getNodeSocketElement(toNodeId, toSocketId);
-            if (element) {
-                const rect = element.getBoundingClientRect();
-                return [rect.x + 8, rect.y + 8 - menuBarHeight];
+            if (nodeElement && element) {
+                const top = nodeElement.offsetTop + element.offsetTop;
+                const left = nodeElement.offsetLeft + element.offsetLeft;
+                return [left + 8, top + 8];
             }
             return [0, 0];
         };
@@ -56,7 +59,12 @@ export default function MaterialGraphEditorConnectionsOverlay() {
     }
 
     return (
-        <svg width="100%" height="100%" viewBox="0 0 100% 100%" class="pointer-events-none">
+        <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 100% 100%"
+            class="absolute pointer-events-none"
+        >
             <For each={materialCtx.getSocketConnections()}>
                 {(connection) => (
                     <ConnectionLine

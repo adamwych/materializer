@@ -15,6 +15,10 @@ export const [EditorContextProvider, useEditorContext] = createContextProvider((
             nodeElements.set(nodeId, element);
         },
 
+        getNodeElement(nodeId: number): HTMLElement | undefined {
+            return nodeElements.get(nodeId);
+        },
+
         getNodeSocketElement(nodeId: number, socketId: string): HTMLElement | null | undefined {
             return nodeElements.get(nodeId)?.querySelector(`[data-socket=${socketId}`);
         },
