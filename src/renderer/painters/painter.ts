@@ -1,7 +1,7 @@
 import { DeepReadonly } from "ts-essentials";
 import { MaterialNode } from "../../types/material";
 
-export type MaterialNodePainterType = "glsl" | "scatter";
+export type MaterialNodePainterType = "glsl" | "scatter" | "tile";
 
 /**
  * Painter is responsible for drawing a node of certain type onto its output textures.

@@ -321,6 +321,63 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                 },
             },
         ],
+        [
+            "tile",
+            {
+                name: "Tile",
+                parameters: [
+                    {
+                        id: "amountX",
+                        label: "Amount X",
+                        default: 1,
+                        type: "number",
+                        valueType: "int",
+                        min: 1,
+                        max: 16,
+                    },
+                    {
+                        id: "amountY",
+                        label: "Amount Y",
+                        default: 1,
+                        type: "number",
+                        valueType: "int",
+                        min: 1,
+                        max: 16,
+                    },
+                    {
+                        id: "offsetX",
+                        label: "Offset X",
+                        default: 0,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                    {
+                        id: "offsetY",
+                        label: "Offset Y",
+                        default: 0,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                ],
+                inputSockets: [
+                    {
+                        id: "shape",
+                    },
+                ],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                painter: {
+                    type: "tile",
+                },
+            },
+        ],
     ]),
 };
 

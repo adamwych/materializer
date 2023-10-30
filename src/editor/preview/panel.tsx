@@ -14,7 +14,7 @@ export default function MaterialPreviewPanel() {
 
     const onMouseDown = makeMouseMoveListener((ev) => {
         renderingEngine.previewCamera.rotationX += ev.movementX / 50.0;
-        renderingEngine.previewCamera.rotationY += ev.movementY / 50.0;
+        renderingEngine.previewCamera.rotationY -= ev.movementY / 50.0;
         renderingEngine.renderPreview();
     });
 

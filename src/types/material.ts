@@ -63,6 +63,9 @@ export type MaterialNodePainterInfo =
       }
     | {
           type: "scatter";
+      }
+    | {
+          type: "tile";
       };
 
 /**

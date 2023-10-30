@@ -124,6 +124,13 @@ export default class MaterialNodeShaderProgram {
             console.warn(`Parameter '${name}' was not found in the fragment shader.`);
         }
     }
+
+    public setUniformInt(name: string, value: number) {
+        const location = this.gl.getUniformLocation(this.program, name);
+        if (location) {
+            this.gl.uniform1i(location, value);
+        }
+    }
 }
 
 function createAndCompileShader(gl: WebGL2RenderingContext, type: number, code: string) {

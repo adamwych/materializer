@@ -59,10 +59,12 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
         in mat4 i_transformMatrix;
         
         out vec2 v_texCoord;
+        flat out int v_instanceId;
         
         void main(void) {
             gl_Position = i_transformMatrix * vec4(a_position, 1);
             v_texCoord = a_texCoord;
+            v_instanceId = gl_InstanceID;
         }
         `.trim(),
             glslCode,
@@ -134,6 +136,8 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
         gl.bindBuffer(gl.ARRAY_BUFFER, this.matrixBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, matrixData, gl.DYNAMIC_DRAW);
 
+        this.shaderProgram.setUniformInt("x_instancesCount", pattern.length);
+
         gl.bindVertexArray(this.vao);
         gl.enable(gl.BLEND);
 
@@ -147,9 +151,11 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
                 gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
                 gl.blendEquation(gl.FUNC_SUBTRACT);
                 break;
-            default:
+            case 255:
                 gl.disable(gl.BLEND);
                 break;
+            default:
+                gl.blendFunc(gl.ONE, gl.ONE);
         }
 
         gl.drawBuffers(node.spec!.outputSockets.map((_, i) => gl.COLOR_ATTACHMENT0 + i));

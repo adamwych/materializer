@@ -10,6 +10,7 @@ import { ReactiveMap } from "@solid-primitives/map";
 import MaterialNodePainter, { MaterialNodePainterType } from "./painters/painter";
 import GLSLMaterialNodePainter from "./painters/glsl";
 import ScatterMaterialNodePainter from "./painters/scatter";
+import TileMaterialNodePainter from "./painters/tile";
 
 type NodeBitmapStorageEntry = {
     bitmap?: ImageBitmap;
@@ -88,6 +89,8 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
                 return GLSLMaterialNodePainter;
             case "scatter":
                 return ScatterMaterialNodePainter;
+            case "tile":
+                return TileMaterialNodePainter;
         }
     }
 
@@ -203,30 +206,29 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
 
             const vertices = [
                 [
-                    [-1, 0, -1],
+                    [0, 0, 0],
+                    [0, 0],
+                ],
+                [
+                    [1, 0, 0],
+                    [1, 0],
+                ],
+                [
+                    [1, 0, -1],
+                    [1, 1],
+                ],
+
+                [
+                    [0, 0, 0],
                     [0, 0],
                 ],
                 [
                     [1, 0, -1],
-                    [1, 0],
-                ],
-                [
-                    [-1, 0, 1],
-                    [0, 1],
-                ],
-
-                [
-                    [1, 0, -1],
-                    [1, 0],
-                ],
-                [
-                    [-1, 0, 1],
-                    [0, 1],
-                ],
-
-                [
-                    [1, 0, 1],
                     [1, 1],
+                ],
+                [
+                    [0, 0, -1],
+                    [0, 1],
                 ],
             ];
 
@@ -234,9 +236,9 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
             const dv = new DataView(buffer);
             for (let i = 0; i < vertices.length; i++) {
                 const v = vertices[i];
-                dv.setFloat32(20 * i, v[0][0], true);
+                dv.setFloat32(20 * i, v[0][0] - 0.5, true);
                 dv.setFloat32(20 * i + 4, v[0][1], true);
-                dv.setFloat32(20 * i + 8, v[0][2], true);
+                dv.setFloat32(20 * i + 8, v[0][2] + 0.5, true);
                 dv.setFloat32(20 * i + 12, v[1][0], true);
                 dv.setFloat32(20 * i + 16, v[1][1], true);
             }
@@ -253,7 +255,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
             gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 20, 3 * 4);
             gl.enableVertexAttribArray(1);
 
-            gl.clearColor(0.05, 0.05, 0.05, 1);
+            gl.clearColor(0.1, 0.1, 0.1, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
 

@@ -1,9 +1,9 @@
 import * as glMatrix from "gl-matrix";
 
 export default class PreviewCameraController {
-    public rotationX = -45 * (Math.PI / 180);
-    public rotationY = -45 * (Math.PI / 180);
-    public zoom = 4;
+    public rotationX = 0 * (Math.PI / 180);
+    public rotationY = 0.01 * (Math.PI / 180);
+    public zoom = 2;
 
     public getProjectionMatrix(): glMatrix.mat4 {
         return glMatrix.mat4.perspective(
