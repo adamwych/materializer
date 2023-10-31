@@ -5,7 +5,7 @@ import {
     MaterialNodeParametersMap,
     MaterialNodeSocketAddr,
 } from "../types/material.ts";
-import { createStore, produce } from "solid-js/store";
+import { createStore, produce, unwrap } from "solid-js/store";
 import { useAppContext } from "../app-context.ts";
 import { createEmitter } from "@solid-primitives/event-bus";
 import { DeepReadonly } from "ts-essentials";
@@ -208,6 +208,8 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
             getOutputTextureWidth: () => material.textureWidth,
             getOutputTextureHeight: () => material.textureHeight,
             getSocketConnections: () => material.connections,
+
+            getMaterial: () => structuredClone(unwrap(material)),
 
             events,
         };

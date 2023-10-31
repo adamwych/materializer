@@ -2,7 +2,7 @@ import { createContextProvider } from "@solid-primitives/context";
 import { useRenderingEngine } from "./engine";
 import { useMaterialContext } from "../editor/material-context";
 import createRAF from "@solid-primitives/raf";
-import { MaterialNode, isOutputNodePath } from "../types/material";
+import { MaterialNode } from "../types/material";
 import { DeepReadonly } from "ts-essentials";
 
 /**
@@ -18,23 +18,22 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
     const engine = useRenderingEngine()!;
 
     let queue: Array<number> = [];
-    let shouldRenderPreview = true;
+    let isRendering = false;
 
     const [_, start, __] = createRAF(() => {
-        for (const job of queue) {
-            try {
-                engine.renderNode(job);
-            } catch (error) {
-                console.error(error);
-            }
+        if (isRendering) {
+            return;
         }
 
-        if (shouldRenderPreview) {
-            engine.renderPreview();
-        }
+        if (queue.length > 0) {
+            isRendering = true;
 
-        queue = [];
-        shouldRenderPreview = false;
+            engine.requestNodesUpdate(queue).then(() => {
+                isRendering = false;
+            });
+
+            queue = [];
+        }
     });
 
     /**
@@ -53,10 +52,6 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
         // Prevent scheduling multiple render jobs for the same node.
         if (isNodeQueued(node)) {
             return;
-        }
-
-        if (isOutputNodePath(node.path)) {
-            shouldRenderPreview = true;
         }
 
         queue.push(node.id);
@@ -104,13 +99,6 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
     // so we need to use events to communicate when a change was made.
     materialCtx.events.on("added", scheduleChain);
     materialCtx.events.on("changed", scheduleChain);
-
-    // Re-render preview after an output node is removed.
-    materialCtx.events.on("removed", (node) => {
-        if (isOutputNodePath(node.path)) {
-            shouldRenderPreview = true;
-        }
-    });
 
     start();
 

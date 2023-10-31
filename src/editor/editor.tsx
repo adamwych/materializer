@@ -8,7 +8,7 @@ import { EditorContextProvider } from "./editor-context.ts";
 import MaterialGraphEditorNodes from "./graph.tsx";
 import MaterialNodeInspectorPanel from "./inspector/inspector.tsx";
 import { MaterialContextProvider } from "./material-context.ts";
-import MaterialPreviewPanel from "./preview/panel.tsx";
+import MaterialPreviewPanel from "./preview-panel.tsx";
 import { EditorSelectionManagerProvider } from "./selection/manager.ts";
 
 interface Props {
