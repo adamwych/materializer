@@ -155,6 +155,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                 outputSockets: [
                     {
                         id: "output",
+                        hidden: true,
                     },
                 ],
                 painter: {

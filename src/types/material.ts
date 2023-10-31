@@ -25,6 +25,9 @@ export type MaterialNodeParameterInfo = {
  */
 export type MaterialNodeSocketInfo = {
     id: string;
+
+    /** Whether this socket should be visible in the UI. */
+    hidden?: boolean;
 };
 
 export type MaterialNodeSocketAddr = {

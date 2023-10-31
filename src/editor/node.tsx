@@ -69,7 +69,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
 
                 <div class="flex justify-between h-full">
                     <div class="flex flex-col justify-center gap-2">
-                        <For each={props.node()!.spec!.inputSockets}>
+                        <For each={props.node()!.spec!.inputSockets.filter((x) => !x.hidden)}>
                             {(socket) => (
                                 <MaterialNodeSocketBox
                                     id={socket.id}
@@ -95,7 +95,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
                         </For>
                     </div>
                     <div class="flex flex-col justify-center gap-2">
-                        <For each={props.node()!.spec!.outputSockets}>
+                        <For each={props.node()!.spec!.outputSockets.filter((x) => !x.hidden)}>
                             {(socket) => (
                                 <MaterialNodeSocketBox
                                     id={socket.id}
