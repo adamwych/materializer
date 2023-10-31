@@ -10,7 +10,7 @@ interface Props {
 export default function ExportDialog(props: Props) {
     const context = useWorkspaceContext()!;
     const activeMaterial = context.activeEditorTabMaterial;
-    const outputNodes = () => activeMaterial().nodes;
+    const outputNodes = () => activeMaterial()?.nodes ?? [];
     const [_selectedOutputNodes, setSelectedOutputNodes] = createSignal<Array<number>>([]);
 
     function toggleOutputNode(node: MaterialNode) {
@@ -31,7 +31,7 @@ export default function ExportDialog(props: Props) {
 
     return (
         <Dialog
-            title={`Exporting ${activeMaterial().name}`}
+            title={`Exporting ${activeMaterial()!.name}`}
             buttons={[
                 {
                     label: "Export",
