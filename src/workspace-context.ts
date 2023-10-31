@@ -4,6 +4,7 @@ import { unwrap } from "solid-js/store";
 import { v4 as uuidv4 } from "uuid";
 import { Material } from "./types/material.ts";
 import { useWorkspaceStorage } from "./workspace-storage.ts";
+import TextureFilterMethod from "./types/texture-filter.ts";
 
 type Props = {
     initialMaterial: Material;
@@ -40,6 +41,7 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                     nodes: [],
                     textureWidth: 1024,
                     textureHeight: 1024,
+                    textureFiltering: TextureFilterMethod.Linear,
                     connections: [],
                 });
             },
