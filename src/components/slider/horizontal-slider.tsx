@@ -10,8 +10,14 @@ export default function HorizontalSlider(props: SliderProps) {
 
     const onMouseDown = makeMouseMoveListener((ev) => {
         const trackBoundingBox = trackElementRef?.getBoundingClientRect()!;
-        const value = (ev.pageX - trackBoundingBox.x) / trackBoundingBox.width;
-        props.onChange(clamp(value * props.max, props.min, props.max));
+        let value = (ev.pageX - trackBoundingBox.x) / trackBoundingBox.width;
+        value = clamp(value * props.max, props.min, props.max);
+
+        if (props.step) {
+            value = Math.floor(value / props.step) * props.step;
+        }
+
+        props.onChange(value);
     });
 
     return (

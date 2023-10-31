@@ -7,6 +7,8 @@ export type SliderProps = {
     /** Maximal value allowed by the slider. */
     max: number;
 
+    step?: number;
+
     /** Current value of the slider. */
     value: number;
 

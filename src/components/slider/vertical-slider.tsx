@@ -10,8 +10,14 @@ export default function VerticalSlider(props: SliderProps) {
 
     const onMouseDown = makeMouseMoveListener((ev) => {
         const trackBoundingBox = trackElementRef?.getBoundingClientRect()!;
-        const value = 1 - (ev.pageY - trackBoundingBox.y) / trackBoundingBox.height;
-        props.onChange(clamp(value * props.max, props.min, props.max));
+        let value = 1 - (ev.pageY - trackBoundingBox.y) / trackBoundingBox.height;
+        value = clamp(value * props.max, props.min, props.max);
+
+        if (props.step) {
+            value = Math.floor(value / props.step) * props.step;
+        }
+
+        props.onChange(value);
     });
 
     return (
