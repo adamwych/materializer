@@ -9,7 +9,11 @@ export default function VerticalSlider(props: SliderProps) {
     const clampedValue = () => clamp(props.value, props.min, props.max);
 
     const onMouseDown = makeMouseMoveListener((ev) => {
-        const trackBoundingBox = trackElementRef?.getBoundingClientRect()!;
+        if (!trackElementRef) {
+            return;
+        }
+
+        const trackBoundingBox = trackElementRef.getBoundingClientRect();
         let value = 1 - (ev.pageY - trackBoundingBox.y) / trackBoundingBox.height;
         value = clamp(value * props.max, props.min, props.max);
 

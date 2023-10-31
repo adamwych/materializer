@@ -3,7 +3,7 @@ import { InputProps } from "./parameter";
 import Select from "../../components/select/select";
 import SelectOption from "../../components/select/select-option";
 
-export default function MaterialNodeInspectorSelectInput(props: InputProps<any>) {
+export default function MaterialNodeInspectorSelectInput(props: InputProps<unknown>) {
     const selectedOption = () => props.parameter.options!.find((x) => x.value === props.value());
 
     return (

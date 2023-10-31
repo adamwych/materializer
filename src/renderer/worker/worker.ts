@@ -67,6 +67,7 @@ self.onmessage = (msg: MessageEvent<RenderWorkerMessage>) => {
     }[msg.data?.type];
 
     if (handler) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         handler(msg.data as any);
     } else {
         console.warn(`Render worker received a message of unsupported type: ${msg.data?.type}`);

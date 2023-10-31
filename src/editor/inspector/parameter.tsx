@@ -4,6 +4,7 @@ import MaterialNodeInspectorRGBInput from "./input-rgb.tsx";
 import { Accessor, Component, JSX, Show } from "solid-js";
 import MaterialNodeInspectorSelectInput from "./input-select.tsx";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type InputProps<T = any> = {
     parameter: Partial<MaterialNodeParameterInfo>;
     value: Accessor<T>;

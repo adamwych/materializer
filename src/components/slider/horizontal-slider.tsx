@@ -9,7 +9,11 @@ export default function HorizontalSlider(props: SliderProps) {
     const clampedValue = () => clamp(props.value, props.min, props.max);
 
     const onMouseDown = makeMouseMoveListener((ev) => {
-        const trackBoundingBox = trackElementRef?.getBoundingClientRect()!;
+        if (!trackElementRef) {
+            return;
+        }
+
+        const trackBoundingBox = trackElementRef.getBoundingClientRect();
         let value = (ev.pageX - trackBoundingBox.x) / trackBoundingBox.width;
         value = clamp(value * props.max, props.min, props.max);
 

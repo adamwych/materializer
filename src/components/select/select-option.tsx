@@ -3,7 +3,7 @@ import { useSelectContext } from "./context";
 
 interface Props {
     children: JSX.Element;
-    value: any;
+    value: unknown;
 }
 
 export default function SelectOption(props: Props) {

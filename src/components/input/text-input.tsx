@@ -1,8 +1,8 @@
 interface Props {
-    value: any;
+    value: string;
     center?: boolean;
-    onChange?(value: any): void;
-    onInput?(value: any): void;
+    onChange?(value: string): void;
+    onInput?(value: string): void;
 }
 
 export default function TextInput(props: Props) {

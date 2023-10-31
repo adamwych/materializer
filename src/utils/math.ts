@@ -5,8 +5,8 @@ export function clamp(value: number, min: number, max: number) {
 }
 
 export function distance2d(x1: number, y1: number, x2: number, y2: number) {
-    let xx = x2 - x1;
-    let yy = y2 - y1;
+    const xx = x2 - x1;
+    const yy = y2 - y1;
     return Math.sqrt(xx * xx + yy * yy);
 }
 

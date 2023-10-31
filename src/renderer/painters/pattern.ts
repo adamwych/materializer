@@ -98,7 +98,7 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
         gl.bindBuffer(gl.ARRAY_BUFFER, this.matrixBuffer);
         // mat4 attribute takes 4 separate attribute slots, row by row.
         for (let i = 0; i < 4; i++) {
-            let loc = 2 + i;
+            const loc = 2 + i;
             gl.vertexAttribPointer(loc, 4, gl.FLOAT, false, 4 * 16, i * 16);
             gl.vertexAttribDivisor(loc, 1);
             gl.enableVertexAttribArray(loc);

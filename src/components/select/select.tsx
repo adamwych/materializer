@@ -5,9 +5,9 @@ import { SelectContextProvider } from "./context";
 
 interface Props {
     children: JSX.Element;
-    value: any;
+    value: unknown;
     label: string;
-    onChange(value: any): void;
+    onChange(value: unknown): void;
 }
 
 export default function Select(props: Props) {

@@ -68,20 +68,20 @@ export default class MaterialNodeShaderProgram {
         }
     }
 
-    public setParameter(info: DeepReadonly<MaterialNodeParameterInfo>, value: any) {
+    public setParameter(info: DeepReadonly<MaterialNodeParameterInfo>, value: unknown) {
         this.gl.useProgram(this.program);
 
         switch (info.valueType) {
             case "vec2":
             case "vec3":
             case "vec4":
-                this.setVecParameter(info.id, value);
+                this.setVecParameter(info.id, value as Array<number>);
                 break;
             case "float":
-                this.setFloatParameter(info.id, value);
+                this.setFloatParameter(info.id, value as number);
                 break;
             case "int":
-                this.setIntParameter(info.id, value);
+                this.setIntParameter(info.id, value as number);
                 break;
             default:
                 console.warn(
