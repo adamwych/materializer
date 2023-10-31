@@ -24,15 +24,16 @@ export default function MaterialPreviewPanel() {
             return;
         }
 
+        const texture = renderingEngine.previewTexture();
         try {
-            const texture = renderingEngine.previewTexture();
             if (texture) {
                 const context = canvasElement.getContext("2d");
                 context?.drawImage(texture, 0, 0, canvasElement.width, canvasElement.height);
-                texture.close();
             }
         } catch (error) {
             console.error(error);
+        } finally {
+            texture?.close();
         }
     });
 

@@ -25,9 +25,10 @@ export default function MaterialNodeBoxImage(props: Props) {
                     context.canvas.width,
                     context.canvas.height,
                 );
-                texture.bitmap.close();
             } catch (exception) {
                 console.error(exception);
+            } finally {
+                texture.bitmap.close();
             }
         }
     });
