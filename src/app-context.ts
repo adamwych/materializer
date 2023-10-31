@@ -11,6 +11,7 @@ import blendGlsl from "../glsl/blend.glsl?raw";
 import noiseGlsl from "../glsl/noise.glsl?raw";
 import shapeGlsl from "../glsl/shape.glsl?raw";
 import transformGlsl from "../glsl/transform.glsl?raw";
+import invertGlsl from "../glsl/invert.glsl?raw";
 import BlendMode from "./types/blend-mode.ts";
 import { createSignal } from "solid-js";
 import { Point2D } from "./types/point.ts";
@@ -426,6 +427,28 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                 painter: {
                     type: "glsl",
                     glsl: transformGlsl,
+                },
+            },
+        ],
+        [
+            "invert",
+            {
+                name: "Invert",
+                groupName: "Utilities",
+                parameters: [],
+                inputSockets: [
+                    {
+                        id: "in",
+                    },
+                ],
+                outputSockets: [
+                    {
+                        id: "out",
+                    },
+                ],
+                painter: {
+                    type: "glsl",
+                    glsl: invertGlsl,
                 },
             },
         ],
