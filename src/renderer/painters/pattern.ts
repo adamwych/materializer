@@ -156,6 +156,8 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
                 break;
             default:
                 gl.blendFunc(gl.ONE, gl.ONE);
+                gl.blendEquation(gl.FUNC_ADD);
+                break;
         }
 
         gl.drawBuffers(node.spec!.outputSockets.map((_, i) => gl.COLOR_ATTACHMENT0 + i));
