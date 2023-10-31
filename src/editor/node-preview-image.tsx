@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function MaterialNodeBoxImage(props: Props) {
-    let context: ImageBitmapRenderingContext;
+    let context: CanvasRenderingContext2D;
     const renderingEngine = useRenderingEngine()!;
     const bitmap = renderingEngine.getNodeBitmap(props.nodeId, props.name);
 
@@ -18,7 +18,13 @@ export default function MaterialNodeBoxImage(props: Props) {
         const texture = bitmap();
         if (texture?.bitmap) {
             try {
-                context?.transferFromImageBitmap(texture.bitmap);
+                context?.drawImage(
+                    texture.bitmap,
+                    0,
+                    0,
+                    context.canvas.width,
+                    context.canvas.height,
+                );
             } catch (exception) {
                 console.error(exception);
             }
@@ -28,7 +34,7 @@ export default function MaterialNodeBoxImage(props: Props) {
     return (
         <canvas
             ref={(canvas) => {
-                context = canvas.getContext("bitmaprenderer")!;
+                context = canvas.getContext("2d")!;
             }}
             class="absolute rounded-md"
             style={

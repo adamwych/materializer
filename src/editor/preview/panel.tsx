@@ -27,8 +27,8 @@ export default function MaterialPreviewPanel() {
         try {
             const texture = renderingEngine.previewTexture();
             if (texture) {
-                const context = canvasElement.getContext("bitmaprenderer");
-                context?.transferFromImageBitmap(texture);
+                const context = canvasElement.getContext("2d");
+                context?.drawImage(texture, 0, 0, canvasElement.width, canvasElement.height);
             }
         } catch (error) {
             console.error(error);
