@@ -6,6 +6,8 @@ import * as glMatrix from "gl-matrix";
 
 export default function MaterialPreviewPanel() {
     const renderer = useRenderingEngine()!;
+    const width = 340;
+    const height = 340;
     let renderRequested = false;
     let canvasElement: HTMLCanvasElement;
     let rotationX = 0 * (Math.PI / 180);
@@ -42,7 +44,7 @@ export default function MaterialPreviewPanel() {
         const projection = glMatrix.mat4.perspective(
             glMatrix.mat4.create(),
             40.0 * (Math.PI / 180),
-            400.0 / 400.0,
+            width / height,
             0.01,
             1000,
         );
@@ -70,7 +72,7 @@ export default function MaterialPreviewPanel() {
                 height={2048}
                 onMouseDown={onMouseDown}
                 onWheel={onWheel}
-                style={{ width: "400px", height: "400px" }}
+                style={{ width: width + "px", height: height + "px" }}
             />
         </PanelSection>
     );

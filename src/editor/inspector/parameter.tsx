@@ -35,7 +35,7 @@ export default function MaterialNodeInspectorParameter(props: Props) {
 
     return (
         <div class="px-4 py-2 border-b border-gray-300">
-            <div class="font-semibold">{props.parameter.label}</div>
+            <div class="font-semibold text-sm">{props.parameter.label}</div>
             <div class="pt-2">
                 <Show when={InputComponent}>
                     <InputComponent

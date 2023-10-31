@@ -11,7 +11,7 @@ interface Props {
 
 export default function ColorWheel(props: Props) {
     let wheelElementRef: HTMLElement | undefined;
-    const size = () => props.size ?? 240;
+    const size = () => props.size ?? 180;
     const hsv = () =>
         culori.convertRgbToHsv({
             r: props.value[0],
