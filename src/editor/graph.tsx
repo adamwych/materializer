@@ -5,11 +5,15 @@ import makeMouseMoveListener from "../utils/makeMouseMoveListener.ts";
 import { clamp } from "../utils/math.ts";
 import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorContext } from "./editor-context.ts";
+import MaterialGraphEditorBackground from "./graph-background.tsx";
 import MaterialGraphEditorControls from "./graph-controls.tsx";
 import { useMaterialContext } from "./material-context.ts";
 import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
 import MaterialNodeBox from "./node.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
+
+const MIN_SCALE = 0.2;
+const MAX_SCALE = 2;
 
 export default function MaterialGraphEditorNodes() {
     const appCtx = useAppContext()!;
@@ -17,24 +21,69 @@ export default function MaterialGraphEditorNodes() {
     const materialCtx = useMaterialContext()!;
     const editorCtx = useEditorContext()!;
     const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
-    const dragOffset = editorCtx.dragOffset;
-    const zoom = editorCtx.zoom;
+    const transformMatrix = () => {
+        const m = [];
+        m[3] = m[0] = editorCtx.smoothedZoom();
+        m[2] = m[1] = 0;
+        m[4] = editorCtx.smoothedOffset().x;
+        m[5] = editorCtx.smoothedOffset().y;
+        return m;
+    };
+    const transformMatrixCss = () => {
+        const m = transformMatrix();
+        return `matrix(${m[0]},${m[1]},${m[2]},${m[3]},${m[4]},${m[5]})`;
+    };
 
     const registerPanMoveHandler = makeMouseMoveListener((ev) => {
-        editorCtx.setDragOffset((offset) => ({
-            x: Math.round(offset.x + ev.movementX / editorCtx.zoom()),
-            y: Math.round(offset.y + ev.movementY / editorCtx.zoom()),
-        }));
+        editorCtx.setPanZoomSettings(
+            (settings) => ({
+                scale: settings.scale,
+                offset: {
+                    x: Math.round(settings.offset.x + ev.movementX),
+                    y: Math.round(settings.offset.y + ev.movementY),
+                },
+            }),
+            false,
+        );
     });
 
-    function setTargetZoom(callback: (zoom: number) => number) {
-        editorCtx.setTargetZoom((zoom) => {
-            return clamp(callback(zoom), 0.2, 2);
-        });
+    function centerDragOffset() {
+        editorCtx.setPanZoomSettings(() => ({
+            scale: 1,
+            offset: {
+                x: -6900 / 2,
+                y: -6900 / 2,
+            },
+        }));
+    }
+
+    function setZoom(callback: (zoom: number) => number) {
+        editorCtx.setPanZoomSettings((settings) => ({
+            scale: clamp(callback(settings.scale), MIN_SCALE, MAX_SCALE),
+            offset: settings.offset,
+        }));
     }
 
     function onWheel(ev: WheelEvent) {
-        setTargetZoom((z) => z - ev.deltaY / 100 / 5);
+        const relativeX = ev.pageX;
+        const relativeY = ev.pageY - 70;
+        const isZoomingIn = ev.deltaY < 0;
+        const scaleMultiplier = isZoomingIn ? 1.2 : 1 / 1.2;
+
+        editorCtx.setPanZoomSettings((settings) => {
+            const newZoom = settings.scale * scaleMultiplier;
+            if (newZoom < MIN_SCALE || newZoom > MAX_SCALE) {
+                return settings;
+            }
+
+            return {
+                scale: newZoom,
+                offset: {
+                    x: relativeX - (relativeX - settings.offset.x) * scaleMultiplier,
+                    y: relativeY - (relativeY - settings.offset.y) * scaleMultiplier,
+                },
+            };
+        });
     }
 
     window.addEventListener("keyup", (ev) => {
@@ -66,6 +115,7 @@ export default function MaterialGraphEditorNodes() {
 
     return (
         <div
+            ref={(e) => editorCtx.setRootElement(e)}
             id="editor-root"
             class="relative w-full h-full flex-1 overflow-hidden bg-gray-100"
             onWheel={onWheel}
@@ -90,32 +140,21 @@ export default function MaterialGraphEditorNodes() {
             {selectionManager.renderMultiselectBox()}
 
             <MaterialGraphEditorControls
-                zoom={zoom()}
-                onZoomIn={() => setTargetZoom((s) => s + 0.2)}
-                onZoomOut={() => setTargetZoom((s) => s - 0.2)}
-                onZoomReset={() => setTargetZoom((_) => 1)}
-                onCenter={() => editorCtx.setDragOffset({ x: 0, y: 0 })}
-            />
-
-            <div
-                class="absolute w-full h-full top-0 left-0 pointer-events-none"
-                style={{
-                    "background-image": "url(grid-bg.svg)",
-                    "background-position": `${dragOffset().x * zoom()}px ${
-                        dragOffset().y * zoom()
-                    }px`,
-                }}
+                zoom={editorCtx.smoothedZoom()}
+                onZoomIn={() => setZoom((s) => s + 0.2)}
+                onZoomOut={() => setZoom((s) => s - 0.2)}
+                onZoomReset={() => setZoom((_) => 1)}
+                onCenter={centerDragOffset}
             />
 
             <div
                 id="editor-root"
-                class="w-full h-full"
+                class="relative w-full h-full origin-top-left"
                 style={{
-                    transform: `scale(${zoom()}) translate(${dragOffset().x}px, ${
-                        dragOffset().y
-                    }px)`,
+                    transform: transformMatrixCss(),
                 }}
             >
+                <MaterialGraphEditorBackground />
                 <MaterialGraphEditorConnectionsOverlay />
 
                 <For each={materialCtx.getNodes()}>

@@ -14,9 +14,9 @@ export default function MaterialGraphNodeConnectionCurve(props: Props) {
     return (
         <svg
             class="fixed top-0 left-0 z-20 pointer-events-none"
-            width="100vw"
-            height="100vh"
-            viewBox="0 0 100vw 100vh"
+            width="6900px"
+            height="6900px"
+            viewBox="0 0 6900px 6900px"
         >
             <path
                 d={commands().join(" ")}

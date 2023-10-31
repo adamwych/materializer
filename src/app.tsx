@@ -1,106 +1,18 @@
 /* @refresh reload */
 import "./scss/styles.scss";
 import { render } from "solid-js/web";
-import { Material, MaterialNodeOutputTarget } from "./types/material.ts";
+import { Material } from "./types/material.ts";
 import AppMenuBar from "./app-menu-bar.tsx";
 import { AppContextProvider } from "./app-context.ts";
 import EditorTabs from "./editor/editor-tabs.tsx";
 import { WorkspaceContextProvider } from "./workspace-context.ts";
-import BlendMode from "./types/blend-mode.ts";
 
 const DEFAULT_MATERIAL: Material = {
     name: "Default",
     textureWidth: 2048,
     textureHeight: 2048,
-    nodes: [
-        {
-            id: 2,
-            path: "@materializer/shape",
-            label: "Shape",
-            x: 410,
-            y: 310,
-            zIndex: 1,
-            parameters: {
-                rectWidth: 0.9,
-                rectHeight: 0.4,
-            },
-        },
-        {
-            id: 0,
-            path: "@materializer/tile",
-            label: "Tile",
-            x: 610,
-            y: 310,
-            zIndex: 0,
-            parameters: {
-                amountX: 1,
-                amountY: 1,
-                offsetX: 0,
-                offsetY: 0,
-            },
-        },
-        {
-            id: 1,
-            path: "@materializer/output",
-            label: "Output",
-            x: 810,
-            y: 310,
-            zIndex: 1,
-            parameters: {
-                target: MaterialNodeOutputTarget.Albedo,
-            },
-        },
-        {
-            id: 3,
-            path: "@materializer/scatter",
-            label: "Scatter",
-            x: 610,
-            y: 510,
-            zIndex: 0,
-            parameters: {
-                seed: Math.random(),
-                amount: 15,
-                size: 0.25,
-                spreadX: 1,
-                spreadY: 1,
-                randomRotation: 0,
-                randomScale: 0,
-                blendMode: BlendMode.Add,
-            },
-        },
-    ],
-    connections: [
-        {
-            from: {
-                nodeId: 2,
-                socketId: "color",
-            },
-            to: {
-                nodeId: 0,
-                socketId: "shape",
-            },
-        },
-        {
-            from: {
-                nodeId: 0,
-                socketId: "color",
-            },
-            to: {
-                nodeId: 1,
-                socketId: "color",
-            },
-        },
-        {
-            from: {
-                nodeId: 0,
-                socketId: "color",
-            },
-            to: {
-                nodeId: 3,
-                socketId: "shape",
-            },
-        },
-    ],
+    nodes: [],
+    connections: [],
 };
 
 export default function App() {

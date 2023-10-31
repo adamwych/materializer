@@ -60,9 +60,9 @@ export default function MaterialGraphEditorConnectionsOverlay() {
 
     return (
         <svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 100% 100%"
+            width="6900px"
+            height="6900px"
+            viewBox="0 0 6900px 6900px"
             class="absolute pointer-events-none"
         >
             <For each={materialCtx.getSocketConnections()}>

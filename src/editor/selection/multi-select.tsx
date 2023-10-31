@@ -65,8 +65,8 @@ export default function createMultiSelectManager() {
         for (const node of nodes) {
             materialCtx.moveNode(
                 node.id,
-                ev.movementX / editorCtx.zoom(),
-                ev.movementY / editorCtx.zoom(),
+                ev.movementX / editorCtx.smoothedZoom(),
+                ev.movementY / editorCtx.smoothedZoom(),
             );
         }
     }

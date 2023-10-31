@@ -18,8 +18,8 @@ export default function createSingleSelectHandler() {
         const info = touchDownInfo()!;
         materialCtx.moveNode(
             info.nodeId,
-            ev.movementX / editorCtx.zoom(),
-            ev.movementY / editorCtx.zoom(),
+            ev.movementX / editorCtx.smoothedZoom(),
+            ev.movementY / editorCtx.smoothedZoom(),
         );
     }
 

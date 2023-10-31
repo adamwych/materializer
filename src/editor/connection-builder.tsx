@@ -65,7 +65,6 @@ export function EditorConnectionBuilderProvider(props: { children: JSX.Element }
         },
 
         onSocketMouseUp(ev, nodeId, socketId) {
-            ev.stopPropagation();
             window.removeEventListener("mouseup", onWindowMouseUp);
             window.removeEventListener("mousemove", onWindowMouseMove);
 
@@ -73,6 +72,8 @@ export function EditorConnectionBuilderProvider(props: { children: JSX.Element }
             if (!upcoming) {
                 return;
             }
+
+            ev.stopPropagation();
 
             const isInputSocket = materialCtx
                 .getNodeById(nodeId)!
