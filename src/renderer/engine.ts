@@ -22,7 +22,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
         materialCtx.getOutputTextureWidth(),
         materialCtx.getOutputTextureHeight(),
     );
-    const emptyTextureData = new Uint8Array(canvas.width * canvas.height * 4);
+    const emptyTextureData = new Uint8Array(canvas.width * canvas.height * 3);
     const gl = canvas.getContext("webgl2", {
         antialias: false,
     })!;
@@ -71,11 +71,11 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
         gl.texImage2D(
             gl.TEXTURE_2D,
             0,
-            gl.RGBA,
+            gl.RGB,
             canvas.width,
             canvas.height,
             0,
-            gl.RGBA,
+            gl.RGB,
             gl.UNSIGNED_BYTE,
             emptyTextureData,
         );
@@ -162,7 +162,7 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
                     canvas.width,
                     canvas.height,
                     gl.COLOR_BUFFER_BIT,
-                    gl.LINEAR,
+                    gl.NEAREST,
                 );
 
                 const key = `${node.id}-${node.spec.outputSockets[i].id}`;
