@@ -29,6 +29,7 @@ export default function MaterialPreviewPanel() {
             if (texture) {
                 const context = canvasElement.getContext("2d");
                 context?.drawImage(texture, 0, 0, canvasElement.width, canvasElement.height);
+                texture.close();
             }
         } catch (error) {
             console.error(error);
