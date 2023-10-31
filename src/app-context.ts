@@ -10,6 +10,7 @@ import outputGlsl from "../glsl/output.glsl?raw";
 import blendGlsl from "../glsl/blend.glsl?raw";
 import noiseGlsl from "../glsl/noise.glsl?raw";
 import shapeGlsl from "../glsl/shape.glsl?raw";
+import transformGlsl from "../glsl/transform.glsl?raw";
 import BlendMode from "./types/blend-mode.ts";
 import { createSignal } from "solid-js";
 import { Point2D } from "./types/point.ts";
@@ -384,6 +385,47 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                 ],
                 painter: {
                     type: "tile",
+                },
+            },
+        ],
+        [
+            "transform",
+            {
+                name: "Transform",
+                groupName: "Layout",
+                parameters: [
+                    {
+                        id: "offsetX",
+                        label: "Offset X",
+                        default: 0.5,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                    {
+                        id: "offsetY",
+                        label: "Offset Y",
+                        default: 0.5,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 1,
+                    },
+                ],
+                inputSockets: [
+                    {
+                        id: "in",
+                    },
+                ],
+                outputSockets: [
+                    {
+                        id: "color",
+                    },
+                ],
+                painter: {
+                    type: "glsl",
+                    glsl: transformGlsl,
                 },
             },
         ],
