@@ -1,22 +1,23 @@
-import { MaterialNodeParameterInfo } from "../../types/material.ts";
+import { MaterialNodeParameterInfo, MaterialNodeParameterType } from "../../types/material.ts";
 import MaterialNodeInspectorNumberInput from "./input-number.tsx";
 import MaterialNodeInspectorRGBInput from "./input-rgb.tsx";
-import { Accessor, Component, Show } from "solid-js";
+import { Accessor, Component, JSX, Show } from "solid-js";
 import MaterialNodeInspectorSelectInput from "./input-select.tsx";
 
 export type InputProps<T = any> = {
-    parameter: MaterialNodeParameterInfo;
+    parameter: Partial<MaterialNodeParameterInfo>;
     value: Accessor<T>;
     onChange(value: T): void;
 };
 
 interface Props {
-    parameter: MaterialNodeParameterInfo;
+    children?: JSX.Element;
+    parameter: Partial<MaterialNodeParameterInfo>;
     value: Accessor<unknown>;
     onChange(value: unknown): void;
 }
 
-function getInputComponent(type: string): Component<InputProps> | undefined {
+function getInputComponent(type: MaterialNodeParameterType): Component<InputProps> | undefined {
     switch (type) {
         case "rgb":
             return MaterialNodeInspectorRGBInput;
@@ -31,7 +32,7 @@ function getInputComponent(type: string): Component<InputProps> | undefined {
 }
 
 export default function MaterialNodeInspectorParameter(props: Props) {
-    const InputComponent = getInputComponent(props.parameter.type)!;
+    const InputComponent = getInputComponent(props.parameter.type!)!;
 
     return (
         <div class="px-4 py-2 border-b border-gray-300">
@@ -45,10 +46,11 @@ export default function MaterialNodeInspectorParameter(props: Props) {
                     />
                 </Show>
                 <Show when={!InputComponent}>
-                    <span class="text-gray-800">
+                    <span class="text-washed-red-900">
                         Unsupported parameter type: {props.parameter.type}
                     </span>
                 </Show>
+                {props.children}
             </div>
         </div>
     );

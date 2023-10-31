@@ -16,7 +16,7 @@ export default function Select(props: Props) {
     return (
         <div class="relative w-full">
             <div
-                class="bg-gray-100 hover:bg-gray-300 active:bg-gray-400 rounded-md"
+                class="bg-gray-100 hover:bg-gray-300 active:bg-gray-400 rounded-sm"
                 onClick={() => setOptionsVisible((v) => !v)}
             >
                 <div class="p-2 px-3 flex items-center gap-4 justify-between">

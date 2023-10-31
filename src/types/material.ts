@@ -3,6 +3,8 @@ export enum MaterialNodeOutputTarget {
     Height = "height",
 }
 
+export type MaterialNodeParameterType = "rgb" | "number" | "select";
+
 /**
  * Describes a parameter that can be passed to a {@link MaterialNode}.
  * This does not hold the actual value of that parameter, it only describes
@@ -11,11 +13,12 @@ export enum MaterialNodeOutputTarget {
 export type MaterialNodeParameterInfo = {
     id: string;
     label: string;
-    type: string;
+    type: MaterialNodeParameterType;
     default: unknown;
     valueType: string;
     min?: number;
     max?: number;
+    step?: number;
     options?: Array<{ label: string; value: any }>;
     when?: string;
 };

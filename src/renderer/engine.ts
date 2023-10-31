@@ -11,7 +11,7 @@ type NodeBitmapStorageEntry = {
 export const [RenderingEngineProvider, useRenderingEngine] = createContextProvider(() => {
     const materialCtx = useMaterialContext()!;
     const bitmaps = new ReactiveMap<string, NodeBitmapStorageEntry>();
-    const worker = new RenderWorkerImpl();
+    let worker: Worker;
 
     materialCtx.events.on("removed", (node) => {
         worker.postMessage({
@@ -27,6 +27,11 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
 
     return {
         initializeCanvas(canvas: OffscreenCanvas) {
+            if (worker) {
+                worker.terminate();
+            }
+
+            worker = new RenderWorkerImpl();
             worker.postMessage(
                 {
                     type: RenderWorkerMessageType.InitializeCanvas,

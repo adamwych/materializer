@@ -92,9 +92,6 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
         return queue.some((nodeId) => nodeId === node.id);
     }
 
-    // Render all nodes present at the time of construction.
-    materialCtx.getNodes().forEach(scheduleChain);
-
     // Listen to changes. Internally, material is kept as a store
     // so we need to use events to communicate when a change was made.
     materialCtx.events.on("added", scheduleChain);

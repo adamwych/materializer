@@ -35,7 +35,7 @@ export default function MaterialGraphEditor(props: DeepReadonly<Props>) {
             >
                 <MaterialGraphEditorNodes />
 
-                <div class="flex flex-col" style={{ "flex-basis": "340px" }}>
+                <div class="flex flex-col">
                     <MaterialNodeInspectorPanel />
                     <MaterialPreviewPanel />
                 </div>

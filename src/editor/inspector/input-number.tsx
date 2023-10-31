@@ -18,6 +18,7 @@ export default function MaterialNodeInspectorNumberInput(props: InputProps<numbe
             <HorizontalSlider
                 min={props.parameter.min ?? 0}
                 max={(props.parameter.max ?? 1) * maxScale()}
+                step={props.parameter.step ?? 0.01}
                 value={props.value()}
                 onChange={(value) => props.onChange(isFloat ? value : Math.round(value))}
             />

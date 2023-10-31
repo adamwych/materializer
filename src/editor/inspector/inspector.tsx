@@ -4,6 +4,7 @@ import MaterialNodeInspectorParameter from "./parameter.tsx";
 import { useMaterialContext } from "../material-context.ts";
 import PanelSection from "../../components/panel/section.tsx";
 import TextInput from "../../components/input/text-input.tsx";
+import MaterialParametersInspectorSection from "./material-params.tsx";
 
 export default function MaterialNodeInspectorPanel() {
     const editorCtx = useEditorContext()!;
@@ -49,6 +50,10 @@ export default function MaterialNodeInspectorPanel() {
                         </For>
                     </div>
                 </PanelSection>
+            </Show>
+
+            <Show when={!node()}>
+                <MaterialParametersInspectorSection />
             </Show>
         </div>
     );

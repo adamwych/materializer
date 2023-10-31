@@ -205,6 +205,15 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
             getNodes: () => material.nodes,
             getNodeById: (id: number) => material.nodes.find((x) => x.id === id),
 
+            setOutputTextureSize(size: number) {
+                setMaterial(
+                    produce((material) => {
+                        material.textureWidth = size;
+                        material.textureHeight = size;
+                    }),
+                );
+            },
+
             getOutputTextureWidth: () => material.textureWidth,
             getOutputTextureHeight: () => material.textureHeight,
             getSocketConnections: () => material.connections,
