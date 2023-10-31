@@ -243,7 +243,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                         label: "Amount",
                         default: 10,
                         type: "number",
-                        valueType: "float",
+                        valueType: "int",
                         min: 0,
                         max: 200,
                     },

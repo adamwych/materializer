@@ -4,6 +4,7 @@ import { InputProps } from "./parameter";
 
 export default function MaterialNodeInspectorNumberInput(props: InputProps<number>) {
     const [maxScale, setMaxScale] = createSignal(1);
+    const isFloat = props.parameter.valueType === "float";
 
     createEffect(() => {
         const max = props.parameter.max ?? 1;
@@ -18,23 +19,17 @@ export default function MaterialNodeInspectorNumberInput(props: InputProps<numbe
                 min={props.parameter.min ?? 0}
                 max={(props.parameter.max ?? 1) * maxScale()}
                 value={props.value()}
-                onChange={props.onChange}
+                onChange={(value) => props.onChange(isFloat ? value : Math.round(value))}
             />
 
             <input
                 style={{ width: "54px" }}
                 class="border-none outline-none bg-transparent text-center"
                 type="number"
-                value={
-                    props.parameter.valueType === "float"
-                        ? props.value().toFixed(2)
-                        : Math.round(props.value())
-                }
+                value={isFloat ? props.value().toFixed(2) : props.value()}
                 onChange={(ev) =>
                     props.onChange(
-                        props.parameter.valueType === "float"
-                            ? parseFloat(ev.target.value)
-                            : parseInt(ev.target.value),
+                        isFloat ? parseFloat(ev.target.value) : parseInt(ev.target.value),
                     )
                 }
             />
