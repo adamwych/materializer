@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function MenuBarSubmenu(props: Props) {
-    const [open, setOpen] = createSignal(true);
+    const [open, setOpen] = createSignal(false);
 
     return (
         <MenuBarContextProvider onClose={() => setOpen(false)}>

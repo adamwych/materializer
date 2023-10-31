@@ -2,6 +2,8 @@ import MaterialGraphEditor from "./editor.tsx";
 import { For, Show, createEffect, createSignal, on } from "solid-js";
 import { useWorkspaceContext } from "../workspace-context.ts";
 import { RiSystemAddFill } from "solid-icons/ri";
+import EditorWelcomeMessage from "./welcome.tsx";
+import EditorTabButton from "./editor-tab-button.tsx";
 
 export default function EditorTabs() {
     const workspace = useWorkspaceContext()!;
@@ -20,18 +22,7 @@ export default function EditorTabs() {
         <div class="w-full h-full flex flex-col flex-1">
             <div class="flex items-center bg-gray-200">
                 <For each={workspace.openedMaterials()}>
-                    {(material, index) => (
-                        <div
-                            class={`px-4 animate-fade-in flex items-center h-[35px] text-sm ${
-                                index() === workspace.activeEditorTab()
-                                    ? "bg-blue-500"
-                                    : "hover:bg-gray-300 active:bg-gray-200"
-                            }`}
-                            onClick={() => workspace.setActiveEditorTab(index)}
-                        >
-                            {material.name}
-                        </div>
-                    )}
+                    {(material) => <EditorTabButton material={material} />}
                 </For>
 
                 <div class="px-2 flex items-center h-[35px]">
@@ -44,7 +35,11 @@ export default function EditorTabs() {
                 </div>
             </div>
 
-            <Show when={!hidden()}>
+            <Show when={workspace.activeEditorTab() === undefined}>
+                <EditorWelcomeMessage />
+            </Show>
+
+            <Show when={!hidden() && workspace.activeEditorTab() !== undefined}>
                 <MaterialGraphEditor material={workspace.activeEditorTabMaterial()!} />
             </Show>
         </div>

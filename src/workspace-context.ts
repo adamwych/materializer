@@ -16,22 +16,23 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
         const [openedMaterials, setOpenedMaterials] = createSignal<Array<Material>>([
             props.initialMaterial,
         ]);
-        const [activeEditorTab, setActiveEditorTab] = createSignal<number>(0);
+        const [activeEditorTab, setActiveEditorTab] = createSignal<string | undefined>(
+            props.initialMaterial.id,
+        );
 
         return {
             openMaterial(material: Material) {
                 setOpenedMaterials((materials) => {
-                    const index = materials.findIndex((x) => x.id === material.id);
-                    if (index !== -1) {
-                        setActiveEditorTab(index);
+                    const alreadyOpen = materials.some((x) => x.id === material.id);
+                    if (alreadyOpen) {
                         return materials;
                     }
 
                     const newMaterials = [...materials];
                     newMaterials.push(material);
-                    setActiveEditorTab(newMaterials.length - 1);
                     return newMaterials;
                 });
+                setActiveEditorTab(material.id);
             },
 
             openNewMaterial() {
@@ -47,7 +48,32 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
             },
 
             saveActiveMaterial() {
-                storage.saveMaterial(unwrap(this.activeEditorTabMaterial()));
+                const activeMaterial = this.activeEditorTabMaterial();
+                if (activeMaterial) {
+                    storage.saveMaterial(unwrap(activeMaterial));
+                }
+            },
+
+            closeEditorTab(materialId: string) {
+                if (activeEditorTab() === materialId) {
+                    const materials = openedMaterials();
+                    const materialIndex = materials.findIndex((x) => x.id === materialId);
+                    if (materials.length === 1) {
+                        setActiveEditorTab(undefined);
+                    } else {
+                        const closestMaterialIndex = materialIndex === 0 ? 1 : materialIndex - 1;
+                        setActiveEditorTab(materials[closestMaterialIndex].id);
+                    }
+                }
+
+                setOpenedMaterials((materials) => {
+                    const newMaterials = [...materials];
+                    newMaterials.splice(
+                        newMaterials.findIndex((x) => x.id === materialId),
+                        1,
+                    );
+                    return newMaterials;
+                });
             },
 
             openedMaterials,
@@ -55,7 +81,7 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
             setActiveEditorTab,
 
             get activeEditorTabMaterial() {
-                return () => openedMaterials()[activeEditorTab()];
+                return () => openedMaterials().find((x) => x.id === activeEditorTab());
             },
         };
     },
