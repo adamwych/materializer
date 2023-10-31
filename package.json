@@ -2,7 +2,7 @@
     "name": "materializer",
     "version": "1.0.0",
     "main": "index.js",
-    "license": "MIT",
+    "license": "GPL-3.0",
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
