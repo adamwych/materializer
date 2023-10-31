@@ -8,7 +8,7 @@ export default function MaterialPreviewPanel() {
     let canvasElement: HTMLCanvasElement;
 
     function onWheel(ev: WheelEvent) {
-        renderingEngine.previewCamera.zoom += ev.deltaY / 200;
+        renderingEngine.previewCamera.zoom *= ev.deltaY > 0 ? 1.2 : 1 / 1.2;
         renderingEngine.renderPreview();
     }
 
