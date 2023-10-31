@@ -7,16 +7,6 @@ export default function EditorTabs() {
     const workspace = useWorkspaceContext()!;
     const [hidden, setHidden] = createSignal(false);
 
-    function openNewTab() {
-        workspace.openMaterial({
-            name: "Test",
-            nodes: [],
-            textureWidth: 2048,
-            textureHeight: 2048,
-            connections: [],
-        });
-    }
-
     // Show & hide the graph to ensure that everything fully re-initializes
     // after changing active tab.
     createEffect(
@@ -34,7 +24,7 @@ export default function EditorTabs() {
                         <div
                             class={`px-4 animate-fade-in flex items-center h-[35px] text-sm ${
                                 index() === workspace.activeEditorTab()
-                                    ? "bg-gray-100"
+                                    ? "bg-blue-500"
                                     : "hover:bg-gray-300 active:bg-gray-200"
                             }`}
                             onClick={() => workspace.setActiveEditorTab(index)}
@@ -47,7 +37,7 @@ export default function EditorTabs() {
                 <div class="px-2 flex items-center h-[35px]">
                     <div
                         class="text-sm hover:bg-gray-300 active:bg-gray-200 p-1 rounded-md"
-                        onClick={openNewTab}
+                        onClick={() => workspace.openNewMaterial()}
                     >
                         <RiSystemAddFill />
                     </div>

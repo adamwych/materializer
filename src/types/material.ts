@@ -1,3 +1,5 @@
+import TextureFilterMethod from "./texture-filter";
+
 export enum MaterialNodeOutputTarget {
     Albedo = "albedo",
     Height = "height",
@@ -52,9 +54,11 @@ export type MaterialNode = {
 };
 
 export type Material = {
+    id: string;
     name: string;
     textureWidth: number;
     textureHeight: number;
+    textureFiltering: TextureFilterMethod;
     nodes: Array<MaterialNode>;
     connections: Array<{
         from: MaterialNodeSocketAddr;

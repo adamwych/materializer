@@ -15,7 +15,7 @@ export default function MenuBarItem(props: Props) {
     }
 
     return (
-        <div class="px-3 py-2 hover:bg-gray-300 active:bg-gray-200" onClick={onClick}>
+        <div class="px-3 py-2 text-sm hover:bg-gray-300 active:bg-gray-200" onClick={onClick}>
             {props.label}
         </div>
     );

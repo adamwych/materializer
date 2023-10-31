@@ -1,4 +1,5 @@
 import { Material, MaterialNode } from "../../types/material";
+import TextureFilterMethod from "../../types/texture-filter";
 import { ConstructorOf } from "../../types/utils";
 import GLSLMaterialNodePainter from "../painters/glsl";
 import MaterialNodePainter, { MaterialNodePainterType } from "../painters/painter";
@@ -38,6 +39,7 @@ function createFramebuffer(
     gl: WebGL2RenderingContext,
     node: MaterialNode,
     textures: Map<string, WebGLTexture>,
+    filterMethod: TextureFilterMethod,
 ) {
     const fbo = gl.createFramebuffer()!;
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
@@ -47,7 +49,7 @@ function createFramebuffer(
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + index,
             gl.TEXTURE_2D,
-            bindOutputSocketTexture(gl, textures, node.id, socket.id),
+            bindOutputSocketTexture(gl, textures, node.id, socket.id, filterMethod),
             0,
         );
     });
@@ -69,6 +71,7 @@ function bindOutputSocketTexture(
     textures: Map<string, WebGLTexture>,
     nodeId: number,
     outputId: string,
+    filterMethod: TextureFilterMethod,
 ) {
     const key = `${nodeId}-${outputId}`;
     const existingTexture = textures.get(key);
@@ -90,8 +93,9 @@ function bindOutputSocketTexture(
         gl.UNSIGNED_BYTE,
         emptyTextureData,
     );
-    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    const glFilterMethod = filterMethod === TextureFilterMethod.Linear ? gl.LINEAR : gl.NEAREST;
+    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, glFilterMethod);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, glFilterMethod);
     textures.set(key, texture);
     return texture;
 }
@@ -123,7 +127,7 @@ export function renderNode(
         painters.set(node.id, new painterCtor(gl, node.spec.painter));
     }
 
-    const fbo = createFramebuffer(gl, node, textures);
+    const fbo = createFramebuffer(gl, node, textures, material.textureFiltering);
 
     const inputTextures = new Map<string, WebGLTexture>();
     for (const input of node.spec.inputSockets) {

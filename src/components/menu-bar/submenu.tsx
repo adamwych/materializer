@@ -7,13 +7,13 @@ interface Props {
 }
 
 export default function MenuBarSubmenu(props: Props) {
-    const [open, setOpen] = createSignal(false);
+    const [open, setOpen] = createSignal(true);
 
     return (
         <MenuBarContextProvider onClose={() => setOpen(false)}>
             <div class="relative">
                 <div
-                    class="px-3 py-2 hover:bg-gray-300 active:bg-gray-200"
+                    class="px-3 py-2 text-sm hover:bg-gray-300 active:bg-gray-200"
                     onClick={() => setOpen((open) => !open)}
                 >
                     {props.label}

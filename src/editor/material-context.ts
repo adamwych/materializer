@@ -1,14 +1,15 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { createEmitter } from "@solid-primitives/event-bus";
+import { createStore, produce, unwrap } from "solid-js/store";
+import { DeepReadonly } from "ts-essentials";
+import { useAppContext } from "../app-context.ts";
 import {
     Material,
     MaterialNode,
     MaterialNodeParametersMap,
     MaterialNodeSocketAddr,
 } from "../types/material.ts";
-import { createStore, produce, unwrap } from "solid-js/store";
-import { useAppContext } from "../app-context.ts";
-import { createEmitter } from "@solid-primitives/event-bus";
-import { DeepReadonly } from "ts-essentials";
+import TextureFilterMethod from "../types/texture-filter";
 
 /**
  * Provides access to the currently edited {@link Material} and methods to safely modify it.
@@ -202,8 +203,25 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                 );
             },
 
-            getNodes: () => material.nodes,
-            getNodeById: (id: number) => material.nodes.find((x) => x.id === id),
+            setName(name: string) {
+                setMaterial(
+                    produce((material) => {
+                        material.name = name;
+                    }),
+                );
+            },
+
+            getName: () => material.name,
+
+            setOutputTextureFiltering(method: TextureFilterMethod) {
+                setMaterial(
+                    produce((material) => {
+                        material.textureFiltering = method;
+                    }),
+                );
+            },
+
+            getOutputTextureFiltering: () => material.textureFiltering,
 
             setOutputTextureSize(size: number) {
                 setMaterial(
@@ -217,8 +235,9 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
             getOutputTextureWidth: () => material.textureWidth,
             getOutputTextureHeight: () => material.textureHeight,
             getSocketConnections: () => material.connections,
-
             getMaterial: () => structuredClone(unwrap(material)),
+            getNodes: () => material.nodes,
+            getNodeById: (id: number) => material.nodes.find((x) => x.id === id),
 
             events,
         };

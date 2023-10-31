@@ -18,6 +18,7 @@
         "@solid-primitives/tween": "^1.2.6",
         "@types/culori": "^2.0.3",
         "@types/seedrandom": "^3.0.7",
+        "@types/uuid": "^9.0.6",
         "@typescript-eslint/eslint-plugin": "^6.7.4",
         "@typescript-eslint/parser": "^6.7.4",
         "autoprefixer": "^10.4.16",
@@ -35,6 +36,7 @@
         "tailwindcss": "^3.3.3",
         "ts-essentials": "^9.4.1",
         "typescript": "^5.2.2",
+        "uuid": "^9.0.1",
         "vite": "^4.4.11",
         "vite-plugin-solid": "^2.7.0"
     }
