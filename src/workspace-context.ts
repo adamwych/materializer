@@ -1,6 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createSignal } from "solid-js";
-import { unwrap } from "solid-js/store";
+import { createStore, produce, unwrap } from "solid-js/store";
 import { v4 as uuidv4 } from "uuid";
 import { Material } from "./types/material.ts";
 import { useWorkspaceStorage } from "./workspace-storage.ts";
@@ -13,16 +13,18 @@ type Props = {
 export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProvider(
     (props: Props) => {
         const storage = useWorkspaceStorage()!;
-        const [openedMaterials, setOpenedMaterials] = createSignal<Array<Material>>([
-            props.initialMaterial,
-        ]);
-        const [activeEditorTab, setActiveEditorTab] = createSignal<string | undefined>(
+        const [materials, setMaterials] = createStore<Array<Material>>([props.initialMaterial]);
+        const [activeMaterialId, setActiveMaterialId] = createSignal<string | undefined>(
             props.initialMaterial.id,
         );
 
         return {
+            /**
+             * Opens an editor tab for given material.
+             * @param material
+             */
             openMaterial(material: Material) {
-                setOpenedMaterials((materials) => {
+                setMaterials((materials) => {
                     const alreadyOpen = materials.some((x) => x.id === material.id);
                     if (alreadyOpen) {
                         return materials;
@@ -32,9 +34,12 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                     newMaterials.push(material);
                     return newMaterials;
                 });
-                setActiveEditorTab(material.id);
+                setActiveMaterialId(material.id);
             },
 
+            /**
+             * Creates a new, empty material and opens its editor.
+             */
             openNewMaterial() {
                 this.openMaterial({
                     id: uuidv4(),
@@ -47,6 +52,17 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                 });
             },
 
+            mutateMaterial(id: string, mutator: (material: Material) => void) {
+                setMaterials(
+                    produce((materials) => {
+                        const material = materials.find((x) => x.id === id);
+                        if (material) {
+                            mutator(material);
+                        }
+                    }),
+                );
+            },
+
             saveActiveMaterial() {
                 const activeMaterial = this.activeEditorTabMaterial();
                 if (activeMaterial) {
@@ -55,18 +71,17 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
             },
 
             closeEditorTab(materialId: string) {
-                if (activeEditorTab() === materialId) {
-                    const materials = openedMaterials();
+                if (activeMaterialId() === materialId) {
                     const materialIndex = materials.findIndex((x) => x.id === materialId);
                     if (materials.length === 1) {
-                        setActiveEditorTab(undefined);
+                        setActiveMaterialId(undefined);
                     } else {
                         const closestMaterialIndex = materialIndex === 0 ? 1 : materialIndex - 1;
-                        setActiveEditorTab(materials[closestMaterialIndex].id);
+                        setActiveMaterialId(materials[closestMaterialIndex].id);
                     }
                 }
 
-                setOpenedMaterials((materials) => {
+                setMaterials((materials) => {
                     const newMaterials = [...materials];
                     newMaterials.splice(
                         newMaterials.findIndex((x) => x.id === materialId),
@@ -76,12 +91,12 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                 });
             },
 
-            openedMaterials,
-            activeEditorTab,
-            setActiveEditorTab,
+            materials,
+            activeMaterialId,
+            setActiveMaterialId,
 
             get activeEditorTabMaterial() {
-                return () => openedMaterials().find((x) => x.id === activeEditorTab());
+                return () => materials.find((x) => x.id === activeMaterialId());
             },
         };
     },

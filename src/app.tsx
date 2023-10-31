@@ -8,10 +8,11 @@ import EditorTabs from "./editor/editor-tabs.tsx";
 import { WorkspaceContextProvider } from "./workspace-context.ts";
 import { WorkspaceStorageProvider } from "./workspace-storage.ts";
 import TextureFilterMethod from "./types/texture-filter.ts";
+import { v4 as uuidv4 } from "uuid";
 
 const DEFAULT_MATERIAL: Material = {
-    id: "test",
-    name: "Default",
+    id: uuidv4(),
+    name: "New Material",
     textureWidth: 2048,
     textureHeight: 2048,
     textureFiltering: TextureFilterMethod.Linear,

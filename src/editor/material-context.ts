@@ -1,6 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createEmitter } from "@solid-primitives/event-bus";
-import { createStore, produce, unwrap } from "solid-js/store";
+import { unwrap } from "solid-js/store";
 import { DeepReadonly } from "ts-essentials";
 import { useAppContext } from "../app-context.ts";
 import {
@@ -10,27 +10,35 @@ import {
     MaterialNodeSocketAddr,
 } from "../types/material.ts";
 import TextureFilterMethod from "../types/texture-filter";
+import { useWorkspaceContext } from "../workspace-context.ts";
 
 /**
  * Provides access to the currently edited {@link Material} and methods to safely modify it.
  */
 export const [MaterialContextProvider, useMaterialContext] = createContextProvider(
     ({ value }: { value: Material }) => {
+        const material = value;
         const appContext = useAppContext()!;
-        const [material, setMaterial] = createStore(value);
+        const workspaceContext = useWorkspaceContext()!;
         const events = createEmitter<{
             added: DeepReadonly<MaterialNode>;
             removed: DeepReadonly<MaterialNode>;
             changed: DeepReadonly<MaterialNode>;
         }>();
 
-        value.nodes.forEach((node) => {
-            node.spec = appContext.getNodeSpec(node.path);
-            node.spec.parameters.forEach((info) => {
-                const hasValue = info.id in node.parameters;
-                if (!hasValue) {
-                    node.parameters[info.id] = info.default;
-                }
+        function setMaterial(mutator: (material: Material) => void) {
+            workspaceContext.mutateMaterial(material.id, mutator);
+        }
+
+        setMaterial((material) => {
+            material.nodes.forEach((node) => {
+                node.spec = appContext.getNodeSpec(node.path);
+                node.spec.parameters.forEach((info) => {
+                    const hasValue = info.id in node.parameters;
+                    if (!hasValue) {
+                        node.parameters[info.id] = info.default;
+                    }
+                });
             });
         });
 
@@ -66,12 +74,10 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                     zIndex: id,
                 };
 
-                setMaterial(
-                    produce((material) => {
-                        material.nodes.push(node);
-                        events.emit("added", node);
-                    }),
-                );
+                setMaterial((material) => {
+                    material.nodes.push(node);
+                    events.emit("added", node);
+                });
             },
 
             /**
@@ -82,87 +88,77 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
              * @param y
              */
             moveNode(id: number, x: number, y: number) {
-                setMaterial(
-                    produce((material) => {
-                        const node = material.nodes.find((x) => x.id === id);
-                        if (!node) {
-                            throw new Error(`Failed to move a node: Node does not exist.`);
-                        }
+                setMaterial((material) => {
+                    const node = material.nodes.find((x) => x.id === id);
+                    if (!node) {
+                        throw new Error(`Failed to move a node: Node does not exist.`);
+                    }
 
-                        node.x += x;
-                        node.y += y;
-                    }),
-                );
+                    node.x += x;
+                    node.y += y;
+                });
             },
 
             setNodeLabel(id: number, label: string) {
-                setMaterial(
-                    produce((material) => {
-                        const node = material.nodes.find((x) => x.id === id);
-                        if (!node) {
-                            throw new Error(`Failed to change node label: Node does not exist.`);
-                        }
+                setMaterial((material) => {
+                    const node = material.nodes.find((x) => x.id === id);
+                    if (!node) {
+                        throw new Error(`Failed to change node label: Node does not exist.`);
+                    }
 
-                        node.label = label;
-                    }),
-                );
+                    node.label = label;
+                });
             },
 
             setNodeParameter(id: number, parameterName: string, newValue: unknown) {
-                setMaterial(
-                    produce((material) => {
-                        const node = material.nodes.find((x) => x.id === id);
-                        if (!node) {
-                            throw new Error(
-                                `Failed to change node parameter: Node does not exist.`,
-                            );
-                        }
+                setMaterial((material) => {
+                    const node = material.nodes.find((x) => x.id === id);
+                    if (!node) {
+                        throw new Error(`Failed to change node parameter: Node does not exist.`);
+                    }
 
-                        node.parameters[parameterName] = newValue;
+                    node.parameters[parameterName] = newValue;
 
-                        events.emit("changed", node);
-                    }),
-                );
+                    events.emit("changed", node);
+                });
             },
 
             removeNode(id: number) {
-                setMaterial(
-                    produce((material) => {
-                        const index = material.nodes.findIndex((node) => node.id === id);
-                        if (index === -1) {
-                            throw new Error("Failed to remove node: Node does not exist.");
-                        }
+                setMaterial((material) => {
+                    const index = material.nodes.findIndex((node) => node.id === id);
+                    if (index === -1) {
+                        throw new Error("Failed to remove node: Node does not exist.");
+                    }
 
-                        const nodesToRefresh: Array<number> = [];
+                    const nodesToRefresh: Array<number> = [];
 
-                        material.connections
-                            .filter((connection) => {
-                                return connection.from.nodeId === id || connection.to.nodeId === id;
-                            })
-                            .forEach((connection) => {
-                                if (connection.from.nodeId === id) {
-                                    nodesToRefresh.push(connection.to.nodeId);
-                                } else if (connection.to.nodeId === id) {
-                                    nodesToRefresh.push(connection.from.nodeId);
-                                }
+                    material.connections
+                        .filter((connection) => {
+                            return connection.from.nodeId === id || connection.to.nodeId === id;
+                        })
+                        .forEach((connection) => {
+                            if (connection.from.nodeId === id) {
+                                nodesToRefresh.push(connection.to.nodeId);
+                            } else if (connection.to.nodeId === id) {
+                                nodesToRefresh.push(connection.from.nodeId);
+                            }
 
-                                material.connections.splice(
-                                    material.connections.indexOf(connection),
-                                    1,
-                                );
-                            });
-
-                        const node = material.nodes[index];
-
-                        material.nodes.splice(index, 1);
-
-                        events.emit("removed", node);
-
-                        nodesToRefresh.forEach((id) => {
-                            events.emit("changed", material.nodes.find((x) => x.id === id)!);
+                            material.connections.splice(
+                                material.connections.indexOf(connection),
+                                1,
+                            );
                         });
-                    }),
-                );
+
+                    const node = material.nodes[index];
+
+                    material.nodes.splice(index, 1);
+
+                    events.emit("removed", node);
+
+                    nodesToRefresh.forEach((id) => {
+                        events.emit("changed", material.nodes.find((x) => x.id === id)!);
+                    });
+                });
             },
 
             /**
@@ -173,63 +169,55 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
              * @param destination
              */
             addSocketConnection(from: MaterialNodeSocketAddr, destination: MaterialNodeSocketAddr) {
-                setMaterial(
-                    produce((material) => {
-                        // Remove existing connections to the destination socket.
-                        material.connections
-                            .filter(
-                                (x) =>
-                                    x.to.nodeId === destination.nodeId &&
-                                    x.to.socketId === destination.socketId,
-                            )
-                            .forEach((connection) => {
-                                material.connections.splice(
-                                    material.connections.indexOf(connection),
-                                    1,
-                                );
-                            });
-
-                        material.connections.push({
-                            from,
-                            to: destination,
+                setMaterial((material) => {
+                    // Remove existing connections to the destination socket.
+                    material.connections
+                        .filter(
+                            (x) =>
+                                x.to.nodeId === destination.nodeId &&
+                                x.to.socketId === destination.socketId,
+                        )
+                        .forEach((connection) => {
+                            material.connections.splice(
+                                material.connections.indexOf(connection),
+                                1,
+                            );
                         });
 
-                        events.emit("changed", material.nodes.find((x) => x.id === from.nodeId)!);
-                        events.emit(
-                            "changed",
-                            material.nodes.find((x) => x.id === destination.nodeId)!,
-                        );
-                    }),
-                );
+                    material.connections.push({
+                        from,
+                        to: destination,
+                    });
+
+                    events.emit("changed", material.nodes.find((x) => x.id === from.nodeId)!);
+                    events.emit(
+                        "changed",
+                        material.nodes.find((x) => x.id === destination.nodeId)!,
+                    );
+                });
             },
 
             setName(name: string) {
-                setMaterial(
-                    produce((material) => {
-                        material.name = name;
-                    }),
-                );
+                setMaterial((material) => {
+                    material.name = name;
+                });
             },
 
             getName: () => material.name,
 
             setOutputTextureFiltering(method: TextureFilterMethod) {
-                setMaterial(
-                    produce((material) => {
-                        material.textureFiltering = method;
-                    }),
-                );
+                setMaterial((material) => {
+                    material.textureFiltering = method;
+                });
             },
 
             getOutputTextureFiltering: () => material.textureFiltering,
 
             setOutputTextureSize(size: number) {
-                setMaterial(
-                    produce((material) => {
-                        material.textureWidth = size;
-                        material.textureHeight = size;
-                    }),
-                );
+                setMaterial((material) => {
+                    material.textureWidth = size;
+                    material.textureHeight = size;
+                });
             },
 
             getOutputTextureWidth: () => material.textureWidth,

@@ -12,7 +12,7 @@ export default function EditorTabs() {
     // Show & hide the graph to ensure that everything fully re-initializes
     // after changing active tab.
     createEffect(
-        on(workspace.activeEditorTab, () => {
+        on(workspace.activeMaterialId, () => {
             setHidden(true);
             setTimeout(() => setHidden(false));
         }),
@@ -21,7 +21,7 @@ export default function EditorTabs() {
     return (
         <div class="w-full h-full flex flex-col flex-1">
             <div class="flex items-center bg-gray-200">
-                <For each={workspace.openedMaterials()}>
+                <For each={workspace.materials}>
                     {(material) => <EditorTabButton material={material} />}
                 </For>
 
@@ -35,11 +35,11 @@ export default function EditorTabs() {
                 </div>
             </div>
 
-            <Show when={workspace.activeEditorTab() === undefined}>
+            <Show when={workspace.activeMaterialId() === undefined}>
                 <EditorWelcomeMessage />
             </Show>
 
-            <Show when={!hidden() && workspace.activeEditorTab() !== undefined}>
+            <Show when={!hidden() && workspace.activeMaterialId() !== undefined}>
                 <MaterialGraphEditor material={workspace.activeEditorTabMaterial()!} />
             </Show>
         </div>
