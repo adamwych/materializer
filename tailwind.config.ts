@@ -42,7 +42,7 @@ export default {
     safelist: [
         {
             pattern:
-                /(text|bg|border)-(white|black|gray|washed-red|washed-green|washed-blue)-(100|200|300|400|500|600|700|800)/,
+                /(text|bg|border)-(white|black|gray|red|green|blue|washed-red|washed-green|washed-blue)-(100|200|300|400|500|600|700|800)/,
             variants: ["hover", "active", "group-hover"],
         },
     ],
@@ -50,6 +50,10 @@ export default {
         extend: {
             boxShadow: {
                 md: "0px 10px 40px -10px rgba(0, 0, 0, 0.5)",
+            },
+            zIndex: {
+                dialog: "90",
+                snackbars: "100",
             },
         },
         colors: {

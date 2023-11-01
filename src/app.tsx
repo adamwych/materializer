@@ -9,6 +9,8 @@ import { WorkspaceContextProvider } from "./workspace-context.ts";
 import { WorkspaceStorageProvider } from "./workspace-storage.ts";
 import TextureFilterMethod from "./types/texture-filter.ts";
 import { v4 as uuidv4 } from "uuid";
+import { SnackbarProvider } from "./components/snackbar/context.ts";
+import SnackbarsContainer from "./components/snackbar/container.tsx";
 
 const DEFAULT_MATERIAL: Material = {
     id: uuidv4(),
@@ -52,16 +54,19 @@ const DEFAULT_MATERIAL: Material = {
 
 export default function App() {
     return (
-        <AppContextProvider>
-            <WorkspaceStorageProvider>
-                <WorkspaceContextProvider initialMaterial={DEFAULT_MATERIAL}>
-                    <div class="w-full h-full flex flex-col overflow-hidden">
-                        <AppMenuBar />
-                        <EditorTabs />
-                    </div>
-                </WorkspaceContextProvider>
-            </WorkspaceStorageProvider>
-        </AppContextProvider>
+        <SnackbarProvider>
+            <AppContextProvider>
+                <WorkspaceStorageProvider>
+                    <WorkspaceContextProvider initialMaterial={DEFAULT_MATERIAL}>
+                        <div class="w-full h-full flex flex-col overflow-hidden">
+                            <SnackbarsContainer />
+                            <AppMenuBar />
+                            <EditorTabs />
+                        </div>
+                    </WorkspaceContextProvider>
+                </WorkspaceStorageProvider>
+            </AppContextProvider>
+        </SnackbarProvider>
     );
 }
 

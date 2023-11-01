@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import { Material } from "./types/material.ts";
 import { useWorkspaceStorage } from "./workspace-storage.ts";
 import TextureFilterMethod from "./types/texture-filter.ts";
+import { useSnackbar } from "./components/snackbar/context.ts";
+import { RiSystemCheckFill } from "solid-icons/ri";
 
 type Props = {
     initialMaterial: Material;
@@ -13,6 +15,7 @@ type Props = {
 export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProvider(
     (props: Props) => {
         const storage = useWorkspaceStorage()!;
+        const snackbar = useSnackbar()!;
         const [materials, setMaterials] = createStore<Array<Material>>([props.initialMaterial]);
         const [activeMaterialId, setActiveMaterialId] = createSignal<string | undefined>(
             props.initialMaterial.id,
@@ -67,6 +70,12 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                 const activeMaterial = this.activeEditorTabMaterial();
                 if (activeMaterial) {
                     storage.saveMaterial(unwrap(activeMaterial));
+                    snackbar.push({
+                        type: "success",
+                        text: "Material saved.",
+                        icon: RiSystemCheckFill,
+                        duration: 2000,
+                    });
                 }
             },
 

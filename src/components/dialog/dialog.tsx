@@ -18,7 +18,7 @@ export default function Dialog(props: Props) {
 
     return (
         <Portal>
-            <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
+            <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center z-dialog">
                 <div
                     class="absolute top-0 left-0 w-full h-full animate-fade-in"
                     style={{ background: "rgba(0, 0, 0, 0.5)" }}
