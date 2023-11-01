@@ -2,7 +2,7 @@ import { DeepReadonly } from "ts-essentials";
 import { MaterialNode, MaterialNodePainterInfo } from "../../types/material";
 import MaterialNodePainter from "./painter";
 import MaterialNodeShaderProgram from "../program";
-import glslCode from "../../../glsl/scatter.glsl?raw";
+import glslCode from "../../../glsl/pattern.glsl?raw";
 import * as glMatrix from "gl-matrix";
 import BlendMode from "../../types/blend-mode";
 
