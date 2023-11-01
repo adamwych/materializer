@@ -90,6 +90,11 @@ export default function MaterialGraphEditorNodes() {
     }
 
     createEventListener(window, "keydown", (ev) => {
+        if (ev.key === "s" && ev.ctrlKey) {
+            ev.preventDefault();
+            workspace.saveActiveMaterial();
+        }
+
         const hoveredElements = document.querySelectorAll(":hover");
         if (
             hoveredElements.length === 0 ||
@@ -113,10 +118,6 @@ export default function MaterialGraphEditorNodes() {
             [...editorCtx.getHighlightedNodes(), editorCtx.getInspectedNode()()?.id]
                 .filter((x) => typeof x !== "undefined")
                 .forEach((node) => materialCtx.removeNode(node!));
-        } else if (ev.key === "s" && ev.ctrlKey) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            workspace.saveActiveMaterial();
         }
     });
 
