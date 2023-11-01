@@ -20,7 +20,7 @@ export default function MaterialGraphNewNodePopoverPackage(props: Props) {
     };
 
     return (
-        <div class="bg-gray-300 py-2">
+        <div class="py-2">
             <div class="p-2 flex items-center gap-1">
                 <RiOthersBox1Fill size={12} />
                 <span class="font-semibold text-xs" style={{ position: "relative", top: "-1px" }}>
@@ -36,7 +36,7 @@ export default function MaterialGraphNewNodePopoverPackage(props: Props) {
                         <For each={nodes}>
                             {([typeId, spec]) => (
                                 <li
-                                    class="p-2 pl-[32px] text-sm hover:bg-gray-400 active:bg-gray-200 flex items-center gap-1"
+                                    class="p-2 pl-[32px] text-sm hover:bg-gray-200 active:bg-gray-100 flex items-center gap-1"
                                     onClick={() => props.onItemClick(`${props.id}/${typeId}`)}
                                 >
                                     <RiMediaImage2Fill size={16} />

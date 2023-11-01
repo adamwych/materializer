@@ -27,7 +27,7 @@ export default function MaterialGraphNewNodePopover(props: Props) {
 
     return (
         <div
-            class="animate-fade-scale-in origin-top-left fixed w-[224px] rounded-md overflow-hidden bg-gray-300"
+            class="animate-fade-scale-in origin-top-left fixed w-[224px] rounded-md overflow-hidden bg-gray-100 border border-gray-300 shadow-md"
             style={{
                 top: props.y + "px",
                 left: props.x + "px",
@@ -35,7 +35,7 @@ export default function MaterialGraphNewNodePopover(props: Props) {
             }}
             onMouseDown={(ev) => ev.stopPropagation()}
         >
-            <div class="p-2 text-sm text-gray-800 flex justify-between items-center border-b border-gray-200">
+            <div class="p-2 text-sm text-gray-600 flex justify-between items-center border-b border-gray-200">
                 <div class="flex items-center gap-1">
                     <RiSystemAddFill size={16} />
                     <span class="font-semibold">Add node</span>
