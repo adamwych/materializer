@@ -6,8 +6,8 @@ import MaterialNodePainter, { MaterialNodePainterType } from "../painters/painte
 import ScatterMaterialNodePainter from "../painters/scatter";
 import TileMaterialNodePainter from "../painters/tile";
 
-const thumbnailWidth = 144;
-const thumbnailHeight = 144;
+const thumbnailWidth = 128;
+const thumbnailHeight = 128;
 
 const painters = new Map<number, MaterialNodePainter>();
 const painterCtors = new Map<MaterialNodePainterType, ConstructorOf<MaterialNodePainter>>([

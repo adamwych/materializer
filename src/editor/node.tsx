@@ -21,7 +21,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
         connectionBuilder.isBuildingConnectionFrom(props.node().id) ||
         inspectedNode()?.id === props.node().id ||
         editorCtx.isNodeHighlighted(props.node().id);
-    const size = 144;
+    const size = 128;
 
     return (
         <div
