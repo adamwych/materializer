@@ -12,6 +12,7 @@ import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
 import MaterialNodeBox from "./node.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { createEventListener } from "@solid-primitives/event-listener";
+import { useWorkspaceContext } from "../workspace-context.ts";
 
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 2;
@@ -21,6 +22,7 @@ export default function MaterialGraphEditorNodes() {
     const selectionManager = useEditorSelectionManager()!;
     const materialCtx = useMaterialContext()!;
     const editorCtx = useEditorContext()!;
+    const workspace = useWorkspaceContext()!;
     const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
     const transformMatrix = () => {
         const m = [];
@@ -87,7 +89,7 @@ export default function MaterialGraphEditorNodes() {
         });
     }
 
-    createEventListener(window, "keyup", (ev) => {
+    createEventListener(window, "keydown", (ev) => {
         const hoveredElements = document.querySelectorAll(":hover");
         if (
             hoveredElements.length === 0 ||
@@ -111,6 +113,10 @@ export default function MaterialGraphEditorNodes() {
             [...editorCtx.getHighlightedNodes(), editorCtx.getInspectedNode()()?.id]
                 .filter((x) => typeof x !== "undefined")
                 .forEach((node) => materialCtx.removeNode(node!));
+        } else if (ev.key === "s" && ev.ctrlKey) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            workspace.saveActiveMaterial();
         }
     });
 
