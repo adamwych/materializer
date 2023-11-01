@@ -533,6 +533,13 @@
   dependencies:
     "@solid-primitives/utils" "^6.2.1"
 
+"@solid-primitives/event-listener@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@solid-primitives/event-listener/-/event-listener-2.3.0.tgz#2e962e7e39ab47a8aed138b73f75f6d8dc9a558b"
+  integrity sha512-0DS7DQZvCExWSpurVZC9/wjI8RmkhuOtWOy6Pp1Woq9ElMT9/bfjNpkwXsOwisLpcTqh9eUs17kp7jtpWcC20w==
+  dependencies:
+    "@solid-primitives/utils" "^6.2.1"
+
 "@solid-primitives/map@^0.4.8":
   version "0.4.8"
   resolved "https://registry.yarnpkg.com/@solid-primitives/map/-/map-0.4.8.tgz#876a60d3cc10bf9e9769ead0f7ebef4a85a4860d"

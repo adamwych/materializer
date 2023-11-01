@@ -1,4 +1,4 @@
-import makeMouseMoveListener from "../../utils/makeMouseMoveListener";
+import makeDeferredDragListener from "../../utils/makeDeferredDragListener";
 import { clamp } from "../../utils/math";
 import { SliderProps } from "./props";
 import defaultStyles from "./styles";
@@ -8,7 +8,7 @@ export default function VerticalSlider(props: SliderProps) {
     let trackElementRef: HTMLElement | undefined;
     const clampedValue = () => clamp(props.value, props.min, props.max);
 
-    const onMouseDown = makeMouseMoveListener((ev) => {
+    const onMouseDown = makeDeferredDragListener((ev) => {
         if (!trackElementRef) {
             return;
         }

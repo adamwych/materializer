@@ -7,12 +7,12 @@ const [EditorSelectionManagerProvider, useEditorSelectionManager] = createContex
     const singleSelect = createSingleSelectManager();
 
     return {
-        renderMultiselectBox() {
-            return multiSelect.renderMultiselectBox();
+        renderSelectionRect() {
+            return multiSelect.renderSelectionRect();
         },
 
         onMainAreaMouseDown(ev: MouseEvent) {
-            multiSelect.onMouseDown(ev);
+            multiSelect.onMainAreaMouseDown(ev);
         },
 
         onNodeMouseDown(ev: MouseEvent, nodeId: number) {

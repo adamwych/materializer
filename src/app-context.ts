@@ -15,6 +15,7 @@ import invertGlsl from "../glsl/invert.glsl?raw";
 import BlendMode from "./types/blend-mode.ts";
 import { createSignal } from "solid-js";
 import { Point2D } from "./types/point.ts";
+import { makeEventListener } from "@solid-primitives/event-listener";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
     nodes: new Map<string, MaterialNodeSpec>([
@@ -461,7 +462,7 @@ export const [AppContextProvider, useAppContext] = createContextProvider(() => {
     const nodesPackages = new ReactiveMap<string, MaterialNodesPackage>();
     nodesPackages.set("@materializer", BUILTIN_NODES_PACKAGE);
 
-    window.addEventListener("mousemove", (ev) => {
+    makeEventListener(window, "mousemove", (ev) => {
         setMousePosition({ x: ev.pageX, y: ev.pageY });
     });
 

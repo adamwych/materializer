@@ -1,6 +1,6 @@
 import * as culori from "culori";
 import { clamp, distance2d, toDegrees, toRadians } from "../../utils/math";
-import makeMouseMoveListener from "../../utils/makeMouseMoveListener";
+import makeDeferredDragListener from "../../utils/makeDeferredDragListener";
 import ColorWheelChannelSliders from "./channel-sliders";
 
 interface Props {
@@ -27,7 +27,7 @@ export default function ColorWheel(props: Props) {
         };
     };
 
-    const onMouseDown = makeMouseMoveListener((ev) => {
+    const onMouseDown = makeDeferredDragListener((ev) => {
         const wheelRect = wheelElementRef!.getBoundingClientRect()!;
         const wheelCenter = {
             x: wheelRect.x + wheelRect.width / 2,

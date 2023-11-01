@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from "solid-js";
 import { useAppContext } from "../app-context.ts";
 import { Point2D } from "../types/point.ts";
-import makeMouseMoveListener from "../utils/makeMouseMoveListener.ts";
+import makeDeferredDragListener from "../utils/makeDeferredDragListener.ts";
 import { clamp } from "../utils/math.ts";
 import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorContext } from "./editor-context.ts";
@@ -11,6 +11,7 @@ import { useMaterialContext } from "./material-context.ts";
 import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
 import MaterialNodeBox from "./node.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
+import { createEventListener } from "@solid-primitives/event-listener";
 
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 2;
@@ -34,7 +35,7 @@ export default function MaterialGraphEditorNodes() {
         return `matrix(${m[0]},${m[1]},${m[2]},${m[3]},${m[4]},${m[5]})`;
     };
 
-    const registerPanMoveHandler = makeMouseMoveListener((ev) => {
+    const registerPanMoveHandler = makeDeferredDragListener((ev) => {
         editorCtx.setPanZoomSettings(
             (settings) => ({
                 scale: settings.scale,
@@ -86,7 +87,7 @@ export default function MaterialGraphEditorNodes() {
         });
     }
 
-    window.addEventListener("keyup", (ev) => {
+    createEventListener(window, "keyup", (ev) => {
         const hoveredElements = document.querySelectorAll(":hover");
         if (
             hoveredElements.length === 0 ||
@@ -137,7 +138,7 @@ export default function MaterialGraphEditorNodes() {
                 />
             </Show>
 
-            {selectionManager.renderMultiselectBox()}
+            {selectionManager.renderSelectionRect()}
 
             <MaterialGraphEditorControls
                 zoom={editorCtx.smoothedZoom()}

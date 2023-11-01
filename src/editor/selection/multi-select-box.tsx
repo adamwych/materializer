@@ -5,7 +5,7 @@ type Props = {
     height: number;
 };
 
-export default function MaterialGraphEditorMultiselectBox(props: Props) {
+export default function MaterialGraphEditorSelectionRect(props: Props) {
     return (
         <div
             style={{

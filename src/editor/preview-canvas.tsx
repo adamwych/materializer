@@ -1,5 +1,5 @@
 import { useRenderingEngine } from "../renderer/engine.ts";
-import makeMouseMoveListener from "../utils/makeMouseMoveListener.ts";
+import makeDeferredDragListener from "../utils/makeDeferredDragListener.ts";
 import { onMount } from "solid-js";
 import * as glMatrix from "gl-matrix";
 import { useMaterialContext } from "./material-context.ts";
@@ -33,7 +33,7 @@ export default function MaterialPreviewCanvas() {
         }
     }
 
-    const onMouseDown = makeMouseMoveListener((ev) => {
+    const onMouseDown = makeDeferredDragListener((ev) => {
         rotationX += ev.movementX / 50.0;
         rotationY -= ev.movementY / 50.0;
         requestRender();

@@ -1,110 +1,91 @@
 import { createSignal } from "solid-js";
-import { MaterialNode } from "../../types/material.ts";
-import { Point2D } from "../../types/point.ts";
 import { rectIntersects } from "../../utils/math.ts";
 import { useEditorContext } from "../editor-context.ts";
 import { useMaterialContext } from "../material-context.ts";
-import MaterialGraphEditorMultiselectBox from "./multi-select-box.tsx";
+import MaterialGraphEditorSelectionRect from "./multi-select-box.tsx";
+import makeDragListener from "../../utils/makeDragListener.ts";
 
 export default function createMultiSelectManager() {
     const editorCtx = useEditorContext()!;
     const materialCtx = useMaterialContext()!;
-    const [touchDownPoint, setTouchDownPoint] = createSignal<Point2D>();
-    const [boxRect, setBoxRect] = createSignal<DOMRect>();
-    const [highlightedNodes, setHighlightedNodes] = createSignal<Array<MaterialNode>>([]);
+    const [selectionRect, setSelectionRect] = createSignal<DOMRect>();
 
-    function calculateSelectionBoxRect(mouseX: number, mouseY: number) {
-        const startPoint = touchDownPoint()!;
-        return new DOMRect(
-            mouseX < startPoint.x ? mouseX : startPoint.x,
-            mouseY < startPoint.y ? mouseY : startPoint.y,
-            Math.abs(mouseX - startPoint.x),
-            Math.abs(mouseY - startPoint.y),
+    function registerSelectionDragListener(downEvent: MouseEvent) {
+        makeDragListener(
+            (moveEvent) => {
+                const rect = new DOMRect(
+                    moveEvent.pageX < downEvent.pageX ? moveEvent.pageX : downEvent.pageX,
+                    moveEvent.pageY < downEvent.pageY ? moveEvent.pageY : downEvent.pageY,
+                    Math.abs(moveEvent.pageX - downEvent.pageX),
+                    Math.abs(moveEvent.pageY - downEvent.pageY),
+                );
+
+                const intersectingNodes = findNodesWithinRect(rect);
+
+                editorCtx.setHighlightedNodes(intersectingNodes.map((x) => x.id));
+                setSelectionRect(rect);
+            },
+            (upEvent) => {
+                const movedDistance =
+                    Math.abs(upEvent.pageX - downEvent.pageX) +
+                    Math.abs(upEvent.pageY - downEvent.pageY);
+                if (movedDistance <= 10) {
+                    editorCtx.inspectNode(undefined);
+                    editorCtx.setHighlightedNodes([]);
+                }
+
+                setSelectionRect(undefined);
+            },
         );
     }
 
-    function onMouseMove(ev: MouseEvent) {
-        ev.stopPropagation();
-
-        const rect = calculateSelectionBoxRect(ev.pageX, ev.pageY);
-        const intersectingNodes = materialCtx.getNodes().filter((node) => {
-            const element = editorCtx.getNodeElement(node.id);
-            if (!element) {
-                return false;
+    function registerGroupMoveListener() {
+        makeDragListener((moveEvent) => {
+            const nodes = editorCtx.getHighlightedNodes().map((id) => materialCtx.getNodeById(id));
+            for (const node of nodes) {
+                if (node) {
+                    materialCtx.moveNode(
+                        node.id,
+                        moveEvent.movementX / editorCtx.smoothedZoom(),
+                        moveEvent.movementY / editorCtx.smoothedZoom(),
+                    );
+                }
             }
-
-            const elementRect = element.getBoundingClientRect();
-            return rectIntersects(elementRect, rect);
         });
-
-        setHighlightedNodes(intersectingNodes);
-        editorCtx.setHighlightedNodes(intersectingNodes.map((x) => x.id));
-        setBoxRect(rect);
     }
 
-    function onMouseUp(ev: MouseEvent) {
-        ev.stopPropagation();
-
-        const point = touchDownPoint()!;
-        const movedDistance = Math.abs(ev.pageX - point.x) + Math.abs(ev.pageY - point.y);
-        if (movedDistance <= 10) {
-            editorCtx.inspectNode(undefined);
-            editorCtx.setHighlightedNodes([]);
-            setHighlightedNodes([]);
-        }
-
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-        setBoxRect(undefined);
-    }
-
-    function onNodeMouseMove(ev: MouseEvent) {
-        ev.stopPropagation();
-
-        const nodes = highlightedNodes();
-        for (const node of nodes) {
-            materialCtx.moveNode(
-                node.id,
-                ev.movementX / editorCtx.smoothedZoom(),
-                ev.movementY / editorCtx.smoothedZoom(),
-            );
-        }
-    }
-
-    function onNodeMouseUp(ev: MouseEvent) {
-        ev.stopPropagation();
-        window.removeEventListener("mousemove", onNodeMouseMove);
-        window.removeEventListener("mouseup", onNodeMouseUp);
+    function findNodesWithinRect(rect: DOMRect) {
+        return materialCtx.getNodes().filter((node) => {
+            const element = editorCtx.getNodeElement(node.id);
+            return element ? rectIntersects(element.getBoundingClientRect(), rect) : false;
+        });
     }
 
     return {
-        renderMultiselectBox() {
+        renderSelectionRect() {
             return (
-                <MaterialGraphEditorMultiselectBox
-                    x={boxRect()?.left || 0}
-                    y={boxRect()?.top || 0}
-                    width={boxRect()?.width || 0}
-                    height={boxRect()?.height || 0}
+                <MaterialGraphEditorSelectionRect
+                    x={selectionRect()?.left || 0}
+                    y={selectionRect()?.top || 0}
+                    width={selectionRect()?.width || 0}
+                    height={selectionRect()?.height || 0}
                 />
             );
         },
-        onMouseDown(ev: MouseEvent) {
+        onMainAreaMouseDown(ev: MouseEvent) {
             ev.stopPropagation();
-            setTouchDownPoint({ x: ev.pageX, y: ev.pageY });
-            window.addEventListener("mousemove", onMouseMove);
-            window.addEventListener("mouseup", onMouseUp);
+            editorCtx.inspectNode(undefined);
+            registerSelectionDragListener(ev);
         },
         onNodeMouseDown(ev: MouseEvent) {
             ev.stopPropagation();
-            window.addEventListener("mousemove", onNodeMouseMove);
-            window.addEventListener("mouseup", onNodeMouseUp);
+            registerGroupMoveListener();
         },
         deselectAll() {
             editorCtx.setHighlightedNodes([]);
-            setHighlightedNodes([]);
         },
         isNodeSelected(nodeId: number) {
-            return highlightedNodes()?.find((x) => x.id === nodeId);
+            return editorCtx.getHighlightedNodes().includes(nodeId);
         },
     };
 }

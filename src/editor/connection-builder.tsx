@@ -4,6 +4,7 @@ import { useEditorContext } from "./editor-context.ts";
 import { MaterialNodeSocketAddr } from "../types/material.ts";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { useMaterialContext } from "./material-context.ts";
+import makeDragListener from "../utils/makeDragListener.ts";
 
 type UpcomingConnectionInfo = {
     from: MaterialNodeSocketAddr;
@@ -29,19 +30,6 @@ export function EditorConnectionBuilderProvider(props: { children: JSX.Element }
     const selectionManager = useEditorSelectionManager()!;
     const [upcomingInfo, setUpcomingInfo] = createSignal<UpcomingConnectionInfo | undefined>();
 
-    function onWindowMouseMove(ev: MouseEvent) {
-        setUpcomingInfo((value) => ({
-            ...value!,
-            toCoords: [ev.pageX, ev.pageY],
-        }));
-    }
-
-    function onWindowMouseUp(_ev: MouseEvent) {
-        window.removeEventListener("mouseup", onWindowMouseUp);
-        window.removeEventListener("mousemove", onWindowMouseMove);
-        setUpcomingInfo(undefined);
-    }
-
     const context: IConnectionBuilder = {
         onSocketMouseDown(ev, nodeId, socketId) {
             ev.stopPropagation();
@@ -60,20 +48,24 @@ export function EditorConnectionBuilderProvider(props: { children: JSX.Element }
                 toCoords: [boundingBox.x + 8, boundingBox.y + 8],
             });
 
-            window.addEventListener("mouseup", onWindowMouseUp);
-            window.addEventListener("mousemove", onWindowMouseMove);
+            makeDragListener(
+                (ev: MouseEvent) => {
+                    setUpcomingInfo((value) => ({
+                        ...value!,
+                        toCoords: [ev.pageX, ev.pageY],
+                    }));
+                },
+                () => {
+                    setUpcomingInfo(undefined);
+                },
+            );
         },
 
-        onSocketMouseUp(ev, nodeId, socketId) {
-            window.removeEventListener("mouseup", onWindowMouseUp);
-            window.removeEventListener("mousemove", onWindowMouseMove);
-
+        onSocketMouseUp(_, nodeId, socketId) {
             const upcoming = upcomingInfo();
             if (!upcoming) {
                 return;
             }
-
-            ev.stopPropagation();
 
             const isInputSocket = materialCtx
                 .getNodeById(nodeId)!
