@@ -30,7 +30,7 @@ export default function EditorTabButton(props: Props) {
 
     return (
         <div
-            class={`px-4 animate-fade-in flex items-center gap-2 h-[35px] text-sm border-r border-gray-200 ${
+            class={`px-4 animate-fade-scale-in flex items-center gap-2 h-[35px] text-sm border-r border-gray-200 ${
                 isCurrentTab() ? "bg-blue-500" : "hover:bg-gray-200 active:bg-gray-100"
             }`}
             onClick={onTabClick}

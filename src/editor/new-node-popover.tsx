@@ -27,7 +27,7 @@ export default function MaterialGraphNewNodePopover(props: Props) {
 
     return (
         <div
-            class="animate-fade-in origin-top-left fixed w-[224px] rounded-md overflow-hidden bg-gray-300"
+            class="animate-fade-scale-in origin-top-left fixed w-[224px] rounded-md overflow-hidden bg-gray-300"
             style={{
                 top: props.y + "px",
                 left: props.x + "px",

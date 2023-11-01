@@ -42,6 +42,7 @@ export default function ExportDialog(props: Props) {
                     onClick: props.onClose,
                 },
             ]}
+            onClose={props.onClose}
         >
             <div>Select output nodes to export:</div>
             <For each={outputNodes()}>

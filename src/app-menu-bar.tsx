@@ -3,7 +3,7 @@ import MenuBarItem from "./components/menu-bar/item.tsx";
 import MenuBar from "./components/menu-bar/menu-bar.tsx";
 import MenuBarSubmenu from "./components/menu-bar/submenu.tsx";
 import ExportDialog from "./export-dialog.tsx";
-import OpenMaterialDialog from "./open-material-dialog.tsx";
+import OpenMaterialDialog from "./app/open-dialog/open-dialog.tsx";
 import { useWorkspaceContext } from "./workspace-context.ts";
 import { RiDocumentFileLine } from "solid-icons/ri";
 

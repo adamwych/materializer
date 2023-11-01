@@ -47,6 +47,11 @@ export default {
         },
     ],
     theme: {
+        extend: {
+            boxShadow: {
+                md: "0px 10px 40px -10px rgba(0, 0, 0, 0.5)",
+            },
+        },
         colors: {
             transparent: "transparent",
             white: "#ffffff",

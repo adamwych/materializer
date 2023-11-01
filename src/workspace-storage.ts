@@ -1,8 +1,9 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { Accessor, createSignal } from "solid-js";
 import { Material } from "./types/material.ts";
 import TextureFilterMethod from "./types/texture-filter.ts";
 
-type SerializedMaterialNode = {
+export type SerializedMaterialNode = {
     id: number;
     path: string;
     label: string;
@@ -11,7 +12,7 @@ type SerializedMaterialNode = {
     y: number;
 };
 
-type SerializedMaterial = {
+export type SerializedMaterial = {
     version: number;
     id: string;
     name: string;
@@ -26,12 +27,16 @@ type SerializedMaterial = {
     savedAt: number;
 };
 
-type SerializedMaterialNodeSocketAddr = {
+export type SerializedMaterialNodeSocketAddr = {
     nodeId: number;
     socketId: string;
 };
 
 export const [WorkspaceStorageProvider, useWorkspaceStorage] = createContextProvider(() => {
+    const [savedMaterials, setSavedMaterials] = createSignal<{ [k: string]: SerializedMaterial }>(
+        JSON.parse(localStorage.getItem("workspace.savedMaterials") ?? "{}"),
+    );
+
     function serializeMaterial(material: Material): SerializedMaterial {
         return {
             version: 1,
@@ -78,35 +83,52 @@ export const [WorkspaceStorageProvider, useWorkspaceStorage] = createContextProv
     }
 
     return {
+        serializeMaterial,
+        deserializeMaterial,
+
         saveMaterial(material: Material) {
-            const materials = JSON.parse(localStorage.getItem("workspace.savedMaterials") ?? "{}");
-            materials[material.id] = serializeMaterial(material);
-            localStorage.setItem("workspace.savedMaterials", JSON.stringify(materials));
+            setSavedMaterials((materials) => {
+                const newMaterials = { ...materials };
+                newMaterials[material.id] = serializeMaterial(material);
+                localStorage.setItem("workspace.savedMaterials", JSON.stringify(newMaterials));
+                return newMaterials;
+            });
+        },
+
+        importMaterial(serialized: SerializedMaterial) {
+            setSavedMaterials((materials) => {
+                const newMaterials = { ...materials };
+                newMaterials[serialized.id] = serialized;
+                localStorage.setItem("workspace.savedMaterials", JSON.stringify(newMaterials));
+                return newMaterials;
+            });
+        },
+
+        removeMaterial(id: string) {
+            setSavedMaterials((materials) => {
+                const newMaterials = { ...materials };
+                delete newMaterials[id];
+                localStorage.setItem("workspace.savedMaterials", JSON.stringify(newMaterials));
+                return newMaterials;
+            });
         },
 
         getMaterialById(uuid: string): Material | undefined {
-            return this.getMaterials().get(uuid);
+            return this.materials().get(uuid);
         },
 
-        getMaterials(): Map<string, Material> {
-            const map = new Map<string, Material>();
-            const serializedMap: { [k: string]: SerializedMaterial } = JSON.parse(
-                localStorage.getItem("workspace.savedMaterials") ?? "{}",
-            );
-
-            for (const [id, material] of Object.entries(serializedMap)) {
-                map.set(id, deserializeMaterial(material));
-            }
-
-            return map;
+        get materials(): Accessor<Map<string, Material>> {
+            return () => {
+                const map = new Map<string, Material>();
+                for (const [id, material] of Object.entries(savedMaterials())) {
+                    map.set(id, deserializeMaterial(material));
+                }
+                return map;
+            };
         },
 
-        getSavedMaterials(): Map<string, SerializedMaterial> {
-            return new Map(
-                Object.entries(
-                    JSON.parse(localStorage.getItem("workspace.savedMaterials") ?? "{}"),
-                ),
-            );
+        get savedMaterials(): Accessor<Map<string, SerializedMaterial>> {
+            return () => new Map(Object.entries(savedMaterials()));
         },
     };
 });

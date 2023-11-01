@@ -26,7 +26,7 @@ export default function MaterialNodeBox(props: DeepReadonly<Props>) {
     return (
         <div
             ref={(e) => editorCtx.updateNodeBoxElement(props.node().id, e)}
-            class={`animate-fade-in group absolute bg-gray-200 rounded-md outline ${
+            class={`animate-fade-scale-in group absolute bg-gray-200 rounded-md outline ${
                 isHighlighted()
                     ? "outline-blue-500 active:outline-gray-300"
                     : "outline-transparent hover:outline-gray-300"

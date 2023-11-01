@@ -24,7 +24,7 @@ export default function MenuBarSubmenu(props: Props) {
 
                 <Show when={open()}>
                     <div
-                        class="absolute z-10 animate-fade-in origin-top-left bg-gray-100 border border-gray-300 rounded-md m-1 overflow-hidden"
+                        class="absolute z-10 animate-fade-scale-in origin-top-left bg-gray-100 border border-gray-300 rounded-md m-1 overflow-hidden"
                         style={{ width: "150px" }}
                     >
                         {props.children}
