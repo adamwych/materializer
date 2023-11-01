@@ -20,7 +20,7 @@ export default function EditorTabs() {
 
     return (
         <div class="w-full h-full flex flex-col flex-1">
-            <div class="flex items-center bg-gray-200">
+            <div class="flex items-center bg-gray-100 border-b border-gray-200">
                 <For each={workspace.materials}>
                     {(material) => <EditorTabButton material={material} />}
                 </For>

@@ -5,6 +5,7 @@ import MenuBarSubmenu from "./components/menu-bar/submenu.tsx";
 import ExportDialog from "./export-dialog.tsx";
 import OpenMaterialDialog from "./open-material-dialog.tsx";
 import { useWorkspaceContext } from "./workspace-context.ts";
+import { RiDocumentFileLine } from "solid-icons/ri";
 
 export default function AppMenuBar() {
     const workspaceContext = useWorkspaceContext()!;
@@ -21,14 +22,16 @@ export default function AppMenuBar() {
                 <ExportDialog onClose={() => setExportDialogVisible(false)} />
             </Show>
 
-            <MenuBarSubmenu label="File">
+            <MenuBarSubmenu label="File" icon={RiDocumentFileLine}>
                 <MenuBarItem label="New" onClick={() => workspaceContext.openNewMaterial()} />
-                <MenuBarItem label="Open" onClick={() => setOpenDialogVisible(true)} />
-                <MenuBarItem label="Save" onClick={() => workspaceContext.saveActiveMaterial()} />
-                {/* <MenuBarItem label="Save As..." /> */}
-                <MenuBarItem label="Export" onClick={() => setExportDialogVisible(true)} />
+                <MenuBarItem label="Open..." onClick={() => setOpenDialogVisible(true)} />
+                <MenuBarItem
+                    label="Save"
+                    shortcut="Ctrl+S"
+                    onClick={() => workspaceContext.saveActiveMaterial()}
+                />
+                <MenuBarItem label="Export..." onClick={() => setExportDialogVisible(true)} />
             </MenuBarSubmenu>
-            <MenuBarSubmenu label="Help" />
         </MenuBar>
     );
 }
