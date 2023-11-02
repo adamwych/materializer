@@ -49,11 +49,11 @@ export const [WorkspaceStorageProvider, useWorkspaceStorage] = createContextProv
                 id: node.id,
                 path: node.path,
                 label: node.label,
-                parameters: node.parameters,
+                parameters: structuredClone(node.parameters),
                 x: node.x,
                 y: node.y,
             })),
-            connections: material.connections,
+            connections: structuredClone(material.connections),
             savedAt: new Date().getTime(),
         };
     }
@@ -72,13 +72,13 @@ export const [WorkspaceStorageProvider, useWorkspaceStorage] = createContextProv
             nodes: material.nodes.map((node) => ({
                 id: node.id,
                 label: node.label,
-                parameters: node.parameters,
+                parameters: structuredClone(node.parameters),
                 path: node.path,
                 x: node.x,
                 y: node.y,
                 zIndex: node.id,
             })),
-            connections: material.connections,
+            connections: structuredClone(material.connections),
         };
     }
 

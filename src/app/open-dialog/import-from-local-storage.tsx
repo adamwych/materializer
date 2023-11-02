@@ -1,6 +1,6 @@
 import { RiSystemDeleteBinLine } from "solid-icons/ri";
 import { For } from "solid-js";
-import { useWorkspaceContext } from "../../workspace-context.ts";
+import { useWorkspaceContext } from "../../workspace-context";
 import { useWorkspaceStorage } from "../../workspace-storage.ts";
 
 export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClose(): void }) {

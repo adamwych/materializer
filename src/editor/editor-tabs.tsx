@@ -1,6 +1,6 @@
 import MaterialGraphEditor from "./editor.tsx";
 import { For, Show, createEffect, createSignal, on } from "solid-js";
-import { useWorkspaceContext } from "../workspace-context.ts";
+import { useWorkspaceContext } from "../workspace-context";
 import { RiSystemAddFill } from "solid-icons/ri";
 import EditorWelcomeMessage from "./welcome.tsx";
 import EditorTabButton from "./editor-tab-button.tsx";

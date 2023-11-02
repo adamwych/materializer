@@ -1,6 +1,7 @@
 import { RiSystemCloseFill } from "solid-icons/ri";
 import { Material } from "../types/material.ts";
-import { useWorkspaceContext } from "../workspace-context.ts";
+import { useWorkspaceContext } from "../workspace-context";
+import { useWorkspaceHistory } from "../history-context.tsx";
 
 interface Props {
     material: Material;
@@ -9,7 +10,9 @@ interface Props {
 export default function EditorTabButton(props: Props) {
     const material = props.material;
     const workspace = useWorkspaceContext()!;
+    const workspaceHistory = useWorkspaceHistory()!;
     const isCurrentTab = () => material.id === workspace.activeMaterialId();
+    const hasUnsavedChanges = () => workspaceHistory.hasUnsavedChanges(material.id);
 
     function onTabClick(ev: MouseEvent) {
         if (ev.button === 0) {
@@ -36,7 +39,9 @@ export default function EditorTabButton(props: Props) {
             onClick={onTabClick}
             onAuxClick={onTabAuxClick}
         >
-            <span>{material.name}</span>
+            <span>
+                {material.name} {hasUnsavedChanges() && "*"}
+            </span>
             <div
                 class="text-xs bg-gray-100 bg-opacity-50 hover:bg-gray-300 hover:bg-opacity-50 active:bg-gray-200 active:bg-opacity-50 rounded-full p-0.5"
                 onClick={onCloseButtonClick}

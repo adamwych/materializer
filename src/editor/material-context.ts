@@ -10,7 +10,7 @@ import {
     MaterialNodeSocketAddr,
 } from "../types/material.ts";
 import TextureFilterMethod from "../types/texture-filter";
-import { useWorkspaceContext } from "../workspace-context.ts";
+import { useWorkspaceContext } from "../workspace-context";
 
 /**
  * Provides access to the currently edited {@link Material} and methods to safely modify it.
@@ -26,8 +26,8 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
             changed: DeepReadonly<MaterialNode>;
         }>();
 
-        function setMaterial(mutator: (material: Material) => void) {
-            workspaceContext.mutateMaterial(material.id, mutator);
+        function setMaterial(mutator: (material: Material) => void, markAsChanged = true) {
+            workspaceContext.mutateMaterial(material.id, mutator, markAsChanged);
         }
 
         setMaterial((material) => {
@@ -40,7 +40,7 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                     }
                 });
             });
-        });
+        }, false);
 
         return {
             /**

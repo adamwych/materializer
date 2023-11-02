@@ -7,6 +7,7 @@ import { useWorkspaceStorage } from "./workspace-storage.ts";
 import TextureFilterMethod from "./types/texture-filter.ts";
 import { useSnackbar } from "./components/snackbar/context.ts";
 import { RiSystemCheckFill } from "solid-icons/ri";
+import { NotSavedResolution, useWorkspaceHistory } from "./history-context.tsx";
 
 type Props = {
     initialMaterial: Material;
@@ -16,10 +17,18 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
     (props: Props) => {
         const storage = useWorkspaceStorage()!;
         const snackbar = useSnackbar()!;
+        const history = useWorkspaceHistory()!;
         const [materials, setMaterials] = createStore<Array<Material>>([props.initialMaterial]);
         const [activeMaterialId, setActiveMaterialId] = createSignal<string | undefined>(
             props.initialMaterial.id,
         );
+
+        window.onbeforeunload = () => {
+            const anyUnsavedChanges = materials.some((x) => history.hasUnsavedChanges(x.id));
+            if (anyUnsavedChanges) {
+                return "You have unsaved changes.";
+            }
+        };
 
         return {
             /**
@@ -55,12 +64,20 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                 });
             },
 
-            mutateMaterial(id: string, mutator: (material: Material) => void) {
+            mutateMaterial(
+                id: string,
+                mutator: (material: Material) => void,
+                markAsChanged = true,
+            ) {
                 setMaterials(
                     produce((materials) => {
                         const material = materials.find((x) => x.id === id);
                         if (material) {
                             mutator(material);
+
+                            if (markAsChanged) {
+                                history.markAsChanged(id);
+                            }
                         }
                     }),
                 );
@@ -76,27 +93,38 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                         icon: RiSystemCheckFill,
                         duration: 2000,
                     });
+                    history.markAsSaved(activeMaterial.id);
                 }
             },
 
             closeEditorTab(materialId: string) {
-                if (activeMaterialId() === materialId) {
-                    const materialIndex = materials.findIndex((x) => x.id === materialId);
-                    if (materials.length === 1) {
-                        setActiveMaterialId(undefined);
-                    } else {
-                        const closestMaterialIndex = materialIndex === 0 ? 1 : materialIndex - 1;
-                        setActiveMaterialId(materials[closestMaterialIndex].id);
-                    }
-                }
+                const material = materials.find((x) => x.id === materialId)!;
 
-                setMaterials((materials) => {
-                    const newMaterials = [...materials];
-                    newMaterials.splice(
-                        newMaterials.findIndex((x) => x.id === materialId),
-                        1,
-                    );
-                    return newMaterials;
+                history.warnIfNotSaved(material.id, material.name).then((resolution) => {
+                    if (resolution === NotSavedResolution.SaveChanges) {
+                        storage.saveMaterial(unwrap(material));
+                        history.markAsSaved(materialId);
+                    }
+
+                    if (activeMaterialId() === materialId) {
+                        const materialIndex = materials.findIndex((x) => x.id === materialId);
+                        if (materials.length === 1) {
+                            setActiveMaterialId(undefined);
+                        } else {
+                            const closestMaterialIndex =
+                                materialIndex === 0 ? 1 : materialIndex - 1;
+                            setActiveMaterialId(materials[closestMaterialIndex].id);
+                        }
+                    }
+
+                    setMaterials((materials) => {
+                        const newMaterials = [...materials];
+                        newMaterials.splice(
+                            newMaterials.findIndex((x) => x.id === materialId),
+                            1,
+                        );
+                        return newMaterials;
+                    });
                 });
             },
 

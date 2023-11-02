@@ -1,7 +1,7 @@
 import Dialog from "./components/dialog/dialog.tsx";
 import { MaterialNode } from "./types/material.ts";
 import { createSignal, For } from "solid-js";
-import { useWorkspaceContext } from "./workspace-context.ts";
+import { useWorkspaceContext } from "./workspace-context";
 
 interface Props {
     onClose(): void;

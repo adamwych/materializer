@@ -1,6 +1,6 @@
 import { RiSystemErrorWarningFill, RiSystemUpload2Fill } from "solid-icons/ri";
 import { Show, createSignal } from "solid-js";
-import { useWorkspaceContext } from "../../workspace-context.ts";
+import { useWorkspaceContext } from "../../workspace-context";
 import { SerializedMaterial, useWorkspaceStorage } from "../../workspace-storage.ts";
 
 export default function ImportMaterialFromFilePanel({ onClose }: { onClose(): void }) {

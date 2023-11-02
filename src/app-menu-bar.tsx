@@ -4,7 +4,7 @@ import MenuBar from "./components/menu-bar/menu-bar.tsx";
 import MenuBarSubmenu from "./components/menu-bar/submenu.tsx";
 import ExportDialog from "./export-dialog.tsx";
 import OpenMaterialDialog from "./app/open-dialog/open-dialog.tsx";
-import { useWorkspaceContext } from "./workspace-context.ts";
+import { useWorkspaceContext } from "./workspace-context";
 import {
     RiDocumentFileLine,
     RiLogosGithubFill,

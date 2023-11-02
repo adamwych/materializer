@@ -10,7 +10,7 @@ import MaterialGraphNewNodePopover from "./new-node-popover.tsx";
 import MaterialNodeBox from "./node.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { createEventListener } from "@solid-primitives/event-listener";
-import { useWorkspaceContext } from "../workspace-context.ts";
+import { useWorkspaceContext } from "../workspace-context";
 import { useEditorPanZoomContext } from "./editor-pan-zoom-context.ts";
 import { useMousePosition } from "@solid-primitives/mouse";
 
