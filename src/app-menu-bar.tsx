@@ -5,7 +5,12 @@ import MenuBarSubmenu from "./components/menu-bar/submenu.tsx";
 import ExportDialog from "./export-dialog.tsx";
 import OpenMaterialDialog from "./app/open-dialog/open-dialog.tsx";
 import { useWorkspaceContext } from "./workspace-context.ts";
-import { RiDocumentFileLine } from "solid-icons/ri";
+import {
+    RiDocumentFileLine,
+    RiLogosGithubFill,
+    RiSystemAlarmWarningFill,
+    RiSystemQuestionFill,
+} from "solid-icons/ri";
 
 export default function AppMenuBar() {
     const workspaceContext = useWorkspaceContext()!;
@@ -31,6 +36,23 @@ export default function AppMenuBar() {
                     onClick={() => workspaceContext.saveActiveMaterial()}
                 />
                 <MenuBarItem label="Export..." onClick={() => setExportDialogVisible(true)} />
+            </MenuBarSubmenu>
+
+            <MenuBarSubmenu label="Help" icon={RiSystemQuestionFill}>
+                <MenuBarItem
+                    label="Visit GitHub"
+                    icon={RiLogosGithubFill}
+                    onClick={() =>
+                        window.open("https://github.com/adamwych/materializer", "_blank")
+                    }
+                />
+                <MenuBarItem
+                    label="Report an Issue"
+                    icon={RiSystemAlarmWarningFill}
+                    onClick={() =>
+                        window.open("https://github.com/adamwych/materializer/issues", "_blank")
+                    }
+                />
             </MenuBarSubmenu>
         </MenuBar>
     );

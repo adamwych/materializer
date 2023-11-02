@@ -5,7 +5,7 @@ import hasParentWithCondition from "../../utils/hasParentWithCondition.ts";
 
 interface Props {
     label: string;
-    icon?: Component;
+    icon?: Component<{ size: number }>;
     children?: JSX.Element;
 }
 
@@ -32,7 +32,7 @@ export default function MenuBarSubmenu(props: Props) {
                     class="px-3 py-2 text-sm flex items-center gap-2 hover:bg-gray-300 active:bg-gray-200"
                     onClick={() => setOpen((open) => !open)}
                 >
-                    {IconComponent && <IconComponent />}
+                    {IconComponent && <IconComponent size={16} />}
                     <span>{props.label}</span>
                 </div>
 
