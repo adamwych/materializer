@@ -1,7 +1,7 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
 import createRAF from "@solid-primitives/raf";
-import { Accessor, createSignal, onMount } from "solid-js";
+import { Accessor, createSignal } from "solid-js";
 import { MaterialNode } from "../types/material.ts";
 import { Point2D } from "../types/point.ts";
 import { useMaterialContext } from "./material-context.ts";
