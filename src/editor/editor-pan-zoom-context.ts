@@ -28,13 +28,13 @@ export const [EditorPanZoomProvider, useEditorPanZoomContext] = createContextPro
     function clampOffsetX(x: number, scale: number) {
         const scaledCanvasWidth = EDITOR_GRAPH_WIDTH * scale;
         const minX = -(scaledCanvasWidth - rootElement.clientWidth);
-        return clamp(x, minX, 0);
+        return Math.round(clamp(x, minX, 0));
     }
 
     function clampOffsetY(y: number, scale: number) {
         const scaledCanvasHeight = EDITOR_GRAPH_HEIGHT * scale;
         const minY = -(scaledCanvasHeight - rootElement.clientHeight);
-        return clamp(y, minY, 0);
+        return Math.round(clamp(y, minY, 0));
     }
 
     function tweenImmediately() {
@@ -52,8 +52,8 @@ export const [EditorPanZoomProvider, useEditorPanZoomContext] = createContextPro
          */
         move(x: number, y: number) {
             batch(() => {
-                setOffsetX((cx) => clampOffsetX(Math.round(cx + x), scale()));
-                setOffsetY((cy) => clampOffsetY(Math.round(cy + y), scale()));
+                setOffsetX((cx) => clampOffsetX(cx + x, scale()));
+                setOffsetY((cy) => clampOffsetY(cy + y, scale()));
                 tweenImmediately();
             });
         },
