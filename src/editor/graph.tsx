@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { useAppContext } from "../app-context.ts";
 import { Point2D } from "../types/point.ts";
 import makeDeferredDragListener from "../utils/makeDeferredDragListener.ts";
@@ -123,7 +123,7 @@ export default function MaterialGraphEditorNodes() {
 
     return (
         <div
-            ref={(e) => editorCtx.setRootElement(e)}
+            ref={(e) => onMount(() => editorCtx.setRootElement(e))}
             id="editor-root"
             class="relative w-full h-full flex-1 overflow-hidden bg-gray-100"
             onWheel={onWheel}

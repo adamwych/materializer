@@ -15,17 +15,19 @@ import SnackbarsContainer from "./components/snackbar/container.tsx";
 const DEFAULT_MATERIAL: Material = {
     id: uuidv4(),
     name: "New Material",
-    textureWidth: 2048,
-    textureHeight: 2048,
+    textureWidth: 1024,
+    textureHeight: 1024,
     textureFiltering: TextureFilterMethod.Linear,
     nodes: [
         {
             id: 0,
             label: "Solid color",
-            parameters: {},
+            parameters: {
+                color: [0.5, 1, 0.5],
+            },
             path: "@materializer/solid-color",
-            x: 6900 / 2 + 600,
-            y: 6900 / 2 + 250,
+            x: 6900 / 2,
+            y: 6900 / 2,
             zIndex: 0,
         },
         {
@@ -33,8 +35,8 @@ const DEFAULT_MATERIAL: Material = {
             label: "Output",
             parameters: {},
             path: "@materializer/output",
-            x: 6900 / 2 + 800,
-            y: 6900 / 2 + 250,
+            x: 6900 / 2 + 128 + 64,
+            y: 6900 / 2,
             zIndex: 1,
         },
     ],

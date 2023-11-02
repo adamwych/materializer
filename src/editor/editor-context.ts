@@ -1,7 +1,7 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
 import createRAF from "@solid-primitives/raf";
-import { Accessor, createSignal } from "solid-js";
+import { Accessor, createSignal, onMount } from "solid-js";
 import { MaterialNode } from "../types/material.ts";
 import { Point2D } from "../types/point.ts";
 import { useMaterialContext } from "./material-context.ts";
@@ -90,6 +90,11 @@ export const [EditorContextProvider, useEditorContext] = createContextProvider((
 
         setRootElement(element: HTMLElement) {
             rootElement = element;
+            this.setPanZoomSettings((settings) => {
+                settings.offset.x += Math.round(element.clientWidth / 2);
+                settings.offset.y += Math.round((element.clientHeight - 70) / 2);
+                return settings;
+            }, false);
         },
 
         setPanZoomSettings(
