@@ -18,7 +18,7 @@ export default function Dialog(props: Props) {
 
     return (
         <Portal>
-            <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center z-dialog">
+            <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center pointer-events-auto z-dialog">
                 <div
                     class="absolute top-0 left-0 w-full h-full animate-fade-in"
                     style={{ background: "rgba(0, 0, 0, 0.5)" }}
@@ -33,7 +33,7 @@ export default function Dialog(props: Props) {
                     <div class="p-4">{props.children}</div>
 
                     <Show when={buttons().length > 0}>
-                        <div class="p-4 flex justify-end gap-4">
+                        <div class="p-4 flex justify-center gap-4">
                             <For each={buttons()}>
                                 {(button) => (
                                     <Button onClick={button.onClick}>{button.label}</Button>

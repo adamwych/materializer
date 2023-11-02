@@ -1,17 +1,20 @@
 /* @refresh reload */
-import "./scss/styles.scss";
 import { render } from "solid-js/web";
-import { Material } from "./types/material.ts";
-import AppMenuBar from "./app-menu-bar.tsx";
-import { AppContextProvider } from "./app-context.ts";
-import EditorTabs from "./editor/editor-tabs.tsx";
-import { WorkspaceContextProvider } from "./workspace-context.ts";
-import { WorkspaceStorageProvider } from "./workspace-storage.ts";
-import TextureFilterMethod from "./types/texture-filter.ts";
 import { v4 as uuidv4 } from "uuid";
-import { SnackbarProvider } from "./components/snackbar/context.ts";
+import { AppContextProvider } from "./app-context.ts";
+import AppMenuBar from "./app-menu-bar.tsx";
+import DialogsContainer from "./components/dialog/container.tsx";
+import { DialogsProvider } from "./components/dialog/context.ts";
 import SnackbarsContainer from "./components/snackbar/container.tsx";
+import { SnackbarProvider } from "./components/snackbar/context.ts";
 import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "./editor/constants.ts";
+import EditorTabs from "./editor/editor-tabs.tsx";
+import "./scss/styles.scss";
+import { Material } from "./types/material.ts";
+import TextureFilterMethod from "./types/texture-filter.ts";
+import { WorkspaceContextProvider } from "./workspace-context";
+import { WorkspaceStorageProvider } from "./workspace-storage.ts";
+import { WorkspaceHistoryProvider } from "./history-context.tsx";
 
 const DEFAULT_MATERIAL: Material = {
     id: uuidv4(),
@@ -58,17 +61,23 @@ const DEFAULT_MATERIAL: Material = {
 export default function App() {
     return (
         <SnackbarProvider>
-            <AppContextProvider>
-                <WorkspaceStorageProvider>
-                    <WorkspaceContextProvider initialMaterial={DEFAULT_MATERIAL}>
-                        <div class="w-full h-full flex flex-col overflow-hidden">
-                            <SnackbarsContainer />
-                            <AppMenuBar />
-                            <EditorTabs />
-                        </div>
-                    </WorkspaceContextProvider>
-                </WorkspaceStorageProvider>
-            </AppContextProvider>
+            <DialogsProvider>
+                <AppContextProvider>
+                    <WorkspaceStorageProvider>
+                        <WorkspaceHistoryProvider>
+                            <WorkspaceContextProvider initialMaterial={DEFAULT_MATERIAL}>
+                                <div class="w-full h-full flex flex-col overflow-hidden">
+                                    <SnackbarsContainer />
+                                    <DialogsContainer />
+
+                                    <AppMenuBar />
+                                    <EditorTabs />
+                                </div>
+                            </WorkspaceContextProvider>
+                        </WorkspaceHistoryProvider>
+                    </WorkspaceStorageProvider>
+                </AppContextProvider>
+            </DialogsProvider>
         </SnackbarProvider>
     );
 }
