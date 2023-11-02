@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, onMount } from "solid-js";
 import { useAppContext } from "../app-context.ts";
 import { useMaterialContext } from "./material-context.ts";
 import { RiSystemAddFill, RiSystemCloseFill } from "solid-icons/ri";
@@ -15,6 +15,7 @@ export default function MaterialGraphNewNodePopover(props: Props) {
     const appCtx = useAppContext()!;
     const materialCtx = useMaterialContext()!;
     const editorPanZoom = useEditorPanZoomContext()!;
+    let rootElementRef: HTMLElement;
 
     function onItemClick(typePath: string) {
         const coords = editorPanZoom.mapCoordsToGraphSpace(props.x, props.y);
@@ -22,9 +23,18 @@ export default function MaterialGraphNewNodePopover(props: Props) {
         props.onClose();
     }
 
+    onMount(() => {
+        const bottomEdgeY = rootElementRef.offsetTop + rootElementRef.clientHeight + 4;
+        const outsidePx = bottomEdgeY - window.innerHeight;
+        if (outsidePx > 0) {
+            rootElementRef.style.top = parseFloat(rootElementRef.style.top) - outsidePx + "px";
+        }
+    });
+
     return (
         <div
-            class="animate-fade-scale-in origin-top-left fixed w-[224px] rounded-md overflow-hidden bg-gray-100 border border-gray-300 shadow-md"
+            ref={(e) => (rootElementRef = e)}
+            class="animate-fade-scale-in origin-top-left fixed w-[224px] rounded-md bg-gray-100 border border-gray-300 shadow-md"
             style={{
                 top: props.y + "px",
                 left: props.x + "px",
@@ -40,15 +50,17 @@ export default function MaterialGraphNewNodePopover(props: Props) {
                 <RiSystemCloseFill size={16} onClick={props.onClose} />
             </div>
 
-            <For each={Array.from(appCtx.nodesPackages.entries())}>
-                {([id, pkg]) => (
-                    <MaterialGraphNewNodePopoverPackage
-                        id={id}
-                        package={pkg}
-                        onItemClick={onItemClick}
-                    />
-                )}
-            </For>
+            <div class="overflow-y-auto max-h-[66vh]" onWheel={(ev) => ev.stopPropagation()}>
+                <For each={Array.from(appCtx.nodesPackages.entries())}>
+                    {([id, pkg]) => (
+                        <MaterialGraphNewNodePopoverPackage
+                            id={id}
+                            package={pkg}
+                            onItemClick={onItemClick}
+                        />
+                    )}
+                </For>
+            </div>
         </div>
     );
 }
