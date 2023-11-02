@@ -13,9 +13,6 @@ import shapeGlsl from "../glsl/shape.glsl?raw";
 import transformGlsl from "../glsl/transform.glsl?raw";
 import invertGlsl from "../glsl/invert.glsl?raw";
 import BlendMode from "./types/blend-mode.ts";
-import { createSignal } from "solid-js";
-import { Point2D } from "./types/point.ts";
-import { makeEventListener } from "@solid-primitives/event-listener";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
     nodes: new Map<string, MaterialNodeSpec>([
@@ -400,20 +397,59 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
                     {
                         id: "offsetX",
                         label: "Offset X",
-                        default: 0.5,
+                        default: 0,
                         type: "number",
                         valueType: "float",
-                        min: 0,
+                        min: -1,
                         max: 1,
                     },
                     {
                         id: "offsetY",
                         label: "Offset Y",
-                        default: 0.5,
+                        default: 0,
+                        type: "number",
+                        valueType: "float",
+                        min: -1,
+                        max: 1,
+                    },
+                    {
+                        id: "rotation",
+                        label: "Rotation",
+                        default: 0,
                         type: "number",
                         valueType: "float",
                         min: 0,
-                        max: 1,
+                        max: 360,
+                    },
+                    {
+                        id: "scaleX",
+                        label: "Scale X",
+                        default: 1,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 2,
+                    },
+                    {
+                        id: "scaleY",
+                        label: "Scale Y",
+                        default: 1,
+                        type: "number",
+                        valueType: "float",
+                        min: 0,
+                        max: 2,
+                    },
+                    {
+                        id: "wrapMode",
+                        label: "Wrap Mode",
+                        default: 0,
+                        type: "select",
+                        valueType: "int",
+                        options: [
+                            { label: "Clamp to edge", value: 0 },
+                            { label: "Repeat", value: 1 },
+                            { label: "Cut out", value: 2 },
+                        ],
                     },
                 ],
                 inputSockets: [
@@ -458,13 +494,8 @@ const BUILTIN_NODES_PACKAGE: MaterialNodesPackage = {
 };
 
 export const [AppContextProvider, useAppContext] = createContextProvider(() => {
-    const [mousePosition, setMousePosition] = createSignal<Point2D>({ x: 0, y: 0 });
     const nodesPackages = new ReactiveMap<string, MaterialNodesPackage>();
     nodesPackages.set("@materializer", BUILTIN_NODES_PACKAGE);
-
-    makeEventListener(window, "mousemove", (ev) => {
-        setMousePosition({ x: ev.pageX, y: ev.pageY });
-    });
 
     return {
         addNodesPackage(name: string, pkg: MaterialNodesPackage) {
@@ -482,6 +513,5 @@ export const [AppContextProvider, useAppContext] = createContextProvider(() => {
         },
 
         nodesPackages,
-        mousePosition,
     };
 });
