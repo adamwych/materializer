@@ -21,7 +21,7 @@ function handleInitializeCanvasMessage(message: RenderWorkerSetPreviewCanvasMess
     })!;
 
     initializeNodeRendererResources(message.canvas);
-    initializePreviewRendererResources(gl);
+    initializePreviewRendererResources(message.canvas, gl);
 }
 
 function handleRenderMessage(message: RenderWorkerRenderMessage) {

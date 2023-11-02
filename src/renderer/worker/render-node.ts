@@ -28,6 +28,10 @@ export function clearNodeCache(nodeId: number) {
     painters.delete(nodeId);
 }
 
+function mapTextureFilterToGL(method: TextureFilterMethod) {
+    return method === TextureFilterMethod.Linear ? 0x2601 : 0x2600;
+}
+
 /**
  * Generates a framebuffer object for given node.
  * All output textures will also be generated and bound.
@@ -37,9 +41,9 @@ export function clearNodeCache(nodeId: number) {
  */
 function createFramebuffer(
     gl: WebGL2RenderingContext,
+    material: Material,
     node: MaterialNode,
     textures: Map<string, WebGLTexture>,
-    filterMethod: TextureFilterMethod,
 ) {
     const fbo = gl.createFramebuffer()!;
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
@@ -49,7 +53,7 @@ function createFramebuffer(
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + index,
             gl.TEXTURE_2D,
-            bindOutputSocketTexture(gl, textures, node.id, socket.id, filterMethod),
+            bindOutputSocketTexture(gl, material, textures, node.id, socket.id),
             0,
         );
     });
@@ -68,10 +72,10 @@ function createFramebuffer(
  */
 function bindOutputSocketTexture(
     gl: WebGL2RenderingContext,
+    material: Material,
     textures: Map<string, WebGLTexture>,
     nodeId: number,
     outputId: string,
-    filterMethod: TextureFilterMethod,
 ) {
     const key = `${nodeId}-${outputId}`;
     const existingTexture = textures.get(key);
@@ -86,16 +90,23 @@ function bindOutputSocketTexture(
         gl.TEXTURE_2D,
         0,
         gl.RGB,
-        canvas.width,
-        canvas.height,
+        material.textureWidth,
+        material.textureHeight,
         0,
         gl.RGB,
         gl.UNSIGNED_BYTE,
         emptyTextureData,
     );
-    const glFilterMethod = filterMethod === TextureFilterMethod.Linear ? gl.LINEAR : gl.NEAREST;
-    gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, glFilterMethod);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, glFilterMethod);
+    gl.texParameterf(
+        gl.TEXTURE_2D,
+        gl.TEXTURE_MAG_FILTER,
+        mapTextureFilterToGL(material.textureFiltering),
+    );
+    gl.texParameteri(
+        gl.TEXTURE_2D,
+        gl.TEXTURE_MIN_FILTER,
+        mapTextureFilterToGL(material.textureFiltering),
+    );
     textures.set(key, texture);
     return texture;
 }
@@ -127,7 +138,7 @@ export function renderNode(
         painters.set(node.id, new painterCtor(gl, node.spec.painter));
     }
 
-    const fbo = createFramebuffer(gl, node, textures, material.textureFiltering);
+    const fbo = createFramebuffer(gl, material, node, textures);
 
     const inputTextures = new Map<string, WebGLTexture>();
     for (const input of node.spec.inputSockets) {
@@ -149,7 +160,7 @@ export function renderNode(
 
     gl.bindTexture(gl.TEXTURE_2D, null);
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.viewport(0, 0, material.textureWidth, material.textureHeight);
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -159,10 +170,12 @@ export function renderNode(
     gl.bindFramebuffer(gl.READ_FRAMEBUFFER, fbo);
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
 
-    for (let i = 0; i < node.spec.outputSockets.length; i++) {
-        canvas.width = thumbnailWidth;
-        canvas.height = thumbnailHeight;
+    const originalCanvasWidth = canvas.width;
+    const originalCanvasHeight = canvas.height;
+    canvas.width = thumbnailWidth;
+    canvas.height = thumbnailHeight;
 
+    for (let i = 0; i < node.spec.outputSockets.length; i++) {
         gl.readBuffer(gl.COLOR_ATTACHMENT0 + i);
         gl.blitFramebuffer(
             0,
@@ -174,14 +187,14 @@ export function renderNode(
             thumbnailWidth,
             thumbnailHeight,
             gl.COLOR_BUFFER_BIT,
-            gl.NEAREST,
+            mapTextureFilterToGL(material.textureFiltering),
         );
 
         bitmaps.set(`${node.id}-${node.spec.outputSockets[i].id}`, canvas.transferToImageBitmap());
-
-        canvas.width = material.textureWidth;
-        canvas.height = material.textureHeight;
     }
+
+    canvas.width = originalCanvasWidth;
+    canvas.height = originalCanvasHeight;
 
     gl.deleteFramebuffer(fbo);
 }

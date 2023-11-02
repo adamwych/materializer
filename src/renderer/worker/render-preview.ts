@@ -31,12 +31,17 @@ const xzQuadVertices = [
     ],
 ];
 
+let canvas: OffscreenCanvas;
 let vao: WebGLVertexArrayObject;
 let vbo: WebGLBuffer;
 let shaderProgram: WebGLProgram;
 let viewProjectionUniformLoc: WebGLUniformLocation;
 
-export function initializePreviewRendererResources(gl: WebGL2RenderingContext) {
+export function initializePreviewRendererResources(
+    _canvas: OffscreenCanvas,
+    gl: WebGL2RenderingContext,
+) {
+    canvas = _canvas;
     initializeShaderProgram(gl);
     initializeVBO(gl);
     initializeVAO(gl);
@@ -167,6 +172,7 @@ export function renderPreview(
     gl.bindVertexArray(vao);
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
+    gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.1, 0.1, 0.1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
 

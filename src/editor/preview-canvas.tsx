@@ -71,8 +71,8 @@ export default function MaterialPreviewCanvas() {
         <canvas
             ref={(e) => (canvasElement = e)}
             class="-m-4 flex-shrink-0"
-            width={materialCtx.getOutputTextureWidth()}
-            height={materialCtx.getOutputTextureHeight()}
+            width={Math.max(materialCtx.getOutputTextureWidth(), width)}
+            height={Math.max(materialCtx.getOutputTextureWidth(), height)}
             onMouseDown={onMouseDown}
             onWheel={onWheel}
             style={{ width: width + "px", height: height + "px" }}
