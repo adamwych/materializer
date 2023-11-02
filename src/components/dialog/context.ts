@@ -1,4 +1,4 @@
-import { createContextProvider } from "@solid-primitives/context";
+import { ContextProviderProps, createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
 import { JSX, createUniqueId } from "solid-js";
 
@@ -28,28 +28,29 @@ export interface IDialogsProvider {
  * return <button onClick={onClick}>Show dialog!</button>;
  * ```
  */
-export const [DialogsProvider, useDialogsContext] = createContextProvider<IDialogsProvider, {}>(
-    () => {
-        const dialogs = new ReactiveMap<string, DialogRenderFn>();
+export const [DialogsProvider, useDialogsContext] = createContextProvider<
+    IDialogsProvider,
+    ContextProviderProps
+>(() => {
+    const dialogs = new ReactiveMap<string, DialogRenderFn>();
 
-        return {
-            show(fn: DialogRenderFn): DialogRef {
-                const id = createUniqueId();
+    return {
+        show(fn: DialogRenderFn): DialogRef {
+            const id = createUniqueId();
 
-                dialogs.set(id, fn);
+            dialogs.set(id, fn);
 
-                return {
-                    close() {
-                        dialogs.delete(id);
-                    },
-                };
-            },
+            return {
+                close() {
+                    dialogs.delete(id);
+                },
+            };
+        },
 
-            close(id: string) {
-                dialogs.delete(id);
-            },
+        close(id: string) {
+            dialogs.delete(id);
+        },
 
-            dialogs,
-        };
-    },
-);
+        dialogs,
+    };
+});
