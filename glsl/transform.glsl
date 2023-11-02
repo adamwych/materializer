@@ -14,7 +14,6 @@ uniform sampler2D i_in;
 
 out vec4 out_color;
 
-#define M_PI 3.1415926535897932384626433832795
 #define WRAP_MODE_CLAMP 0 
 #define WRAP_MODE_REPEAT 1
 #define WRAP_MODE_CUTOUT 2
@@ -43,7 +42,7 @@ vec2 scaleUV(vec2 uv, vec2 scale, vec2 pivot) {
 void main(void) {
     vec2 uv = vec2(0.0);
     uv = translateUV(a_texCoord, vec2(p_offsetX, p_offsetY));
-    uv = rotateUV(uv, M_PI - radians(p_rotation), vec2(0.5, 0.5));
+    uv = rotateUV(uv, radians(360.0 - p_rotation), vec2(0.5, 0.5));
     uv = scaleUV(uv, vec2(p_scaleX, p_scaleY), vec2(0.5, 0.5));
 
     if (p_wrapMode == WRAP_MODE_REPEAT) {
