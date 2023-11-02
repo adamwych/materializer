@@ -2,7 +2,6 @@ import { createSignal, For, onMount, Show } from "solid-js";
 import { useAppContext } from "../app-context.ts";
 import { Point2D } from "../types/point.ts";
 import makeDeferredDragListener from "../utils/makeDeferredDragListener.ts";
-import { clamp } from "../utils/math.ts";
 import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
 import { useEditorContext } from "./editor-context.ts";
 import MaterialGraphEditorBackground from "./graph-background.tsx";
@@ -13,80 +12,34 @@ import MaterialNodeBox from "./node.tsx";
 import { useEditorSelectionManager } from "./selection/manager.ts";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { useWorkspaceContext } from "../workspace-context.ts";
-
-const MIN_SCALE = 0.2;
-const MAX_SCALE = 2;
+import { useEditorPanZoomContext } from "./editor-pan-zoom-context.ts";
 
 export default function MaterialGraphEditorNodes() {
     const appCtx = useAppContext()!;
     const selectionManager = useEditorSelectionManager()!;
     const materialCtx = useMaterialContext()!;
     const editorCtx = useEditorContext()!;
+    const editorPanZoom = useEditorPanZoomContext()!;
     const workspace = useWorkspaceContext()!;
     const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
-    const transformMatrix = () => {
-        const m = [];
-        m[3] = m[0] = editorCtx.smoothedZoom();
-        m[2] = m[1] = 0;
-        m[4] = editorCtx.smoothedOffset().x;
-        m[5] = editorCtx.smoothedOffset().y;
-        return m;
-    };
     const transformMatrixCss = () => {
-        const m = transformMatrix();
-        return `matrix(${m[0]},${m[1]},${m[2]},${m[3]},${m[4]},${m[5]})`;
+        const m = [];
+        m[3] = m[0] = editorPanZoom.smoothedZoom();
+        m[2] = m[1] = 0;
+        m[4] = editorPanZoom.smoothedOffset().x;
+        m[5] = editorPanZoom.smoothedOffset().y;
+        return `matrix(${m.join(",")})`;
     };
 
     const registerPanMoveHandler = makeDeferredDragListener((ev) => {
-        editorCtx.setPanZoomSettings(
-            (settings) => ({
-                scale: settings.scale,
-                offset: {
-                    x: Math.round(settings.offset.x + ev.movementX),
-                    y: Math.round(settings.offset.y + ev.movementY),
-                },
-            }),
-            false,
-        );
+        editorPanZoom.move(ev.movementX, ev.movementY);
     });
-
-    function centerDragOffset() {
-        editorCtx.setPanZoomSettings(() => ({
-            scale: 1,
-            offset: {
-                x: -6900 / 2,
-                y: -6900 / 2,
-            },
-        }));
-    }
-
-    function setZoom(callback: (zoom: number) => number) {
-        editorCtx.setPanZoomSettings((settings) => ({
-            scale: clamp(callback(settings.scale), MIN_SCALE, MAX_SCALE),
-            offset: settings.offset,
-        }));
-    }
 
     function onWheel(ev: WheelEvent) {
         const relativeX = ev.pageX;
         const relativeY = ev.pageY - 70;
         const isZoomingIn = ev.deltaY < 0;
-        const scaleMultiplier = isZoomingIn ? 1.2 : 1 / 1.2;
-
-        editorCtx.setPanZoomSettings((settings) => {
-            const newZoom = settings.scale * scaleMultiplier;
-            if (newZoom < MIN_SCALE || newZoom > MAX_SCALE) {
-                return settings;
-            }
-
-            return {
-                scale: newZoom,
-                offset: {
-                    x: relativeX - (relativeX - settings.offset.x) * scaleMultiplier,
-                    y: relativeY - (relativeY - settings.offset.y) * scaleMultiplier,
-                },
-            };
-        });
+        editorPanZoom.zoomAtOrigin(relativeX, relativeY, isZoomingIn ? 1.2 : 1 / 1.2);
     }
 
     createEventListener(window, "keydown", (ev) => {
@@ -123,7 +76,7 @@ export default function MaterialGraphEditorNodes() {
 
     return (
         <div
-            ref={(e) => onMount(() => editorCtx.setRootElement(e))}
+            ref={(e) => onMount(() => editorPanZoom.setRootElement(e))}
             id="editor-root"
             class="relative w-full h-full flex-1 overflow-hidden bg-gray-100"
             onWheel={onWheel}
@@ -148,11 +101,11 @@ export default function MaterialGraphEditorNodes() {
             {selectionManager.renderSelectionRect()}
 
             <MaterialGraphEditorControls
-                zoom={editorCtx.smoothedZoom()}
-                onZoomIn={() => setZoom((s) => s + 0.2)}
-                onZoomOut={() => setZoom((s) => s - 0.2)}
-                onZoomReset={() => setZoom((_) => 1)}
-                onCenter={centerDragOffset}
+                zoom={editorPanZoom.smoothedZoom()}
+                onZoomIn={() => editorPanZoom.zoomAtCenter(1.2)}
+                onZoomOut={() => editorPanZoom.zoomAtCenter(1 / 1.2)}
+                onZoomReset={() => editorPanZoom.zoomAtCenter(1 / editorPanZoom.smoothedZoom())}
+                onCenter={() => editorPanZoom.reset()}
             />
 
             <div

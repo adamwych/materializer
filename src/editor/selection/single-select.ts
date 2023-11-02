@@ -1,9 +1,11 @@
 import { useEditorContext } from "../editor-context.ts";
 import { useMaterialContext } from "../material-context.ts";
 import makeDragListener from "../../utils/makeDragListener.ts";
+import { useEditorPanZoomContext } from "../editor-pan-zoom-context.ts";
 
 export default function createSingleSelectHandler() {
     const editorCtx = useEditorContext()!;
+    const editorPanZoom = useEditorPanZoomContext()!;
     const materialCtx = useMaterialContext()!;
 
     return {
@@ -15,8 +17,8 @@ export default function createSingleSelectHandler() {
                 (moveEvent) => {
                     materialCtx.moveNode(
                         nodeId,
-                        moveEvent.movementX / editorCtx.smoothedZoom(),
-                        moveEvent.movementY / editorCtx.smoothedZoom(),
+                        moveEvent.movementX / editorPanZoom.smoothedZoom(),
+                        moveEvent.movementY / editorPanZoom.smoothedZoom(),
                     );
                 },
                 (upEvent) => {

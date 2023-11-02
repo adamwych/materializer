@@ -3,7 +3,7 @@ import { For } from "solid-js";
 import { useWorkspaceContext } from "../../workspace-context.ts";
 import { useWorkspaceStorage } from "../../workspace-storage.ts";
 
-export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClose: Function }) {
+export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClose(): void }) {
     const workspace = useWorkspaceContext()!;
     const workspaceStorage = useWorkspaceStorage()!;
     const sortedMaterials = () => {

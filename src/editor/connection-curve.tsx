@@ -1,3 +1,5 @@
+import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "./constants";
+
 interface Props {
     fromCoords: [number, number];
     toCoords: [number, number];
@@ -14,9 +16,9 @@ export default function MaterialGraphNodeConnectionCurve(props: Props) {
     return (
         <svg
             class="fixed top-0 left-0 z-20 pointer-events-none"
-            width="6900px"
-            height="6900px"
-            viewBox="0 0 6900px 6900px"
+            width={EDITOR_GRAPH_WIDTH + "px"}
+            height={EDITOR_GRAPH_HEIGHT + "px"}
+            viewBox={`0 0 ${EDITOR_GRAPH_WIDTH}px ${EDITOR_GRAPH_HEIGHT}px`}
         >
             <path
                 d={commands().join(" ")}

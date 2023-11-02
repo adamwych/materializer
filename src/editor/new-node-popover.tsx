@@ -3,7 +3,7 @@ import { useAppContext } from "../app-context.ts";
 import { useMaterialContext } from "./material-context.ts";
 import { RiSystemAddFill, RiSystemCloseFill } from "solid-icons/ri";
 import MaterialGraphNewNodePopoverPackage from "./new-node-popover-package.tsx";
-import { useEditorContext } from "./editor-context.ts";
+import { useEditorPanZoomContext } from "./editor-pan-zoom-context.ts";
 
 type Props = {
     x: number;
@@ -14,14 +14,11 @@ type Props = {
 export default function MaterialGraphNewNodePopover(props: Props) {
     const appCtx = useAppContext()!;
     const materialCtx = useMaterialContext()!;
-    const editorCtx = useEditorContext()!;
+    const editorPanZoom = useEditorPanZoomContext()!;
 
     function onItemClick(typePath: string) {
-        // Map coordinates from screen-space to graph-space.
-        const graphX = (props.x - editorCtx.smoothedOffset().x) / editorCtx.smoothedZoom();
-        const graphY = (props.y - editorCtx.smoothedOffset().y - 70) / editorCtx.smoothedZoom();
-
-        materialCtx.instantiateNode(typePath, graphX, graphY);
+        const coords = editorPanZoom.mapCoordsToGraphSpace(props.x, props.y);
+        materialCtx.instantiateNode(typePath, coords.x, coords.y);
         props.onClose();
     }
 

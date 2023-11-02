@@ -3,7 +3,7 @@ import { Show, createSignal } from "solid-js";
 import { useWorkspaceContext } from "../../workspace-context.ts";
 import { SerializedMaterial, useWorkspaceStorage } from "../../workspace-storage.ts";
 
-export default function ImportMaterialFromFilePanel({ onClose }: { onClose: Function }) {
+export default function ImportMaterialFromFilePanel({ onClose }: { onClose(): void }) {
     const workspace = useWorkspaceContext()!;
     const workspaceStorage = useWorkspaceStorage()!;
     const [importError, setImportError] = createSignal();

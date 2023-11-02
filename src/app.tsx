@@ -11,6 +11,7 @@ import TextureFilterMethod from "./types/texture-filter.ts";
 import { v4 as uuidv4 } from "uuid";
 import { SnackbarProvider } from "./components/snackbar/context.ts";
 import SnackbarsContainer from "./components/snackbar/container.tsx";
+import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "./editor/constants.ts";
 
 const DEFAULT_MATERIAL: Material = {
     id: uuidv4(),
@@ -26,8 +27,8 @@ const DEFAULT_MATERIAL: Material = {
                 color: [0.5, 1, 0.5],
             },
             path: "@materializer/solid-color",
-            x: 6900 / 2,
-            y: 6900 / 2,
+            x: EDITOR_GRAPH_WIDTH / 2 - 64 - 32,
+            y: EDITOR_GRAPH_HEIGHT / 2 - 64,
             zIndex: 0,
         },
         {
@@ -35,8 +36,8 @@ const DEFAULT_MATERIAL: Material = {
             label: "Output",
             parameters: {},
             path: "@materializer/output",
-            x: 6900 / 2 + 128 + 64,
-            y: 6900 / 2,
+            x: EDITOR_GRAPH_WIDTH / 2 - 64 + 128 + 32,
+            y: EDITOR_GRAPH_HEIGHT / 2 - 64,
             zIndex: 1,
         },
     ],

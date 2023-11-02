@@ -4,9 +4,11 @@ import { useEditorContext } from "../editor-context.ts";
 import { useMaterialContext } from "../material-context.ts";
 import MaterialGraphEditorSelectionRect from "./multi-select-box.tsx";
 import makeDragListener from "../../utils/makeDragListener.ts";
+import { useEditorPanZoomContext } from "../editor-pan-zoom-context.ts";
 
 export default function createMultiSelectManager() {
     const editorCtx = useEditorContext()!;
+    const editorPanZoom = useEditorPanZoomContext()!;
     const materialCtx = useMaterialContext()!;
     const [selectionRect, setSelectionRect] = createSignal<DOMRect>();
 
@@ -46,8 +48,8 @@ export default function createMultiSelectManager() {
                 if (node) {
                     materialCtx.moveNode(
                         node.id,
-                        moveEvent.movementX / editorCtx.smoothedZoom(),
-                        moveEvent.movementY / editorCtx.smoothedZoom(),
+                        moveEvent.movementX / editorPanZoom.smoothedZoom(),
+                        moveEvent.movementY / editorPanZoom.smoothedZoom(),
                     );
                 }
             }

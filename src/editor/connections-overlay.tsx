@@ -2,6 +2,7 @@ import { useEditorContext } from "./editor-context.ts";
 import { For } from "solid-js";
 import MaterialGraphNodeConnectionCurve from "./connection-curve.tsx";
 import { useMaterialContext } from "./material-context.ts";
+import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "./constants.ts";
 
 export default function MaterialGraphEditorConnectionsOverlay() {
     const editorCtx = useEditorContext()!;
@@ -60,9 +61,9 @@ export default function MaterialGraphEditorConnectionsOverlay() {
 
     return (
         <svg
-            width="6900px"
-            height="6900px"
-            viewBox="0 0 6900px 6900px"
+            width={EDITOR_GRAPH_WIDTH + "px"}
+            height={EDITOR_GRAPH_HEIGHT + "px"}
+            viewBox={`0 0 ${EDITOR_GRAPH_WIDTH}px ${EDITOR_GRAPH_HEIGHT}px`}
             class="absolute pointer-events-none"
         >
             <For each={materialCtx.getSocketConnections()}>

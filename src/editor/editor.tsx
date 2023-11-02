@@ -10,6 +10,7 @@ import MaterialNodeInspectorPanel from "./inspector/inspector.tsx";
 import { MaterialContextProvider } from "./material-context.ts";
 import MaterialPreviewPanel from "./preview-panel.tsx";
 import { EditorSelectionManagerProvider } from "./selection/manager.ts";
+import { EditorPanZoomProvider } from "./editor-pan-zoom-context.ts";
 
 interface Props {
     material: Material;
@@ -23,6 +24,7 @@ export default function MaterialGraphEditor(props: DeepReadonly<Props>) {
                 RenderingEngineProvider,
                 RenderingSchedulerProvider,
                 EditorContextProvider,
+                EditorPanZoomProvider,
                 EditorSelectionManagerProvider,
                 EditorConnectionBuilderProvider,
             ]}

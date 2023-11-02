@@ -9,7 +9,7 @@ export default function makeDeferredEventListener<
     EventMap extends EventMapOf<Target>,
     EventType extends keyof EventMap,
 >(target: Target, eventName: EventType, handler: (ev: EventMap[EventType]) => void) {
-    let clear: Function | undefined;
+    let clear: VoidFunction | undefined;
     return [
         () => {
             clear = makeEventListener(target, eventName, handler);
