@@ -1,5 +1,4 @@
 import { createSignal, For, onMount, Show } from "solid-js";
-import { useAppContext } from "../app-context.ts";
 import { Point2D } from "../types/point.ts";
 import makeDeferredDragListener from "../utils/makeDeferredDragListener.ts";
 import MaterialGraphEditorConnectionsOverlay from "./connections-overlay.tsx";
@@ -13,14 +12,15 @@ import { useEditorSelectionManager } from "./selection/manager.ts";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { useWorkspaceContext } from "../workspace-context.ts";
 import { useEditorPanZoomContext } from "./editor-pan-zoom-context.ts";
+import { useMousePosition } from "@solid-primitives/mouse";
 
 export default function MaterialGraphEditorNodes() {
-    const appCtx = useAppContext()!;
     const selectionManager = useEditorSelectionManager()!;
     const materialCtx = useMaterialContext()!;
     const editorCtx = useEditorContext()!;
     const editorPanZoom = useEditorPanZoomContext()!;
     const workspace = useWorkspaceContext()!;
+    const mousePosition = useMousePosition();
     const [newNodePopoverCoords, setNewNodePopoverCoords] = createSignal<Point2D>();
     const transformMatrixCss = () => {
         const m = [];
@@ -62,9 +62,7 @@ export default function MaterialGraphEditorNodes() {
         }
 
         if (ev.key === " ") {
-            setNewNodePopoverCoords((coords) =>
-                coords ? undefined : { ...appCtx.mousePosition() },
-            );
+            setNewNodePopoverCoords((coords) => (coords ? undefined : { ...mousePosition }));
         } else if (ev.key === "Escape") {
             setNewNodePopoverCoords(undefined);
         } else if (ev.key === "Delete") {
