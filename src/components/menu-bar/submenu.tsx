@@ -29,7 +29,9 @@ export default function MenuBarSubmenu(props: Props) {
         <MenuBarContextProvider onClose={() => setOpen(false)}>
             <div data-submenu-id={id} class="relative">
                 <div
-                    class="px-3 py-2 text-sm flex items-center gap-2 hover:bg-gray-300 active:bg-gray-200"
+                    class={`px-3 py-2 text-sm flex items-center gap-2 ${
+                        open() ? "bg-gray-200" : "hover:bg-gray-300 active:bg-gray-200"
+                    }`}
                     onClick={() => setOpen((open) => !open)}
                 >
                     {IconComponent && <IconComponent size={16} />}
