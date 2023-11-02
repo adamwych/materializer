@@ -24,3 +24,25 @@ export function rectIntersects(a: DOMRect, b: DOMRect) {
         Math.abs(a.y + a.height / 2 - (b.y + b.height / 2)) * 2 < a.height + b.height
     );
 }
+
+/**
+ * Maps given number from [min .. max] range to [0 .. 1] range.
+ * @param min
+ * @param max
+ * @param value
+ * @returns
+ */
+export function mapTo01(min: number, max: number, value: number) {
+    return (1 / (max - min)) * (value - min) * max;
+}
+
+/**
+ * Maps given number from [0 .. 1] range to [min .. max] range.
+ * @param min
+ * @param max
+ * @param value
+ * @returns
+ */
+export function mapFrom01(min: number, max: number, value: number) {
+    return min + (max - min) * value;
+}
