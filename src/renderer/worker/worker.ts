@@ -20,7 +20,7 @@ function handleInitializeCanvasMessage(message: RenderWorkerSetPreviewCanvasMess
         antialias: false,
     })!;
 
-    initializeNodeRendererResources(message.canvas);
+    initializeNodeRendererResources(message.canvas, gl);
     initializePreviewRendererResources(message.canvas, gl);
 }
 

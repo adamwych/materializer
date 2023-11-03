@@ -15,10 +15,15 @@ const painterCtors = new Map<MaterialNodePainterType, ConstructorOf<MaterialNode
 
 let canvas: OffscreenCanvas;
 let emptyTextureData: Uint8Array;
+let blackTexture: WebGLTexture;
 
-export function initializeNodeRendererResources(_canvas: OffscreenCanvas) {
+export function initializeNodeRendererResources(
+    _canvas: OffscreenCanvas,
+    gl: WebGL2RenderingContext,
+) {
     canvas = _canvas;
     emptyTextureData = new Uint8Array(canvas.width * canvas.height * 3);
+    generateBlackTexture(gl);
 }
 
 export function clearNodeCache(nodeId: number) {
@@ -114,6 +119,12 @@ function bindOutputSocketTexture(
     return texture;
 }
 
+function generateBlackTexture(gl: WebGL2RenderingContext) {
+    blackTexture = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, blackTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, emptyTextureData);
+}
+
 export function renderNode(
     gl: WebGL2RenderingContext,
     material: Material,
@@ -161,6 +172,8 @@ export function renderNode(
                     `Texture for input socket '${input.id}' of node '${node.label}' has not been rendered yet.`,
                 );
             }
+        } else {
+            inputTextures.set(input.id, blackTexture);
         }
     }
 
