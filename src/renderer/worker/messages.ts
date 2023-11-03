@@ -9,7 +9,10 @@ export type RenderWorkerRenderMessage = {
     type: RenderWorkerMessageType.Render;
     material: Material;
     nodeIds: Array<number>;
-    previewViewProjection: Float32Array;
+    textureWidth: number;
+    textureHeight: number;
+    outputBitmapWidth: number;
+    outputBitmapHeight: number;
 };
 
 export type RenderWorkerNodeRemovedMessage = {

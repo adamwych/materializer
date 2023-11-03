@@ -1,7 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createEmitter } from "@solid-primitives/event-bus";
 import { unwrap } from "solid-js/store";
-import { DeepReadonly } from "ts-essentials";
 import { useAppContext } from "../app-context.ts";
 import {
     Material,
@@ -21,9 +20,9 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
         const appContext = useAppContext()!;
         const workspaceContext = useWorkspaceContext()!;
         const events = createEmitter<{
-            added: DeepReadonly<MaterialNode>;
-            removed: DeepReadonly<MaterialNode>;
-            changed: DeepReadonly<MaterialNode>;
+            added: MaterialNode;
+            removed: MaterialNode;
+            changed: MaterialNode;
         }>();
 
         function setMaterial(mutator: (material: Material) => void, markAsChanged = true) {

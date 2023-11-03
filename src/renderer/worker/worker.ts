@@ -30,7 +30,17 @@ function handleRenderMessage(message: RenderWorkerRenderMessage) {
     for (const nodeId of message.nodeIds) {
         const node = message.material.nodes.find((x) => x.id === nodeId);
         if (node) {
-            renderNode(gl, message.material, node, textures, bitmaps);
+            renderNode(
+                gl,
+                message.material,
+                node,
+                textures,
+                bitmaps,
+                message.textureWidth,
+                message.textureHeight,
+                message.outputBitmapWidth,
+                message.outputBitmapHeight,
+            );
         }
     }
 

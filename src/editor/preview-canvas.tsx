@@ -18,6 +18,10 @@ export default function MaterialPreviewCanvas() {
     let zoom = 2;
 
     onMount(() => {
+        renderer.setNodeTextureSize(
+            materialCtx.getOutputTextureWidth(),
+            materialCtx.getOutputTextureHeight(),
+        );
         renderer.initializeCanvas(canvasElement.transferControlToOffscreen());
         materialCtx.getNodes().forEach(scheduler.scheduleChain);
         requestRender();

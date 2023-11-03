@@ -22,7 +22,7 @@ export default function MaterialGraphEditor(props: DeepReadonly<Props>) {
             values={[
                 [MaterialContextProvider, props.material],
                 RenderingEngineProvider,
-                RenderingSchedulerProvider,
+                [RenderingSchedulerProvider, true],
                 EditorContextProvider,
                 EditorPanZoomProvider,
                 EditorSelectionManagerProvider,

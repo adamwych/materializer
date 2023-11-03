@@ -16,10 +16,12 @@ export default function Select(props: Props) {
     return (
         <div class="relative w-full">
             <div
-                class="bg-gray-100 hover:bg-gray-300 active:bg-gray-400 rounded-sm"
+                class={`bg-gray-0 active:bg-gray-100 border border-gray-200 h-[35px] ${
+                    optionsVisible() ? "rounded-t-md" : "rounded-md"
+                }`}
                 onClick={() => setOptionsVisible((v) => !v)}
             >
-                <div class="p-2 px-3 flex items-center gap-4 justify-between">
+                <div class="p-2 flex items-center gap-4 justify-between">
                     <span class="text-sm">{props.label}</span>
                     <RiArrowsArrowDropDownLine size={20} />
                 </div>
@@ -30,7 +32,9 @@ export default function Select(props: Props) {
                 onClose={() => setOptionsVisible(false)}
             >
                 <Show when={optionsVisible()}>
-                    <div class="absolute w-full z-10">{props.children}</div>
+                    <div class="absolute w-full z-10 border border-gray-200 -mt-[1px] rounded-b-md overflow-hidden">
+                        {props.children}
+                    </div>
                 </Show>
             </SelectContextProvider>
         </div>

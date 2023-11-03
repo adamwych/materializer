@@ -6,9 +6,6 @@ import MaterialNodePainter, { MaterialNodePainterType } from "../painters/painte
 import ScatterMaterialNodePainter from "../painters/scatter";
 import TileMaterialNodePainter from "../painters/tile";
 
-const thumbnailWidth = 128;
-const thumbnailHeight = 128;
-
 const painters = new Map<number, MaterialNodePainter>();
 const painterCtors = new Map<MaterialNodePainterType, ConstructorOf<MaterialNodePainter>>([
     ["glsl", GLSLMaterialNodePainter],
@@ -44,6 +41,8 @@ function createFramebuffer(
     material: Material,
     node: MaterialNode,
     textures: Map<string, WebGLTexture>,
+    width: number,
+    height: number,
 ) {
     const fbo = gl.createFramebuffer()!;
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
@@ -53,7 +52,7 @@ function createFramebuffer(
             gl.FRAMEBUFFER,
             gl.COLOR_ATTACHMENT0 + index,
             gl.TEXTURE_2D,
-            bindOutputSocketTexture(gl, material, textures, node.id, socket.id),
+            bindOutputSocketTexture(gl, material, textures, node.id, socket.id, width, height),
             0,
         );
     });
@@ -76,6 +75,8 @@ function bindOutputSocketTexture(
     textures: Map<string, WebGLTexture>,
     nodeId: number,
     outputId: string,
+    width: number,
+    height: number,
 ) {
     const key = `${nodeId}-${outputId}`;
     const existingTexture = textures.get(key);
@@ -90,8 +91,8 @@ function bindOutputSocketTexture(
         gl.TEXTURE_2D,
         0,
         gl.RGB,
-        material.textureWidth,
-        material.textureHeight,
+        width,
+        height,
         0,
         gl.RGB,
         gl.UNSIGNED_BYTE,
@@ -119,6 +120,10 @@ export function renderNode(
     node: MaterialNode,
     textures: Map<string, WebGLTexture>,
     bitmaps: Map<string, ImageBitmap>,
+    textureWidth: number,
+    textureHeight: number,
+    thumbnailWidth: number,
+    thumbnailHeight: number,
 ) {
     if (!node.spec) {
         return;
@@ -140,7 +145,7 @@ export function renderNode(
         painters.set(node.id, new painterCtor(gl, node.spec.painter));
     }
 
-    const fbo = createFramebuffer(gl, material, node, textures);
+    const fbo = createFramebuffer(gl, material, node, textures, textureWidth, textureHeight);
 
     const inputTextures = new Map<string, WebGLTexture>();
     for (const input of node.spec.inputSockets) {
@@ -162,7 +167,7 @@ export function renderNode(
 
     gl.bindTexture(gl.TEXTURE_2D, null);
 
-    gl.viewport(0, 0, material.textureWidth, material.textureHeight);
+    gl.viewport(0, 0, textureWidth, textureHeight);
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -182,8 +187,8 @@ export function renderNode(
         gl.blitFramebuffer(
             0,
             0,
-            material.textureWidth,
-            material.textureHeight,
+            textureWidth,
+            textureHeight,
             0,
             0,
             thumbnailWidth,

@@ -7,6 +7,7 @@ interface Props {
     title: string;
     buttons?: Array<{
         label: string;
+        disabled?: boolean;
         onClick: () => void;
     }>;
     children?: JSX.Element;
@@ -36,7 +37,9 @@ export default function Dialog(props: Props) {
                         <div class="p-4 flex justify-center gap-4">
                             <For each={buttons()}>
                                 {(button) => (
-                                    <Button onClick={button.onClick}>{button.label}</Button>
+                                    <Button disabled={button.disabled} onClick={button.onClick}>
+                                        {button.label}
+                                    </Button>
                                 )}
                             </For>
                         </div>
