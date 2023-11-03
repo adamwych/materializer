@@ -1,13 +1,13 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { RiDeviceSave2Fill } from "solid-icons/ri";
 import { createSignal } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
 import { v4 as uuidv4 } from "uuid";
-import { Material } from "./types/material.ts";
-import { useWorkspaceStorage } from "./workspace-storage.ts";
-import TextureFilterMethod from "./types/texture-filter.ts";
 import { useSnackbar } from "./components/snackbar/context.ts";
-import { RiSystemCheckFill } from "solid-icons/ri";
 import { NotSavedResolution, useWorkspaceHistory } from "./history-context.tsx";
+import { Material } from "./types/material.ts";
+import TextureFilterMethod from "./types/texture-filter.ts";
+import { useWorkspaceStorage } from "./workspace-storage.ts";
 
 type Props = {
     initialMaterial: Material;
@@ -90,7 +90,7 @@ export const [WorkspaceContextProvider, useWorkspaceContext] = createContextProv
                     snackbar.push({
                         type: "success",
                         text: "Material saved.",
-                        icon: RiSystemCheckFill,
+                        icon: RiDeviceSave2Fill,
                         duration: 2000,
                     });
                     history.markAsSaved(activeMaterial.id);
