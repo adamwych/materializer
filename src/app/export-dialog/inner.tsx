@@ -7,8 +7,8 @@ import Select from "../../components/select/select.tsx";
 import HorizontalSlider from "../../components/slider/horizontal-slider.tsx";
 import { useRenderingEngine } from "../../renderer/engine.ts";
 import { useRenderingScheduler } from "../../renderer/scheduler.ts";
+import { Material } from "../../types/material.ts";
 import saveBlobToFile from "../../utils/saveBlobToFile.ts";
-import { useWorkspaceContext } from "../../workspace-context.ts";
 import {
     ExportFileFormat,
     getExportFileExtension,
@@ -19,23 +19,26 @@ import ExportDialogOutputNodesPanel from "./output-nodes.tsx";
 import ExportDialogParameter from "./parameter.tsx";
 
 interface Props {
+    material: Material;
     onClose(): void;
 }
 
 export default function ExportDialogInner(props: Props) {
-    const context = useWorkspaceContext()!;
     const renderer = useRenderingEngine()!;
     const scheduler = useRenderingScheduler()!;
-    const activeMaterial = context.activeEditorTabMaterial;
-    const [fileFormat, setFileFormat] = createSignal(ExportFileFormat.Png);
-    const [textureSize, setTextureSize] = createSignal(activeMaterial()!.textureWidth);
     const selectedNodes = new ReactiveSet<number>();
     const fileNames = new ReactiveMap<number, string>();
+    const [fileFormat, setFileFormat] = createSignal(ExportFileFormat.Png);
+    const [textureSize, setTextureSize] = createSignal(props.material.textureWidth);
+    const [exportProgress, setExportProgress] = createSignal(0);
+    const [isExporting, setExporting] = createSignal(false);
 
     async function exportSelectedNodes() {
-        const material = activeMaterial()!;
+        setExporting(true);
+        setExportProgress(0);
+
         const outputSize = textureSize();
-        const outputNodes = material.nodes.filter((node) => selectedNodes.has(node.id));
+        const outputNodes = props.material.nodes.filter((node) => selectedNodes.has(node.id));
 
         // Initialize renderer and schedule a render of each output node.
         {
@@ -48,7 +51,9 @@ export default function ExportDialogInner(props: Props) {
             });
 
             // Run render jobs and wait for all nodes to be rendered.
-            await scheduler.runOnce();
+            await scheduler.runOnce((progress) => {
+                setExportProgress(progress.finishedJobs / progress.totalJobs);
+            });
         }
 
         const mimeType = getExportFileMimeType(fileFormat());
@@ -78,15 +83,17 @@ export default function ExportDialogInner(props: Props) {
                     saveBlobToFile(fileName, blob);
                 });
         });
+
+        setExporting(false);
     }
 
     return (
         <Dialog
-            title={`Exporting "${activeMaterial()!.name}"`}
+            title={`Exporting "${props.material.name}"`}
             buttons={[
                 {
-                    label: "Export",
-                    disabled: selectedNodes.size == 0,
+                    label: isExporting() ? Math.round(exportProgress() * 100) + "%" : "Export",
+                    disabled: isExporting() ? true : selectedNodes.size == 0,
                     onClick: exportSelectedNodes,
                 },
                 {
@@ -137,7 +144,7 @@ export default function ExportDialogInner(props: Props) {
                     description="Select which output nodes you want to export and set their file names."
                 >
                     <ExportDialogOutputNodesPanel
-                        material={activeMaterial()!}
+                        material={props.material}
                         fileNames={fileNames}
                         selectedNodes={selectedNodes}
                         fileFormat={fileFormat()}

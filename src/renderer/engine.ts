@@ -9,6 +9,11 @@ import {
 import RenderWorkerImpl from "./worker/worker?worker";
 import { EDITOR_THUMBNAIL_HEIGHT, EDITOR_THUMBNAIL_WIDTH } from "../editor/constants";
 
+export type RenderProgressEvent = {
+    finishedJobs: number;
+    totalJobs: number;
+};
+
 type NodeBitmapStorageEntry = {
     bitmap?: ImageBitmap;
 };
@@ -50,13 +55,23 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
             );
         },
 
-        requestNodesUpdate(ids: Array<number>) {
+        requestNodesUpdate(
+            ids: Array<number>,
+            progressCallback?: (ev: RenderProgressEvent) => void,
+        ) {
             return new Promise<void>((resolve) => {
+                let finishedJobs = 0;
+
                 worker.onmessage = (msg: MessageEvent<OutgoingRenderWorkerMessage>) => {
                     if (msg.data?.type === RenderWorkerMessageType.RenderChunk) {
                         for (const [path, bitmap] of msg.data.bitmaps.entries()) {
                             bitmaps.set(path, { bitmap });
                         }
+
+                        progressCallback?.({
+                            finishedJobs: ++finishedJobs,
+                            totalJobs: ids.length,
+                        });
                     } else if (msg.data?.type === RenderWorkerMessageType.RenderFinished) {
                         resolve();
                     }

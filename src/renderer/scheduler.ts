@@ -2,7 +2,7 @@ import { createContextProvider } from "@solid-primitives/context";
 import createRAF from "@solid-primitives/raf";
 import { useMaterialContext } from "../editor/material-context";
 import { MaterialNode } from "../types/material";
-import { useRenderingEngine } from "./engine";
+import { RenderProgressEvent, useRenderingEngine } from "./engine";
 
 /**
  * Scheduler is responsible for preparing a list of jobs for the rendering engine to do.
@@ -25,7 +25,7 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
             runOnce();
         });
 
-        async function runOnce() {
+        async function runOnce(progressCallback?: (ev: RenderProgressEvent) => void) {
             if (isRendering) {
                 return Promise.resolve();
             }
@@ -35,7 +35,7 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
                 isRendering = true;
                 queue = [];
 
-                await engine.requestNodesUpdate(ids);
+                await engine.requestNodesUpdate(ids, progressCallback);
 
                 isRendering = false;
             }

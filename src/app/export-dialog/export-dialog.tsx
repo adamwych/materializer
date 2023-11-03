@@ -16,7 +16,7 @@ export default function ExportDialog(props: Props) {
         <MaterialContextProvider value={activeMaterial()!}>
             <RenderingEngineProvider>
                 <RenderingSchedulerProvider>
-                    <ExportDialogInner onClose={props.onClose} />
+                    <ExportDialogInner material={activeMaterial()!} onClose={props.onClose} />
                 </RenderingSchedulerProvider>
             </RenderingEngineProvider>
         </MaterialContextProvider>
