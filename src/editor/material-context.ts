@@ -196,6 +196,20 @@ export const [MaterialContextProvider, useMaterialContext] = createContextProvid
                 });
             },
 
+            getInputNodes(node: MaterialNode): Array<MaterialNode> {
+                return material.connections
+                    .filter((connection) => connection.to.nodeId === node.id)
+                    .map((connection) => this.getNodeById(connection.from.nodeId))
+                    .filter((x): x is MaterialNode => x !== undefined);
+            },
+
+            getOutputNodes(node: MaterialNode) {
+                return material.connections
+                    .filter((connection) => connection.from.nodeId === node.id)
+                    .map((connection) => this.getNodeById(connection.to.nodeId))
+                    .filter((x): x is MaterialNode => x !== undefined);
+            },
+
             setName(name: string) {
                 setMaterial((material) => {
                     material.name = name;

@@ -1,9 +1,9 @@
 import { Material } from "../../types/material";
 import {
-    RenderWorkerMessage,
+    IncomingRenderWorkerMessage,
     RenderWorkerMessageType,
     RenderWorkerNodeRemovedMessage,
-    RenderWorkerRenderMessage,
+    RenderWorkerRenderNodesMessage,
     RenderWorkerSetPreviewCameraMessage,
     RenderWorkerSetPreviewCanvasMessage,
 } from "./messages";
@@ -24,33 +24,36 @@ function handleInitializeCanvasMessage(message: RenderWorkerSetPreviewCanvasMess
     initializePreviewRendererResources(message.canvas, gl);
 }
 
-function handleRenderMessage(message: RenderWorkerRenderMessage) {
-    const bitmaps = new Map<string, ImageBitmap>();
-
+function handleRenderMessage(message: RenderWorkerRenderNodesMessage) {
     for (const nodeId of message.nodeIds) {
         const node = message.material.nodes.find((x) => x.id === nodeId);
         if (node) {
-            renderNode(
+            const bitmaps = renderNode(
                 gl,
                 message.material,
                 node,
                 textures,
-                bitmaps,
                 message.textureWidth,
                 message.textureHeight,
                 message.outputBitmapWidth,
                 message.outputBitmapHeight,
             );
+
+            if (bitmaps) {
+                self.postMessage(
+                    { type: RenderWorkerMessageType.RenderChunk, bitmaps },
+                    {
+                        transfer: Array.from(bitmaps.values()),
+                    },
+                );
+            }
         }
     }
 
     renderPreview(gl, textures, message.material, lastPreviewViewProjection);
 
     lastRenderedMaterial = message.material;
-
-    self.postMessage(bitmaps, {
-        transfer: Array.from(bitmaps.values()),
-    });
+    self.postMessage({ type: RenderWorkerMessageType.RenderFinished });
 }
 
 function handleNodeRemovedMessage(message: RenderWorkerNodeRemovedMessage) {
@@ -68,10 +71,10 @@ function handleSetPreviewCameraMessage(message: RenderWorkerSetPreviewCameraMess
     }
 }
 
-self.onmessage = (msg: MessageEvent<RenderWorkerMessage>) => {
+self.onmessage = (msg: MessageEvent<IncomingRenderWorkerMessage>) => {
     const handler = {
         [RenderWorkerMessageType.InitializeCanvas]: handleInitializeCanvasMessage,
-        [RenderWorkerMessageType.Render]: handleRenderMessage,
+        [RenderWorkerMessageType.RenderNodes]: handleRenderMessage,
         [RenderWorkerMessageType.NodeRemoved]: handleNodeRemovedMessage,
         [RenderWorkerMessageType.SetPreviewCamera]: handleSetPreviewCameraMessage,
     }[msg.data?.type];

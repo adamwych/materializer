@@ -44,7 +44,7 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
         }
 
         /**
-         * Schedules a new rendering job for given node.
+         * Schedules a render job for given node.
          *
          * Note that this will only render this exact node, it will not schedule
          * re-renders for inputs of this node, so the result might be outdated if
@@ -56,53 +56,40 @@ export const [RenderingSchedulerProvider, useRenderingScheduler] = createContext
          * @param node
          */
         function schedule(node: MaterialNode) {
-            // Prevent scheduling multiple render jobs for the same node.
-            if (isNodeQueued(node)) {
-                return;
+            if (!queue.includes(node.id)) {
+                queue.push(node.id);
             }
-
-            queue.push(node.id);
         }
 
         /**
-         * Evaluates inputs and outputs of given node and schedules rendering
-         * jobs for all of them.
-         *
+         * Recursively schedules render jobs for given node, its inputs and its outputs.
          * To only render a specific node use `schedule` instead.
          *
          * @param node
          */
         function scheduleChain(node: MaterialNode) {
-            // Prevent scheduling multiple render jobs for the same node.
-            if (isNodeQueued(node)) {
-                return;
+            if (!queue.includes(node.id)) {
+                materialCtx.getInputNodes(node).forEach(scheduleChain);
+                schedule(node);
+                materialCtx.getOutputNodes(node).forEach(scheduleChain);
             }
-
-            // Recursively schedule re-renders of inputs.
-            materialCtx
-                .getSocketConnections()
-                .filter((connection) => connection.to.nodeId === node.id)
-                .map((connection) => materialCtx.getNodeById(connection.from.nodeId)!)
-                .forEach((node) => scheduleChain(node));
-
-            schedule(node);
-
-            // Recursively schedule re-renders of outputs.
-            materialCtx
-                .getSocketConnections()
-                .filter((connection) => connection.from.nodeId === node.id)
-                .map((connection) => materialCtx.getNodeById(connection.to.nodeId)!)
-                .forEach((node) => scheduleChain(node));
         }
 
-        function isNodeQueued(node: MaterialNode) {
-            return queue.some((nodeId) => nodeId === node.id);
+        /**
+         * Recursively schedules a render job for given node and its outputs.
+         * @param node
+         */
+        function scheduleOutputs(node: MaterialNode) {
+            if (!queue.includes(node.id)) {
+                schedule(node);
+                materialCtx.getOutputNodes(node).forEach(scheduleOutputs);
+            }
         }
 
         // Listen to changes. Internally, material is kept as a store
         // so we need to use events to communicate when a change was made.
-        materialCtx.events.on("added", scheduleChain);
-        materialCtx.events.on("changed", scheduleChain);
+        materialCtx.events.on("added", schedule);
+        materialCtx.events.on("changed", scheduleOutputs);
 
         if (autoStart) {
             start();

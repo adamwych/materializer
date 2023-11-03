@@ -5,14 +5,23 @@ export type RenderWorkerSetPreviewCanvasMessage = {
     canvas: OffscreenCanvas;
 };
 
-export type RenderWorkerRenderMessage = {
-    type: RenderWorkerMessageType.Render;
+export type RenderWorkerRenderNodesMessage = {
+    type: RenderWorkerMessageType.RenderNodes;
     material: Material;
     nodeIds: Array<number>;
     textureWidth: number;
     textureHeight: number;
     outputBitmapWidth: number;
     outputBitmapHeight: number;
+};
+
+export type RenderWorkerRenderChunkMessage = {
+    type: RenderWorkerMessageType.RenderChunk;
+    bitmaps: Map<string, ImageBitmap>;
+};
+
+export type RenderWorkerRenderFinishedMessage = {
+    type: RenderWorkerMessageType.RenderFinished;
 };
 
 export type RenderWorkerNodeRemovedMessage = {
@@ -26,15 +35,21 @@ export type RenderWorkerSetPreviewCameraMessage = {
     viewProjection: Float32Array;
 };
 
-export type RenderWorkerMessage =
-    | RenderWorkerRenderMessage
+export type IncomingRenderWorkerMessage =
+    | RenderWorkerRenderNodesMessage
     | RenderWorkerNodeRemovedMessage
     | RenderWorkerSetPreviewCanvasMessage
     | RenderWorkerSetPreviewCameraMessage;
 
+export type OutgoingRenderWorkerMessage =
+    | RenderWorkerRenderChunkMessage
+    | RenderWorkerRenderFinishedMessage;
+
 export enum RenderWorkerMessageType {
     InitializeCanvas,
-    Render,
+    RenderNodes,
+    RenderFinished,
+    RenderChunk,
     NodeRemoved,
     SetPreviewCamera,
 }

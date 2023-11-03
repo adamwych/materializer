@@ -119,7 +119,6 @@ export function renderNode(
     material: Material,
     node: MaterialNode,
     textures: Map<string, WebGLTexture>,
-    bitmaps: Map<string, ImageBitmap>,
     textureWidth: number,
     textureHeight: number,
     thumbnailWidth: number,
@@ -182,6 +181,8 @@ export function renderNode(
     canvas.width = thumbnailWidth;
     canvas.height = thumbnailHeight;
 
+    const bitmaps = new Map<string, ImageBitmap>();
+
     for (let i = 0; i < node.spec.outputSockets.length; i++) {
         gl.readBuffer(gl.COLOR_ATTACHMENT0 + i);
         gl.blitFramebuffer(
@@ -204,4 +205,5 @@ export function renderNode(
     canvas.height = originalCanvasHeight;
 
     gl.deleteFramebuffer(fbo);
+    return bitmaps;
 }

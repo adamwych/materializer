@@ -1,7 +1,11 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
 import { useMaterialContext } from "../editor/material-context";
-import { RenderWorkerMessageType, RenderWorkerRenderMessage } from "./worker/messages";
+import {
+    OutgoingRenderWorkerMessage,
+    RenderWorkerMessageType,
+    RenderWorkerRenderNodesMessage,
+} from "./worker/messages";
 import RenderWorkerImpl from "./worker/worker?worker";
 import { EDITOR_THUMBNAIL_HEIGHT, EDITOR_THUMBNAIL_WIDTH } from "../editor/constants";
 
@@ -12,7 +16,7 @@ type NodeBitmapStorageEntry = {
 export const [RenderingEngineProvider, useRenderingEngine] = createContextProvider(() => {
     const materialCtx = useMaterialContext()!;
     const bitmaps = new ReactiveMap<string, NodeBitmapStorageEntry>();
-    let [outputWidth, outputHeight] = [EDITOR_THUMBNAIL_WIDTH, EDITOR_THUMBNAIL_HEIGHT];
+    let [outputBitmapWidth, outputBitmapHeight] = [EDITOR_THUMBNAIL_WIDTH, EDITOR_THUMBNAIL_HEIGHT];
     let [nodeTextureWidth, nodeTextureHeight] = [32, 32];
     let worker: Worker;
 
@@ -48,22 +52,24 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
 
         requestNodesUpdate(ids: Array<number>) {
             return new Promise<void>((resolve) => {
-                worker.onmessage = (msg) => {
-                    for (const [k, v] of msg.data.entries()) {
-                        bitmaps.set(k, { bitmap: v });
+                worker.onmessage = (msg: MessageEvent<OutgoingRenderWorkerMessage>) => {
+                    if (msg.data?.type === RenderWorkerMessageType.RenderChunk) {
+                        for (const [path, bitmap] of msg.data.bitmaps.entries()) {
+                            bitmaps.set(path, { bitmap });
+                        }
+                    } else if (msg.data?.type === RenderWorkerMessageType.RenderFinished) {
+                        resolve();
                     }
-
-                    resolve();
                 };
 
-                const message: RenderWorkerRenderMessage = {
-                    type: RenderWorkerMessageType.Render,
+                const message: RenderWorkerRenderNodesMessage = {
+                    type: RenderWorkerMessageType.RenderNodes,
                     material: materialCtx.getMaterial(),
                     nodeIds: ids,
                     textureWidth: nodeTextureWidth,
                     textureHeight: nodeTextureHeight,
-                    outputBitmapWidth: outputWidth,
-                    outputBitmapHeight: outputHeight,
+                    outputBitmapWidth,
+                    outputBitmapHeight,
                 };
 
                 worker.postMessage(message);
@@ -83,8 +89,8 @@ export const [RenderingEngineProvider, useRenderingEngine] = createContextProvid
         },
 
         setOutputTextureSize(width: number, height: number) {
-            outputWidth = width;
-            outputHeight = height;
+            outputBitmapWidth = width;
+            outputBitmapHeight = height;
         },
 
         getNodeBitmap(nodeId: number, socketId: string) {
