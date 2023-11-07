@@ -4,6 +4,13 @@ import { unwrap } from "solid-js/store";
 import { MaterialEvents } from "../types/material-events";
 import { MaterialNode } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
+import {
+    EDITOR_GRAPH_HEIGHT,
+    EDITOR_GRAPH_WIDTH,
+    EDITOR_NODE_HEIGHT,
+    EDITOR_NODE_WIDTH,
+} from "../ui/editor/consts";
+import { clamp } from "../utils/math";
 import { useNodeBlueprintsStore } from "./blueprints";
 import { useWorkspaceStore } from "./workspace";
 
@@ -48,8 +55,8 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             workspace.modifyMaterial(material.id, (material) => {
                 const node = material.nodes[id];
                 if (node) {
-                    node.x += x;
-                    node.y += y;
+                    node.x = clamp(node.x + x, 0, EDITOR_GRAPH_WIDTH - EDITOR_NODE_WIDTH);
+                    node.y = clamp(node.y + y, 0, EDITOR_GRAPH_HEIGHT - EDITOR_NODE_HEIGHT);
                     events.emit("nodeMoved", { node });
                 }
             });
