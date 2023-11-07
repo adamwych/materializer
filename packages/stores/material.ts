@@ -68,12 +68,12 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
 
                 delete material.nodes[id];
 
-                events.emit("nodeRemoved", {
-                    node,
-                });
-
                 material.connections = material.connections.filter((connection) => {
                     return connection.from[0] !== id && connection.to[0] !== id;
+                });
+
+                events.emit("nodeRemoved", {
+                    node,
                 });
             });
         },

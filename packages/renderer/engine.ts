@@ -10,6 +10,7 @@ import { RenderWorkerCommand } from "./commands";
 import {
     MinimalRenderableMaterialNodeSnapshot,
     RenderableMaterialNodeSnapshot,
+    RenderableMaterialSnapshot,
     WebGL2RenderWorker,
 } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
@@ -25,6 +26,16 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     const materialStore = useMaterialStore()!;
     const blueprintStore = useNodeBlueprintsStore()!;
     let worker: RenderWorker | undefined;
+
+    function createMaterialSnapshot(material: Material): RenderableMaterialSnapshot {
+        const nodes: { [k: number]: RenderableMaterialNodeSnapshot } = {};
+        Object.values(material.nodes).forEach((node) => {
+            nodes[node.id] = createNodeSnapshot(node);
+        });
+        return {
+            nodes,
+        };
+    }
 
     function createMinimalNodeSnapshot(node: MaterialNode): MinimalRenderableMaterialNodeSnapshot {
         return {
@@ -104,9 +115,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 {
                     command: "initialize",
                     canvas,
-                    material: {
-                        nodes: Object.values(material.nodes).map(createNodeSnapshot),
-                    },
+                    material: createMaterialSnapshot(material),
                     start: runScheduler,
                 },
                 [canvas],

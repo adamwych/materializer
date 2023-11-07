@@ -2,7 +2,7 @@ import { MaterialNode, MaterialNodeBlueprint } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
 
 export type RenderableMaterialSnapshot = {
-    nodes: Record<number, RenderableMaterialNodeSnapshot>;
+    nodes: { [k: number]: RenderableMaterialNodeSnapshot };
 };
 
 /**
