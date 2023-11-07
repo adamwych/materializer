@@ -136,30 +136,34 @@ export default class WebGLNodeRenderer {
 
         painter.render(this.gl, nodeSnapshot, inputTextures);
 
-        // Read texture pixels to a CPU-bound bitmap.
-        const outputBitmaps = new Map<string, ImageData>();
-        // Object.values(blueprint.outputs).forEach((socketInfo, index) => {
-        //     const pixels = new Uint8Array(node.textureSize * node.textureSize * 4);
-        //     this.gl.readBuffer(this.gl.COLOR_ATTACHMENT0 + index);
-        //     this.gl.readPixels(
-        //         0,
-        //         0,
-        //         node.textureSize,
-        //         node.textureSize,
-        //         this.gl.RGBA,
-        //         this.gl.UNSIGNED_BYTE,
-        //         pixels,
-        //     );
-        //     outputBitmaps.set(
-        //         socketInfo.id,
-        //         new ImageData(new Uint8ClampedArray(pixels), node.textureSize, node.textureSize),
-        //     );
-        // });
+        // Restore default framebuffer.
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+
+    public renderToImageData(nodeSnapshot: RenderableMaterialNodeSnapshot): ImageData {
+        const gl = this.gl;
+        const { node } = nodeSnapshot;
+
+        this.render(nodeSnapshot);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
+
+        const pixels = new Uint8Array(node.textureSize * node.textureSize * 4);
+        this.gl.readBuffer(this.gl.COLOR_ATTACHMENT0);
+        this.gl.readPixels(
+            0,
+            0,
+            node.textureSize,
+            node.textureSize,
+            this.gl.RGBA,
+            this.gl.UNSIGNED_BYTE,
+            pixels,
+        );
 
         // Restore default framebuffer.
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        return outputBitmaps;
+        return new ImageData(new Uint8ClampedArray(pixels), node.textureSize, node.textureSize);
     }
 
     public getNodeOutputTexture(nodeId: number) {

@@ -8,12 +8,18 @@ export type InitializeWorkerCommand = {
     command: "initialize";
     canvas: OffscreenCanvas;
     material: RenderableMaterialSnapshot;
+    start: boolean;
 };
 
 export type SynchronizeNodeCommand = {
     command: "synchronizeNode";
     nodeId: number;
     nodeSnapshot: RenderableMaterialNodeSnapshot | MinimalRenderableMaterialNodeSnapshot | null;
+};
+
+export type RenderNodeAndGetImageCommand = {
+    command: "renderNodeAndGetImage";
+    nodeId: number;
 };
 
 export type SetEditorUIViewportSizeCommand = {
@@ -29,8 +35,8 @@ export type SetEditorUITransformCommand = {
     scale: number;
 };
 
-export type SetEnvironmentPreviewOutletCommand = {
-    command: "setEnvironmentPreviewOutlet";
+export type SetEnvironmentPreviewDestinationCommand = {
+    command: "setEnvironmentPreviewDestination";
     canvas: OffscreenCanvas;
 };
 
@@ -44,7 +50,8 @@ export type SetEnvironmentPreviewCameraTransformCommand = {
 export type RenderWorkerCommand =
     | InitializeWorkerCommand
     | SynchronizeNodeCommand
+    | RenderNodeAndGetImageCommand
     | SetEditorUIViewportSizeCommand
     | SetEditorUITransformCommand
-    | SetEnvironmentPreviewOutletCommand
+    | SetEnvironmentPreviewDestinationCommand
     | SetEnvironmentPreviewCameraTransformCommand;

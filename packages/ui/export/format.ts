@@ -1,31 +1,31 @@
-export enum ExportFileFormat {
+export enum ExportImageFormat {
     Png = "image/png",
     Jpeg = "image/jpeg",
 }
 
-export function getExportFileName(format: ExportFileFormat) {
+export function getExportImageFormatName(format: ExportImageFormat) {
     switch (format) {
-        case ExportFileFormat.Png:
+        case ExportImageFormat.Png:
             return "PNG";
-        case ExportFileFormat.Jpeg:
+        case ExportImageFormat.Jpeg:
             return "JPEG";
     }
 }
 
-export function getExportFileExtension(format: ExportFileFormat) {
+export function getExportImageFileExtension(format: ExportImageFormat) {
     switch (format) {
-        case ExportFileFormat.Png:
+        case ExportImageFormat.Png:
             return "png";
-        case ExportFileFormat.Jpeg:
+        case ExportImageFormat.Jpeg:
             return "jpg";
     }
 }
 
-export function getExportFileMimeType(format: ExportFileFormat) {
+export function getExportImageFormatMimeType(format: ExportImageFormat) {
     switch (format) {
-        case ExportFileFormat.Png:
+        case ExportImageFormat.Png:
             return "image/png";
-        case ExportFileFormat.Jpeg:
+        case ExportImageFormat.Jpeg:
             return "image/jpeg";
     }
 }

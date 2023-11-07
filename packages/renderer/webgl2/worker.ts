@@ -36,7 +36,10 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             nodePreviewsRenderer = new WebGLNodePreviewsRenderer(canvas, gl, nodeRenderer);
 
             jobScheduler = new RenderJobScheduler(material);
-            jobScheduler.start(renderQueuedNodes);
+
+            if (ev.data.start) {
+                jobScheduler.start(renderQueuedNodes);
+            }
 
             break;
         }
@@ -85,8 +88,33 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 nodeRenderer.clearNodeCache(ev.data.nodeId);
                 jobScheduler.scheduleOutputs(ev.data.nodeId, true);
                 delete material.nodes[ev.data.nodeId];
+
+                // FIXME:
+                // It seems like sometimes the preview is not updated after
+                // removing a node. It's possible that the scheduler callback
+                // runs right before `delete`. Very difficult to reproduce.
+                nodePreviewsRenderer.render(material);
             }
 
+            break;
+        }
+
+        case "renderNodeAndGetImage": {
+            const requestedNodeId = ev.data.nodeId;
+            const tempScheduler = new RenderJobScheduler(material);
+            tempScheduler.scheduleChain(ev.data.nodeId);
+            tempScheduler.runOnce((ids) => {
+                for (const nodeId of ids) {
+                    const node = material.nodes[nodeId];
+                    if (nodeId === requestedNodeId) {
+                        const imageData = nodeRenderer.renderToImageData(node);
+                        self.postMessage(imageData, { transfer: [imageData.data.buffer] });
+                        break;
+                    } else {
+                        nodeRenderer.render(node);
+                    }
+                }
+            });
             break;
         }
 
@@ -104,7 +132,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             break;
         }
 
-        case "setEnvironmentPreviewOutlet": {
+        case "setEnvironmentPreviewDestination": {
             envPreviewRenderer = new WebGLEnvironmentalPreviewRenderer(
                 ev.data.canvas,
                 gl,

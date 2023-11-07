@@ -1,17 +1,17 @@
+import { ReactiveMap } from "@solid-primitives/map";
 import { ReactiveSet } from "@solid-primitives/set";
 import { RiSystemCheckFill } from "solid-icons/ri";
 import { For, Show } from "solid-js";
-import { ReactiveMap } from "@solid-primitives/map";
-import { ExportFileFormat, getExportFileExtension } from "./format.ts";
 import { Material } from "../../types/material.ts";
 import { MaterialNode } from "../../types/node.ts";
 import TextInput from "../components/input/text-input.tsx";
+import { ExportImageFormat, getExportImageFileExtension } from "./format.ts";
 
 interface Props {
     material: Material;
     fileNames: ReactiveMap<number, string>;
     selectedNodes: ReactiveSet<number>;
-    fileFormat: ExportFileFormat;
+    fileFormat: ExportImageFormat;
 }
 
 export default function ExportDialogOutputNodesPanel(props: Props) {
@@ -60,19 +60,14 @@ export default function ExportDialogOutputNodesPanel(props: Props) {
                             </div>
                         </div>
 
-                        <div class="text-sm flex items-center gap-2">
-                            {node.name}
-                            <span class="text-gray-800">
-                                ({node.parameters["target"] as string})
-                            </span>
-                        </div>
+                        <div class="text-sm flex items-center gap-2">{node.name}</div>
 
                         <TextInput
                             value={props.fileNames.get(node.id) ?? ""}
                             readOnly={!props.selectedNodes.has(node.id)}
                             onChange={(value) => props.fileNames.set(node.id, value)}
                         />
-                        <div class="text-sm">.{getExportFileExtension(props.fileFormat)}</div>
+                        <div class="text-sm">.{getExportImageFileExtension(props.fileFormat)}</div>
                     </div>
                 )}
             </For>

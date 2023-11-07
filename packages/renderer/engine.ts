@@ -26,18 +26,6 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     const blueprintStore = useNodeBlueprintsStore()!;
     let worker: RenderWorker | undefined;
 
-    // Listen to changes in the material and send updates to the worker.
-    const materialEvents = materialStore.getEvents();
-    materialEvents.on("nodeAdded", (ev) => synchronizeNode(ev, true, false));
-    materialEvents.on("nodeParameterChanged", synchronizeNode);
-    materialEvents.on("nodeConnectionsChanged", synchronizeNode);
-    materialEvents.on("nodeMoved", synchronizeNode);
-    materialEvents.on("nodeRemoved", (ev) => synchronizeNode(ev, false));
-
-    onCleanup(() => {
-        worker?.terminate();
-    });
-
     function createMinimalNodeSnapshot(node: MaterialNode): MinimalRenderableMaterialNodeSnapshot {
         return {
             node: unwrap(node),
@@ -53,17 +41,41 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
         };
     }
 
-    function synchronizeNode(ev: MaterialNodeEvent, exists = true, update = true) {
+    function onNodeAdded(ev: MaterialNodeEvent) {
         worker?.postMessage({
             command: "synchronizeNode",
             nodeId: ev.node.id,
-            nodeSnapshot: exists
-                ? update
-                    ? createMinimalNodeSnapshot(ev.node)
-                    : createNodeSnapshot(ev.node)
-                : null,
+            nodeSnapshot: createNodeSnapshot(ev.node),
         });
     }
+
+    function onNodeRemoved(ev: MaterialNodeEvent) {
+        worker?.postMessage({
+            command: "synchronizeNode",
+            nodeId: ev.node.id,
+            nodeSnapshot: null,
+        });
+    }
+
+    function onNodeChanged(ev: MaterialNodeEvent) {
+        worker?.postMessage({
+            command: "synchronizeNode",
+            nodeId: ev.node.id,
+            nodeSnapshot: createMinimalNodeSnapshot(ev.node),
+        });
+    }
+
+    // Listen to changes in the material and send updates to the worker.
+    const materialEvents = materialStore.getEvents();
+    materialEvents.on("nodeAdded", onNodeAdded);
+    materialEvents.on("nodeRemoved", onNodeRemoved);
+    materialEvents.on("nodeParameterChanged", onNodeChanged);
+    materialEvents.on("nodeConnectionsChanged", onNodeChanged);
+    materialEvents.on("nodeMoved", onNodeChanged);
+
+    onCleanup(() => {
+        worker?.terminate();
+    });
 
     return {
         /**
@@ -76,10 +88,15 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
          * UI which would require access to those resources is implemented directly
          * in the worker and is rendered using WebGL.
          *
-         * @param canvas Canvas to which the worker will render UI elements.
-         * @param material
+         * @param canvas Canvas onto which the worker will render UI elements.
+         * @param material Material that will be rendered.
+         * @param runScheduler Whether worker should start its render job scheduler.
          */
-        initializeWebGLWorker(canvas: OffscreenCanvas, material: Material): WebGL2RenderWorker {
+        initializeWebGLWorker(
+            canvas: OffscreenCanvas,
+            material: Material,
+            runScheduler: boolean,
+        ): WebGL2RenderWorker {
             worker?.terminate();
 
             worker = new WebGL2RenderWorkerImpl();
@@ -90,6 +107,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                     material: {
                         nodes: Object.values(material.nodes).map(createNodeSnapshot),
                     },
+                    start: runScheduler,
                 },
                 [canvas],
             );
@@ -114,16 +132,59 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
             };
         },
 
-        setEnvironmentPreviewOutlet(canvas: OffscreenCanvas) {
+        /**
+         * Terminates currently running render worker.
+         */
+        terminateWorker() {
+            worker?.terminate();
+        },
+
+        /**
+         * Renders node by given ID and returns its image data.
+         * To do this, worker will have to copy raw bitmap data from GPU to CPU,
+         * so this operation will be slow for nodes that output large textures.
+         *
+         * @param nodeId ID of the node to render.
+         */
+        renderAndGetImage(nodeId: number): Promise<ImageData> {
+            return new Promise((resolve) => {
+                if (!worker) {
+                    throw "A worker must first be started before retriving node bitmap.";
+                }
+
+                worker.onmessage = (ev) => {
+                    resolve(ev.data);
+                };
+
+                worker.postMessage({
+                    command: "renderNodeAndGetImage",
+                    nodeId,
+                });
+            });
+        },
+
+        /**
+         * Sets the canvas to which environmental preview will be rendered.
+         *
+         * @param canvas
+         */
+        setEnvironmentPreviewDestination(canvas: OffscreenCanvas) {
             worker?.postMessage(
                 {
-                    command: "setEnvironmentPreviewOutlet",
+                    command: "setEnvironmentPreviewDestination",
                     canvas,
                 },
                 [canvas],
             );
         },
 
+        /**
+         * Sets camera parameters of the environmental preview.
+         *
+         * @param rotationX
+         * @param rotationY
+         * @param zoom
+         */
         setEnvironmentPreviewCameraTransform(rotationX: number, rotationY: number, zoom: number) {
             worker?.postMessage({
                 command: "setEnvironmentPreviewCameraTransform",

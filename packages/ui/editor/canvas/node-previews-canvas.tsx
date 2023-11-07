@@ -18,6 +18,7 @@ export default function EditorNodePreviewsCanvas() {
         worker = renderEngine.initializeWebGLWorker(
             canvasElement.transferControlToOffscreen(),
             material,
+            true,
         );
 
         worker.setEditorUITransform(

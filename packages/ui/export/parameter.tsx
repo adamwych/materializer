@@ -1,11 +1,12 @@
-import { JSX } from "solid-js";
+import { ParentProps } from "solid-js";
 
-export default function ExportDialogParameter(props: {
-    label: string;
-    description: string;
-    inline?: boolean;
-    children: JSX.Element;
-}) {
+export default function ExportDialogParameter(
+    props: ParentProps<{
+        label: string;
+        description: string;
+        inline?: boolean;
+    }>,
+) {
     return (
         <div class={props.inline ? "flex items-center justify-between gap-2" : ""}>
             <div class="flex-1">

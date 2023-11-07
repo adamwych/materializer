@@ -180,7 +180,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         },
 
         getMaterial() {
-            return workspace.getActiveMaterial()!;
+            return material;
         },
     };
 });
