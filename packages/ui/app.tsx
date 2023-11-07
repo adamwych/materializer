@@ -4,7 +4,8 @@ import { NodeBlueprintsProvider } from "../stores/blueprints.ts";
 import { ShortcutsProvider } from "../stores/shortcuts.ts";
 import { UserDataStorageProvider } from "../stores/storage.ts";
 import { WorkspaceHistoryProvider } from "../stores/workspace-history.tsx";
-import { WorkspaceProvider } from "../stores/workspace.ts";
+import { WorkspaceProvider, useWorkspaceStore } from "../stores/workspace.ts";
+import { createEmptyMaterial } from "../types/material.ts";
 import AppMenuBar from "./app-menu-bar.tsx";
 import DialogsOutlet from "./components/dialog/outlet.tsx";
 import { DialogsProvider } from "./components/dialog/store.ts";
@@ -40,7 +41,11 @@ function App() {
 }
 
 function AppInner() {
+    const workspace = useWorkspaceStore()!;
+
     registerAppShortcuts();
+
+    workspace.addMaterial(createEmptyMaterial());
 
     return <></>;
 }
