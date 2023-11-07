@@ -3,6 +3,7 @@ import { render } from "solid-js/web";
 import { NodeBlueprintsProvider } from "../stores/blueprints.ts";
 import { ShortcutsProvider } from "../stores/shortcuts.ts";
 import { UserDataStorageProvider } from "../stores/storage.ts";
+import { WorkspaceHistoryProvider } from "../stores/workspace-history.tsx";
 import { WorkspaceProvider } from "../stores/workspace.ts";
 import AppMenuBar from "./app-menu-bar.tsx";
 import DialogsOutlet from "./components/dialog/outlet.tsx";
@@ -11,6 +12,7 @@ import SnackbarsOutlet from "./components/snackbar/container.tsx";
 import { SnackbarProvider } from "./components/snackbar/context.ts";
 import EditorPanel from "./editor/panel.tsx";
 import "./scss/_main.scss";
+import registerAppShortcuts from "./shortcuts.ts";
 
 function App() {
     return (
@@ -20,10 +22,12 @@ function App() {
                 DialogsProvider,
                 NodeBlueprintsProvider,
                 UserDataStorageProvider,
+                WorkspaceHistoryProvider,
                 WorkspaceProvider,
                 ShortcutsProvider,
             ]}
         >
+            <AppInner />
             <DialogsOutlet />
             <SnackbarsOutlet />
 
@@ -33,6 +37,12 @@ function App() {
             </div>
         </MultiProvider>
     );
+}
+
+function AppInner() {
+    registerAppShortcuts();
+
+    return <></>;
 }
 
 render(() => <App />, document.body);

@@ -1,11 +1,25 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createSignal } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { createStore, produce, unwrap } from "solid-js/store";
 import { Material } from "../types/material";
+import { useSnackbar } from "../ui/components/snackbar/context";
+import { useUserDataStorage } from "./storage";
+import { NotSavedResolution, useWorkspaceHistory } from "./workspace-history";
+import { RiDeviceSave2Fill } from "solid-icons/ri";
 
 export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() => {
+    const snackbar = useSnackbar()!;
+    const history = useWorkspaceHistory()!;
+    const userDataStorage = useUserDataStorage()!;
     const [materials, setMaterials] = createStore<Array<Material>>([]);
     const [activeMaterialId, setActiveMaterialId] = createSignal<string>();
+
+    window.onbeforeunload = () => {
+        const anyUnsavedChanges = materials.some((x) => history.hasUnsavedChanges(x.id));
+        if (anyUnsavedChanges) {
+            return "You have unsaved changes.";
+        }
+    };
 
     return {
         /**
@@ -46,6 +60,8 @@ export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() =
                         if (material.id !== previousId) {
                             throw new Error("Changing material's ID is not allowed.");
                         }
+
+                        history.markAsChanged(materialId);
                     }
                 }),
             );
@@ -59,20 +75,43 @@ export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() =
          * @param materialId ID of the material to delete.
          */
         deleteMaterial(materialId: string) {
-            if (this.isActiveMaterial(materialId)) {
-                const materialIndex = materials.findIndex((x) => x.id === materialId);
+            const material = materials.find((x) => x.id === materialId)!;
 
-                // If this is the last material in this workspace, then
-                // just close the editor.
-                if (materials.length === 1) {
-                    setActiveMaterialId(undefined);
-                } else {
-                    const closestMaterialIndex = materialIndex === 0 ? 1 : materialIndex - 1;
-                    setActiveMaterialId(materials[closestMaterialIndex].id);
+            history.warnIfNotSaved(material.id, material.name).then((resolution) => {
+                if (resolution === NotSavedResolution.SaveChanges) {
+                    userDataStorage.saveMaterial(unwrap(material));
+                    history.markAsSaved(materialId);
                 }
-            }
 
-            setMaterials((materials) => materials.filter((x) => x.id !== materialId));
+                if (this.isActiveMaterial(materialId)) {
+                    const materialIndex = materials.findIndex((x) => x.id === materialId);
+
+                    // If this is the last material in this workspace, then
+                    // just close the editor.
+                    if (materials.length === 1) {
+                        setActiveMaterialId(undefined);
+                    } else {
+                        const closestMaterialIndex = materialIndex === 0 ? 1 : materialIndex - 1;
+                        setActiveMaterialId(materials[closestMaterialIndex].id);
+                    }
+                }
+
+                setMaterials((materials) => materials.filter((x) => x.id !== materialId));
+            });
+        },
+
+        saveActiveMaterial() {
+            const activeMaterial = this.getActiveMaterial();
+            if (activeMaterial) {
+                userDataStorage.saveMaterial(unwrap(activeMaterial));
+                snackbar.push({
+                    type: "success",
+                    text: "Material saved.",
+                    icon: RiDeviceSave2Fill,
+                    duration: 2000,
+                });
+                history.markAsSaved(activeMaterial.id);
+            }
         },
 
         getActiveMaterial(): Readonly<Material> | undefined {

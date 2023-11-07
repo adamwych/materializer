@@ -73,6 +73,7 @@ export const [ShortcutsProvider, useShortcutsStore] = createContextProvider(({ v
             }
         }
 
+        ev.preventDefault();
         ev.stopPropagation();
         shortcut.handler({ pointerX: mousePosition.x, pointerY: mousePosition.y });
     });

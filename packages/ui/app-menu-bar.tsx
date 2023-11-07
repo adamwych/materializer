@@ -79,7 +79,7 @@ export default function AppMenuBar() {
                     <MenuBarSubmenuItem
                         label="Save"
                         shortcut="Ctrl+S"
-                        onClick={() => userDataStorage.saveMaterial(workspace.getActiveMaterial()!)}
+                        onClick={() => workspace.saveActiveMaterial()}
                     />
 
                     <Show when={"showSaveFilePicker" in window}>
