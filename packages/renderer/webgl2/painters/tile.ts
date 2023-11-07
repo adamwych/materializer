@@ -1,8 +1,8 @@
-import { RenderableMaterialNodeSnapshot } from "../../types";
+import { MaterialNodeSnapshot } from "../../types";
 import PatternMaterialNodePainter, { PatternElement } from "./pattern";
 
 export default class TileMaterialNodePainter extends PatternMaterialNodePainter {
-    public generatePattern(snapshot: RenderableMaterialNodeSnapshot): Array<PatternElement> {
+    public generatePattern(snapshot: MaterialNodeSnapshot): Array<PatternElement> {
         const node = snapshot.node;
         const elements: Array<PatternElement> = [];
 

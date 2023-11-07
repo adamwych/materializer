@@ -3,7 +3,7 @@ import { XY_QUAD_VERTICES } from "../quads";
 import WebGLNodeRenderer from "./node-renderer";
 import { easingSmoothstep } from "culori";
 import { clamp } from "../../utils/math";
-import { RenderableMaterialSnapshot } from "../types";
+import { MaterialSnapshot } from "../types";
 
 const VERTEX_SHADER_CODE = `
 #version 300 es
@@ -107,7 +107,7 @@ export default class WebGLNodePreviewsRenderer {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     }
 
-    public render(material: RenderableMaterialSnapshot) {
+    public render(material: MaterialSnapshot) {
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -118,7 +118,7 @@ export default class WebGLNodePreviewsRenderer {
 
         const nodeSize = 128;
 
-        Object.values(material.nodes).forEach((snapshot) => {
+        for (const snapshot of material.nodes.values()) {
             let animationTimer = clamp(this.enterAnimationTimers.get(snapshot.node.id) ?? 0, 0, 1);
             if (animationTimer < 1) {
                 animationTimer += 0.05;
@@ -152,7 +152,7 @@ export default class WebGLNodePreviewsRenderer {
             );
             this.gl.uniformMatrix4fv(this.transformMatrixUniformLoc!, false, transformMatrix);
             this.gl.drawArrays(this.gl.TRIANGLES, 0, XY_QUAD_VERTICES.length);
-        });
+        }
 
         this.gl.bindVertexArray(null);
     }

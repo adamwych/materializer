@@ -6,13 +6,9 @@ import { useMaterialStore } from "../stores/material";
 import { Material } from "../types/material";
 import { MaterialNodeEvent } from "../types/material-events";
 import { MaterialNode } from "../types/node";
+import { mapDictionary as mapMap } from "../utils/map";
 import { RenderWorkerCommand } from "./commands";
-import {
-    MinimalRenderableMaterialNodeSnapshot,
-    RenderableMaterialNodeSnapshot,
-    RenderableMaterialSnapshot,
-    WebGL2RenderWorker,
-} from "./types";
+import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
 
 // A re-type of `Worker`, because the original doesn't support specifying message type...
@@ -22,22 +18,24 @@ interface RenderWorker extends Omit<Worker, "postMessage"> {
     postMessage(command: RenderWorkerCommand, options?: StructuredSerializeOptions): void;
 }
 
+/**
+ * The primary purpose of this context is to manage the lifecycle of a render worker and
+ * expose a communication interface between the worker and the UI application.
+ *
+ * Rendering is done by a dedicated worker to which the engine sends commands defined
+ * in {@link RenderWorkerCommand}. Some commands send replies, but most are one-way.
+ *
+ * All changes made to the material through {@link MaterialStore} are tracked by the
+ * engine and synchronized with the worker by sending a snapshot of current state of
+ * the node that was modified. Once the worker receives an update, it will schedule
+ * a re-render of the modified node and its entire chain.
+ */
 export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() => {
     const materialStore = useMaterialStore()!;
     const blueprintStore = useNodeBlueprintsStore()!;
     let worker: RenderWorker | undefined;
 
-    function createMaterialSnapshot(material: Material): RenderableMaterialSnapshot {
-        const nodes: { [k: number]: RenderableMaterialNodeSnapshot } = {};
-        Object.values(material.nodes).forEach((node) => {
-            nodes[node.id] = createNodeSnapshot(node);
-        });
-        return {
-            nodes,
-        };
-    }
-
-    function createMinimalNodeSnapshot(node: MaterialNode): MinimalRenderableMaterialNodeSnapshot {
+    function createMinimalNodeSnapshot(node: MaterialNode): MinimalMaterialNodeSnapshot {
         return {
             node: unwrap(node),
             inputs: materialStore.getInputsMap(node),
@@ -45,7 +43,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
         };
     }
 
-    function createNodeSnapshot(node: MaterialNode): RenderableMaterialNodeSnapshot {
+    function createNodeSnapshot(node: MaterialNode): MaterialNodeSnapshot {
         return {
             ...createMinimalNodeSnapshot(node),
             blueprint: blueprintStore.getBlueprintByPath(node.path)!,
@@ -99,6 +97,9 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
          * UI which would require access to those resources is implemented directly
          * in the worker and is rendered using WebGL.
          *
+         * Returns a {@link WebGL2RenderWorker} object which can be used to send
+         * commands specific to this kind of worker.
+         *
          * @param canvas Canvas onto which the worker will render UI elements.
          * @param material Material that will be rendered.
          * @param runScheduler Whether worker should start its render job scheduler.
@@ -115,7 +116,9 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 {
                     command: "initialize",
                     canvas,
-                    material: createMaterialSnapshot(material),
+                    material: {
+                        nodes: mapMap(material.nodes, createNodeSnapshot),
+                    },
                     start: runScheduler,
                 },
                 [canvas],

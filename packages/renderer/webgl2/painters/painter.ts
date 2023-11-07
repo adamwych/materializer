@@ -1,4 +1,4 @@
-import { RenderableMaterialNodeSnapshot } from "../../types";
+import { MaterialNodeSnapshot } from "../../types";
 
 export type MaterialNodePainterType = "glsl" | "scatter" | "tile";
 
@@ -8,7 +8,7 @@ export type MaterialNodePainterType = "glsl" | "scatter" | "tile";
 export default interface MaterialNodePainter {
     render(
         gl: WebGL2RenderingContext,
-        node: RenderableMaterialNodeSnapshot,
+        node: MaterialNodeSnapshot,
         inputTextures: Map<string, WebGLTexture>,
     ): void;
 }

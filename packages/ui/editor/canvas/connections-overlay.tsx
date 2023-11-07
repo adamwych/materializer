@@ -21,7 +21,7 @@ export default function EditorCanvasConnectionsOverlay() {
         toSocketId: string;
     }) {
         const fromCoords = () => {
-            const node = material().nodes[fromNodeId];
+            const node = material().nodes.get(fromNodeId)!;
             const element = runtimeCache.getNodeSocketDOMElement(fromNodeId, fromSocketId);
             if (element) {
                 const top = node.y + element.offsetTop;
@@ -32,7 +32,7 @@ export default function EditorCanvasConnectionsOverlay() {
         };
 
         const toCoords = () => {
-            const node = material().nodes[toNodeId];
+            const node = material().nodes.get(toNodeId)!;
             const element = runtimeCache.getNodeSocketDOMElement(toNodeId, toSocketId);
             if (element) {
                 const top = node.y + element.offsetTop;

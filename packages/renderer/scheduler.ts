@@ -1,16 +1,16 @@
-import { RenderableMaterialSnapshot } from "./types";
+import { MaterialSnapshot } from "./types";
 
 export type SubmitRenderJobsCallback = (nodeIds: Array<number>) => void;
 
 export default class RenderJobScheduler {
     private readonly queue = new Set<number>();
 
-    constructor(private readonly material: RenderableMaterialSnapshot) {}
+    constructor(private readonly material: MaterialSnapshot) {}
 
     public start(callback: SubmitRenderJobsCallback) {
-        Object.values(this.material.nodes).forEach((snapshot) =>
-            this.scheduleChain(snapshot.node.id),
-        );
+        for (const snapshot of this.material.nodes.values()) {
+            this.scheduleChain(snapshot.node.id);
+        }
 
         requestAnimationFrame(() => this.tick(callback));
     }
@@ -76,12 +76,12 @@ export default class RenderJobScheduler {
     }
 
     private getInputNodes(nodeId: number): Array<number> {
-        const node = this.material.nodes[nodeId];
+        const node = this.material.nodes.get(nodeId);
         return node ? Array.from(node.inputs.values()).map((x) => x[0]) : [];
     }
 
     private getOutputNodes(nodeId: number): Array<number> {
-        const node = this.material.nodes[nodeId];
+        const node = this.material.nodes.get(nodeId);
         return node ? Array.from(node.outputs.values()).map((x) => x[0]) : [];
     }
 }

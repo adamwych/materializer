@@ -16,7 +16,7 @@ interface Props {
 
 export default function ExportDialogOutputNodesPanel(props: Props) {
     const allOutputNodes = () =>
-        Object.values(props.material.nodes).filter((x) => x.path === "materializer/output");
+        Array.from(props.material.nodes.values()).filter((x) => x.path === "materializer/output");
 
     function toggleOutputNode(node: MaterialNode) {
         if (props.selectedNodes.has(node.id)) {

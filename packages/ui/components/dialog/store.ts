@@ -41,6 +41,7 @@ export const [DialogsProvider, useDialogsStore] = createContextProvider(() => {
          * @param renderer Function that renders the dialog.
          */
         show(renderer: DialogRenderFn): DialogRef {
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             const store = this;
             const id = createUniqueId();
             const ref: DialogRef = {

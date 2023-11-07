@@ -1,20 +1,16 @@
-import {
-    MinimalRenderableMaterialNodeSnapshot,
-    RenderableMaterialNodeSnapshot,
-    RenderableMaterialSnapshot,
-} from "./types";
+import { MinimalMaterialNodeSnapshot, MaterialNodeSnapshot, MaterialSnapshot } from "./types";
 
 export type InitializeWorkerCommand = {
     command: "initialize";
     canvas: OffscreenCanvas;
-    material: RenderableMaterialSnapshot;
+    material: MaterialSnapshot;
     start: boolean;
 };
 
 export type SynchronizeNodeCommand = {
     command: "synchronizeNode";
     nodeId: number;
-    nodeSnapshot: RenderableMaterialNodeSnapshot | MinimalRenderableMaterialNodeSnapshot | null;
+    nodeSnapshot: MaterialNodeSnapshot | MinimalMaterialNodeSnapshot | null;
 };
 
 export type RenderNodeAndGetImageCommand = {

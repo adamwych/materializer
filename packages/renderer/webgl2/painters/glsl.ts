@@ -1,5 +1,5 @@
 import { MaterialNodePainterInfo } from "../../../types/node-painter";
-import { RenderableMaterialNodeSnapshot } from "../../types";
+import { MaterialNodeSnapshot } from "../../types";
 import MaterialNodeShaderProgram from "../node-shader";
 import MaterialNodePainter from "./painter";
 
@@ -33,7 +33,7 @@ export default class GLSLMaterialNodePainter implements MaterialNodePainter {
 
     public render(
         gl: WebGL2RenderingContext,
-        node: RenderableMaterialNodeSnapshot,
+        node: MaterialNodeSnapshot,
         inputTextures: ReadonlyMap<string, WebGLTexture>,
     ): void {
         this.shaderProgram.bind();

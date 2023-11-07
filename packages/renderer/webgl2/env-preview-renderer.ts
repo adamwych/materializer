@@ -2,7 +2,7 @@ import * as glMatrix from "gl-matrix";
 import { toRadians } from "../../utils/math";
 import { XZ_QUAD_VERTICES } from "../quads";
 import WebGLNodeRenderer from "./node-renderer";
-import { RenderableMaterialSnapshot } from "../types";
+import { MaterialSnapshot } from "../types";
 
 const VERTEX_SHADER_CODE = `
 #version 300 es
@@ -145,7 +145,7 @@ export default class WebGLEnvironmentalPreviewRenderer {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     }
 
-    public render(material: RenderableMaterialSnapshot) {
+    public render(material: MaterialSnapshot) {
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo!);
 
         this.gl.viewport(0, 0, this.envCanvas.width, this.envCanvas.height);
@@ -154,7 +154,7 @@ export default class WebGLEnvironmentalPreviewRenderer {
         this.gl.useProgram(this.shaderProgram!);
         this.gl.bindVertexArray(this.vao!);
 
-        const outputNodes = Object.values(material.nodes).filter(
+        const outputNodes = Array.from(material.nodes.values()).filter(
             ({ node }) => node.path === "materializer/output",
         );
         if (outputNodes.length > 0) {

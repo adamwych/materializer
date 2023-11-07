@@ -2,7 +2,7 @@ import * as glMatrix from "gl-matrix";
 import MaterialNodePainter from "./painter";
 import BlendMode from "../../../types/blend-mode";
 import MaterialNodeShaderProgram from "../node-shader";
-import { RenderableMaterialNodeSnapshot } from "../../types";
+import { MaterialNodeSnapshot } from "../../types";
 
 const FRAGMENT_SHADER_CODE = `
 #version 300 es
@@ -122,7 +122,7 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
 
     public render(
         gl: WebGL2RenderingContext,
-        node: RenderableMaterialNodeSnapshot,
+        node: MaterialNodeSnapshot,
         inputTextures: ReadonlyMap<string, WebGLTexture>,
     ): void {
         this.shaderProgram.bind();
@@ -182,5 +182,5 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
         this.shaderProgram.reset();
     }
 
-    public abstract generatePattern(node: RenderableMaterialNodeSnapshot): Array<PatternElement>;
+    public abstract generatePattern(node: MaterialNodeSnapshot): Array<PatternElement>;
 }

@@ -10,7 +10,7 @@ export const [EditorRuntimeCache, useEditorRuntimeCache] = createContextProvider
 
     return {
         getNodesWithinRect(rect: DOMRect) {
-            return Object.values(material.nodes).filter((node) => {
+            return Array.from(material.nodes.values()).filter((node) => {
                 const element = nodeElements.get(node.id);
                 return element ? rectIntersects(element.getBoundingClientRect(), rect) : false;
             });

@@ -1,5 +1,5 @@
 import { MaterialNodePainterInfo } from "../../types/node-painter";
-import { RenderableMaterialNodeSnapshot } from "../types";
+import { MaterialNodeSnapshot } from "../types";
 import GLSLMaterialNodePainter from "./painters/glsl";
 import MaterialNodePainter from "./painters/painter";
 import ScatterMaterialNodePainter from "./painters/scatter";
@@ -86,7 +86,7 @@ export default class WebGLNodeRenderer {
         return texture;
     }
 
-    public render(nodeSnapshot: RenderableMaterialNodeSnapshot) {
+    public render(nodeSnapshot: MaterialNodeSnapshot) {
         const gl = this.gl;
         const { node, blueprint } = nodeSnapshot;
         const painter = this.getNodePainter(node.id, blueprint.painter);
@@ -140,7 +140,7 @@ export default class WebGLNodeRenderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    public renderToImageData(nodeSnapshot: RenderableMaterialNodeSnapshot): ImageData {
+    public renderToImageData(nodeSnapshot: MaterialNodeSnapshot): ImageData {
         const gl = this.gl;
         const { node } = nodeSnapshot;
 

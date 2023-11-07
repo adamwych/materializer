@@ -1,9 +1,10 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { Accessor, createSignal } from "solid-js";
-import { unwrap } from "solid-js/store";
+import { createMutable, unwrap } from "solid-js/store";
 import { Material } from "../types/material";
 import { MaterialNode } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
+import { ReactiveMap } from "@solid-primitives/map";
 
 export type SerializedMaterialNode = {
     id: number;
@@ -39,7 +40,7 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
             version: 1,
             id: material.id,
             name: material.name,
-            nodes: Object.values(material.nodes).map((node) => ({
+            nodes: Array.from(material.nodes.values()).map((node) => ({
                 id: node.id,
                 name: node.name,
                 path: node.path,
@@ -58,17 +59,20 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
             throw new Error(`Unsupported material format version: ${material.version}`);
         }
 
-        const nodes: Record<number, MaterialNode> = {};
+        const nodes = new ReactiveMap<number, MaterialNode>();
         material.nodes.forEach((node) => {
-            nodes[node.id] = {
-                id: node.id,
-                name: node.name,
-                path: node.path,
-                parameters: structuredClone(node.parameters),
-                textureSize: node.textureSize,
-                x: node.x,
-                y: node.y,
-            };
+            nodes.set(
+                node.id,
+                createMutable({
+                    id: node.id,
+                    name: node.name,
+                    path: node.path,
+                    parameters: structuredClone(node.parameters),
+                    textureSize: node.textureSize,
+                    x: node.x,
+                    y: node.y,
+                }),
+            );
         });
 
         return {

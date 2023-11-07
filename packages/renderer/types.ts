@@ -1,15 +1,15 @@
 import { MaterialNode, MaterialNodeBlueprint } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
 
-export type RenderableMaterialSnapshot = {
-    nodes: { [k: number]: RenderableMaterialNodeSnapshot };
+export type MaterialSnapshot = {
+    nodes: Map<number, MaterialNodeSnapshot>;
 };
 
 /**
  * All details about a single material node that the worker needs
  * in order to be able to render that node.
  */
-export type RenderableMaterialNodeSnapshot = {
+export type MaterialNodeSnapshot = {
     /** The node itself. */
     node: MaterialNode;
 
@@ -25,15 +25,7 @@ export type RenderableMaterialNodeSnapshot = {
 
 // Minimal version is used for updates, since replacing the entire blueprint at once
 // is not supported anyway.
-export type MinimalRenderableMaterialNodeSnapshot = Omit<
-    RenderableMaterialNodeSnapshot,
-    "blueprint"
->;
-
-export type RenderProgressEvent = {
-    finishedJobs: number;
-    totalJobs: number;
-};
+export type MinimalMaterialNodeSnapshot = Omit<MaterialNodeSnapshot, "blueprint">;
 
 export interface WebGL2RenderWorker {
     /**

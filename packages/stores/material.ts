@@ -1,6 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createEmitter } from "@solid-primitives/event-bus";
-import { unwrap } from "solid-js/store";
+import { createMutable, unwrap } from "solid-js/store";
 import { MaterialEvents } from "../types/material-events";
 import { MaterialNode } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
@@ -33,9 +33,8 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                     parameters[info.id] = info.default;
                 });
 
-                const nextNodeId =
-                    Math.max(0, ...(Object.keys(material.nodes) as any as number[])) + 1;
-                material.nodes[nextNodeId] = {
+                const nextNodeId = Math.max(0, ...Array.from(material.nodes.keys())) + 1;
+                const node: MaterialNode = createMutable({
                     id: nextNodeId,
                     name: spec.name,
                     path: path,
@@ -43,17 +42,18 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                     y,
                     parameters,
                     textureSize: spec.preferredTextureSize,
-                };
+                });
+                material.nodes.set(nextNodeId, node);
 
                 events.emit("nodeAdded", {
-                    node: material.nodes[nextNodeId],
+                    node,
                 });
             });
         },
 
         moveNode(id: number, x: number, y: number) {
             workspace.modifyMaterial(material.id, (material) => {
-                const node = material.nodes[id];
+                const node = material.nodes.get(id);
                 if (node) {
                     node.x = clamp(node.x + x, 0, EDITOR_GRAPH_WIDTH - EDITOR_NODE_WIDTH);
                     node.y = clamp(node.y + y, 0, EDITOR_GRAPH_HEIGHT - EDITOR_NODE_HEIGHT);
@@ -64,23 +64,24 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
 
         removeNode(id: number) {
             workspace.modifyMaterial(material.id, (material) => {
-                const node = material.nodes[id];
+                const node = material.nodes.get(id);
+                if (node) {
+                    material.nodes.delete(id);
 
-                delete material.nodes[id];
+                    material.connections = material.connections.filter((connection) => {
+                        return connection.from[0] !== id && connection.to[0] !== id;
+                    });
 
-                material.connections = material.connections.filter((connection) => {
-                    return connection.from[0] !== id && connection.to[0] !== id;
-                });
-
-                events.emit("nodeRemoved", {
-                    node,
-                });
+                    events.emit("nodeRemoved", {
+                        node,
+                    });
+                }
             });
         },
 
         setNodeParameter<T>(nodeId: number, parameterId: string, value: T) {
             workspace.modifyMaterial(material.id, (material) => {
-                const node = material.nodes[nodeId];
+                const node = material.nodes.get(nodeId);
                 if (node) {
                     node.parameters[parameterId] = value;
                     events.emit("nodeParameterChanged", {
@@ -143,9 +144,9 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 });
 
                 // TODO: Maybe a single `nodeConnectionAdded` event would be better?
-                events.emit("nodeConnectionsChanged", { node: this.getNodeById(sourceNodeId) });
+                events.emit("nodeConnectionsChanged", { node: this.getNodeById(sourceNodeId)! });
                 events.emit("nodeConnectionsChanged", {
-                    node: this.getNodeById(destinationNodeId),
+                    node: this.getNodeById(destinationNodeId)!,
                 });
             });
         },
@@ -175,7 +176,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         },
 
         getNodeById(id: number) {
-            return material.nodes[id];
+            return material.nodes.get(id);
         },
 
         getNodeBlueprint(nodeId: number) {
@@ -201,3 +202,5 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         },
     };
 });
+
+export type MaterialStore = NonNullable<ReturnType<typeof useMaterialStore>>;
