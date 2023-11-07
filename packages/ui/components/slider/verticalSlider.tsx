@@ -42,7 +42,7 @@ export default function VerticalSlider(props: SliderProps) {
                     width: styles().handleSize[0] + "px",
                     height: styles().handleSize[1] + "px",
                     bottom: `${(mappedValue() / props.max) * 100}%`,
-                    transform: `translate(-${styles().handleOffset[0]}px, ${
+                    transform: `translate(-${styles().handleOffset[0] + 1}px, ${
                         styles().handleOffset[1]
                     }px)`,
                 }}

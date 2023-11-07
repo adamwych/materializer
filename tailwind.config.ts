@@ -3,7 +3,7 @@ export default {
     safelist: [
         {
             pattern:
-                /(text|bg|border)-(white|black|gray|red|green|blue|washed-red|washed-green|washed-blue)-(100|200|300|400|500|600|700|800)/,
+                /(text|bg|border)-(white|black|gray|red|green|blue|washed-red|washed-green|washed-blue)-(0|100|200|300|400|500|600|700|800)/,
             variants: ["hover", "active", "group-hover"],
         },
     ],
@@ -48,17 +48,20 @@ export default {
                 500: "#206ded",
             },
             "washed-red": {
+                0: "#211414",
                 500: "#6e4646",
                 700: "#a46363",
                 800: "#c17878",
                 900: "#faacac",
             },
             "washed-green": {
+                0: "#1d2618",
                 500: "#536e46",
                 700: "#64a463",
                 800: "#78c184",
             },
             "washed-blue": {
+                0: "#13171e",
                 500: "#46556e",
                 700: "#637ea4",
                 800: "#788dc1",

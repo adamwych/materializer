@@ -43,7 +43,7 @@ export default function HorizontalSlider(props: SliderProps) {
                     height: styles().handleSize[0] + "px",
                     left: `${(mappedValue() / props.max) * 100}%`,
                     transform: `translate(-${styles().handleOffset[1]}px, -${
-                        styles().handleOffset[0]
+                        styles().handleOffset[0] + 1
                     }px)`,
                 }}
             ></div>
