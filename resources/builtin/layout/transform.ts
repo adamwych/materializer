@@ -150,5 +150,5 @@ export default {
             out_color = texture(i_in, uv);
         }`.trim(),
     },
-    preferredTextureSize: 512,
+    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;

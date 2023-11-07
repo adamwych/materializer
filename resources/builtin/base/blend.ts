@@ -83,5 +83,5 @@ export default {
             out_color.a = 1.0;
         }`.trim(),
     },
-    preferredTextureSize: 512,
+    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;

@@ -34,5 +34,5 @@ export default {
             out_color = 1.0 - texture(i_colorIn, a_texCoord);
         }`.trim(),
     },
-    preferredTextureSize: 512,
+    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;

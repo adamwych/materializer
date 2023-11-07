@@ -84,5 +84,5 @@ export default {
             out_color = vec4(0.5 + 0.5 * vec3(n, n, n), 1.0);
         }`.trim(),
     },
-    preferredTextureSize: 512,
+    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;
