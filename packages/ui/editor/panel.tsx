@@ -37,7 +37,12 @@ export default function EditorPanel() {
                     >
                         <EditorAddNodePopup />
 
-                        <div class="flex w-full h-full">
+                        <div
+                            class="flex w-full"
+                            style={{
+                                height: "calc(100vh - 36px - 36px)",
+                            }}
+                        >
                             <EditorCanvas class="flex-1" material={material!} />
 
                             <div class="flex flex-col justify-between bg-gray-100">

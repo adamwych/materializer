@@ -6,10 +6,10 @@ export default function InspectorMaterialParameters() {
     const materialStore = useMaterialStore()!;
 
     return (
-        <>
-            <PanelSection label="Material">
+        <PanelSection label="Material">
+            <div class="p-4">
                 <TextInput value={materialStore.getName()} onInput={materialStore.setName} />
-            </PanelSection>
-        </>
+            </div>
+        </PanelSection>
     );
 }

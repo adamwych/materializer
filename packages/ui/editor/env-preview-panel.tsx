@@ -2,6 +2,7 @@ import { onMount } from "solid-js";
 import { useRenderEngine } from "../../renderer/engine";
 import makeDragListener from "../../utils/makeDragListener";
 import { toRadians } from "../../utils/math";
+import PanelSection from "../components/panel/section";
 
 export default function EditorEnvironmentPreviewPanel() {
     let rotationX = toRadians(225);
@@ -27,7 +28,7 @@ export default function EditorEnvironmentPreviewPanel() {
     }
 
     return (
-        <div>
+        <PanelSection label="Preview">
             <canvas
                 ref={(e) => onMount(() => initialize(e))}
                 class="w-full"
@@ -36,6 +37,6 @@ export default function EditorEnvironmentPreviewPanel() {
                 onPointerDown={onPointerDown}
                 onWheel={onWheel}
             />
-        </div>
+        </PanelSection>
     );
 }
