@@ -1,0 +1,100 @@
+import { createContextProvider } from "@solid-primitives/context";
+import { createSignal } from "solid-js";
+import { createStore, produce } from "solid-js/store";
+import { Material } from "../types/material";
+
+export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() => {
+    const [materials, setMaterials] = createStore<Array<Material>>([]);
+    const [activeMaterialId, setActiveMaterialId] = createSignal<string>();
+
+    return {
+        /**
+         * Adds a material to the workspace and opens its editor tab.
+         * Any further changes to this material must be made through the
+         * `modifyMaterial` method.
+         *
+         * @param material Material to add.
+         */
+        addMaterial(material: Material) {
+            const alreadyInWorkspace = materials.some((x) => x.id === material.id);
+            if (!alreadyInWorkspace) {
+                setMaterials(
+                    produce((materials) => {
+                        materials.push(material);
+                    }),
+                );
+            }
+
+            setActiveMaterialId(material.id);
+        },
+
+        /**
+         * Modifies a material by given ID.
+         *
+         * @param materialId ID of the material to modify.
+         * @param setter A function that modifies the material.
+         */
+        modifyMaterial(materialId: string, setter: (current: Material) => void) {
+            setMaterials(
+                produce((materials) => {
+                    const material = materials.find((x) => x.id === materialId);
+                    if (material) {
+                        const previousId = material.id;
+
+                        setter(material);
+
+                        if (material.id !== previousId) {
+                            throw new Error("Changing material's ID is not allowed.");
+                        }
+                    }
+                }),
+            );
+        },
+
+        /**
+         * Deletes material by given ID from the workspace.
+         * If this material was currently being edited by the user, the
+         * active tab will be changed to another material from this workspace.
+         *
+         * @param materialId ID of the material to delete.
+         */
+        deleteMaterial(materialId: string) {
+            if (this.isActiveMaterial(materialId)) {
+                const materialIndex = materials.findIndex((x) => x.id === materialId);
+
+                // If this is the last material in this workspace, then
+                // just close the editor.
+                if (materials.length === 1) {
+                    setActiveMaterialId(undefined);
+                } else {
+                    const closestMaterialIndex = materialIndex === 0 ? 1 : materialIndex - 1;
+                    setActiveMaterialId(materials[closestMaterialIndex].id);
+                }
+            }
+
+            setMaterials((materials) => materials.filter((x) => x.id !== materialId));
+        },
+
+        getActiveMaterial(): Readonly<Material> | undefined {
+            return materials.find((x) => x.id === activeMaterialId());
+        },
+
+        /**
+         * Returns whether material by given ID is the active one.
+         *
+         * @param materialId
+         * @returns
+         */
+        isActiveMaterial(materialId: string) {
+            return activeMaterialId() === materialId;
+        },
+
+        /**
+         * Returns a list of all materials within this workspace.
+         * @returns
+         */
+        getMaterials(): ReadonlyArray<Material> {
+            return materials;
+        },
+    };
+});

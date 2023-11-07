@@ -18,7 +18,7 @@
         "noFallthroughCasesInSwitch": true,
         "types": ["@types/wicg-file-system-access"]
     },
-    "include": ["src"],
+    "include": ["packages"],
     "references": [
         {
             "path": "./tsconfig.node.json"

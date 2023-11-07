@@ -1,44 +1,5 @@
-import { PluginAPI } from "tailwindcss/types/config";
-import * as culori from "culori";
-
-function hexToRGB(hex: string) {
-    let { r, g, b } = culori.parseHex(hex) as culori.Rgb;
-    r = Math.round(r * 255);
-    g = Math.round(g * 255);
-    b = Math.round(b * 255);
-    return `${r}, ${g}, ${b}`;
-}
-
-function exportColorsAsCSSVariables(api: PluginAPI) {
-    const properties: { [k: string]: any } = {};
-
-    Object.entries(api.theme("colors")!).forEach(([name, values]) => {
-        if (typeof values === "object") {
-            Object.entries(values!).forEach((entry) => {
-                const weight = entry[0];
-                const value = entry[1] as string;
-                properties[`--color-${name}-${weight}`] = value;
-
-                if (value[0].startsWith("#")) {
-                    properties[`--color-${name}-${weight}-rgb`] = hexToRGB(value);
-                }
-            });
-        } else {
-            properties[`--color-${name}`] = values;
-
-            if (values.startsWith("#")) {
-                properties[`--color-${name}-rgb`] = hexToRGB(values);
-            }
-        }
-    });
-
-    api.addBase({
-        ":root": properties,
-    });
-}
-
 export default {
-    content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+    content: ["./index.html", "./packages/**/*.{js,ts,jsx,tsx}"],
     safelist: [
         {
             pattern:
@@ -47,6 +8,17 @@ export default {
         },
     ],
     theme: {
+        fontFamily: {
+            sans: '"Noto Sans", Arial, Helvetica, sans-serif',
+        },
+        fontSize: {
+            xs: "0.85rem",
+            sm: "0.95rem",
+            base: "1rem",
+            md: "1.05rem",
+            lg: "1.125rem",
+            xl: "1.25rem",
+        },
         extend: {
             boxShadow: {
                 md: "0px 10px 40px -10px rgba(0, 0, 0, 0.5)",
@@ -93,5 +65,4 @@ export default {
             },
         },
     },
-    plugins: [exportColorsAsCSSVariables],
 };
