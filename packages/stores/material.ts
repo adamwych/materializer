@@ -189,5 +189,15 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         getMaterial() {
             return material;
         },
+
+        setName(name: string) {
+            workspace.modifyMaterial(material.id, (material) => {
+                material.name = name;
+            });
+        },
+
+        getName() {
+            return material.name;
+        },
     };
 });
