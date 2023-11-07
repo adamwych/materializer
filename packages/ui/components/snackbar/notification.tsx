@@ -1,7 +1,7 @@
 import { TailwindColorName } from "../../../types/tailwind.ts";
 import { SnackbarNotificationInfo } from "./context.ts";
 
-const colors: { [k: string]: TailwindColorName } = {
+const colors: Record<string, TailwindColorName> = {
     success: "washed-green",
     error: "washed-red",
     info: "washed-blue",

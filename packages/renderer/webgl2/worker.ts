@@ -15,7 +15,10 @@ let jobScheduler: RenderJobScheduler;
 
 function renderQueuedNodes(nodeIds: Array<number>) {
     nodeIds.forEach((id) => {
-        nodeRenderer.render(material.nodes[id]);
+        const node = material.nodes[id];
+        if (node) {
+            nodeRenderer.render(node);
+        }
     });
 
     nodePreviewsRenderer.render(material);

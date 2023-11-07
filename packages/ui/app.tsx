@@ -7,6 +7,8 @@ import { WorkspaceProvider } from "../stores/workspace.ts";
 import AppMenuBar from "./app-menu-bar.tsx";
 import DialogsOutlet from "./components/dialog/outlet.tsx";
 import { DialogsProvider } from "./components/dialog/store.ts";
+import SnackbarsOutlet from "./components/snackbar/container.tsx";
+import { SnackbarProvider } from "./components/snackbar/context.ts";
 import EditorPanel from "./editor/panel.tsx";
 import "./scss/_main.scss";
 
@@ -14,6 +16,7 @@ function App() {
     return (
         <MultiProvider
             values={[
+                SnackbarProvider,
                 DialogsProvider,
                 NodeBlueprintsProvider,
                 UserDataStorageProvider,
@@ -22,6 +25,7 @@ function App() {
             ]}
         >
             <DialogsOutlet />
+            <SnackbarsOutlet />
 
             <div class="w-full h-full flex flex-col overflow-hidden">
                 <AppMenuBar />

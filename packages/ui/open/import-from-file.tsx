@@ -1,11 +1,13 @@
 import { RiSystemErrorWarningFill, RiSystemUpload2Fill } from "solid-icons/ri";
 import { Show, createSignal } from "solid-js";
-import { useWorkspaceContext } from "../../workspace-context";
-import { SerializedMaterial, useWorkspaceStorage } from "../../workspace-storage.ts";
+import { SerializedMaterial, useUserDataStorage } from "../../stores/storage.ts";
+import { useWorkspaceStore } from "../../stores/workspace.ts";
+import { useDialogsStore } from "../components/dialog/store.ts";
 
-export default function ImportMaterialFromFilePanel({ onClose }: { onClose(): void }) {
-    const workspace = useWorkspaceContext()!;
-    const workspaceStorage = useWorkspaceStorage()!;
+export default function ImportMaterialFromFilePanel() {
+    const workspace = useWorkspaceStore()!;
+    const userDataStorage = useUserDataStorage()!;
+    const dialogs = useDialogsStore()!;
     const [importError, setImportError] = createSignal();
     let inputElement: HTMLInputElement;
 
@@ -20,9 +22,9 @@ export default function ImportMaterialFromFilePanel({ onClose }: { onClose(): vo
         reader.onloadend = () => {
             try {
                 const serialized = JSON.parse(reader.result as string) as SerializedMaterial;
-                const material = workspaceStorage.deserializeMaterial(serialized);
-                workspace.openMaterial(material);
-                onClose();
+                const material = userDataStorage.deserializeMaterial(serialized);
+                workspace.addMaterial(material);
+                dialogs.pop();
             } catch (error) {
                 setImportError(error);
             }

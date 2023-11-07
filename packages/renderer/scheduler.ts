@@ -77,11 +77,11 @@ export default class RenderJobScheduler {
 
     private getInputNodes(nodeId: number): Array<number> {
         const node = this.material.nodes[nodeId];
-        return Array.from(node.inputs.values()).map((x) => x[0]);
+        return node ? Array.from(node.inputs.values()).map((x) => x[0]) : [];
     }
 
     private getOutputNodes(nodeId: number): Array<number> {
         const node = this.material.nodes[nodeId];
-        return Array.from(node.outputs.values()).map((x) => x[0]);
+        return node ? Array.from(node.outputs.values()).map((x) => x[0]) : [];
     }
 }

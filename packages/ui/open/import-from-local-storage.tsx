@@ -1,13 +1,15 @@
 import { RiSystemDeleteBinLine } from "solid-icons/ri";
-import { For } from "solid-js";
-import { useWorkspaceContext } from "../../workspace-context";
-import { useWorkspaceStorage } from "../../workspace-storage.ts";
+import { For, Show } from "solid-js";
+import { useWorkspaceStore } from "../../stores/workspace";
+import { useUserDataStorage } from "../../stores/storage";
+import { useDialogsStore } from "../components/dialog/store";
 
-export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClose(): void }) {
-    const workspace = useWorkspaceContext()!;
-    const workspaceStorage = useWorkspaceStorage()!;
+export default function ImportMaterialFromLocalStoragePanel() {
+    const workspace = useWorkspaceStore()!;
+    const userDataStorage = useUserDataStorage()!;
+    const dialogs = useDialogsStore()!;
     const sortedMaterials = () => {
-        return Array.from(workspaceStorage.savedMaterials().values()).sort(
+        return Array.from(userDataStorage.savedMaterials().values()).sort(
             (a, b) => b.savedAt - a.savedAt,
         );
     };
@@ -15,6 +17,13 @@ export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClo
     return (
         <>
             <div class="text-md font-semibold mb-2">Local storage</div>
+
+            <Show when={sortedMaterials().length === 0}>
+                <span class="text-gray-800">
+                    There are no materials in your local storage, yet.
+                </span>
+            </Show>
+
             <div class="flex flex-wrap">
                 <For each={sortedMaterials()}>
                     {(material) => (
@@ -23,10 +32,10 @@ export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClo
                                 <div
                                     class="p-3 flex-1 hover:bg-gray-200 active:bg-gray-100 rounded-md"
                                     onClick={() => {
-                                        workspace.openMaterial(
-                                            workspaceStorage.getMaterialById(material.id)!,
+                                        workspace.addMaterial(
+                                            userDataStorage.getMaterialById(material.id)!,
                                         );
-                                        onClose();
+                                        dialogs.pop();
                                     }}
                                 >
                                     <div class="text-sm font-semibold">{material.name}</div>
@@ -37,7 +46,7 @@ export default function ImportMaterialFromLocalStoragePanel({ onClose }: { onClo
 
                                 <div
                                     class="p-2 mx-2 hover:bg-gray-200 active:bg-gray-100 rounded-md"
-                                    onClick={() => workspaceStorage.removeMaterial(material.id)}
+                                    onClick={() => userDataStorage.removeMaterial(material.id)}
                                 >
                                     <RiSystemDeleteBinLine size={16} />
                                 </div>
