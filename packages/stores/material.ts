@@ -82,13 +82,80 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 material.nodes.set(id, node);
 
                 if (emitEvent) {
-                    events.emit("nodeAdded", {
-                        node,
-                    });
+                    events.emit("nodeAdded", { node });
                 }
             });
 
             return node;
+        },
+
+        /**
+         * Adds a new node using the same blueprint as specified node and
+         * copies all parameters from the original node to the new one.
+         *
+         * Edges from or to this node will not be duplicated.
+         *
+         * @param nodeId
+         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: true)
+         * @return Added node or `undefined` if original node does not exist.
+         */
+        duplicateNode(nodeId: number, emitEvent = true): MaterialNode | undefined {
+            let newNode: MaterialNode | undefined;
+
+            modifyNode(nodeId, (node) => {
+                newNode = this.instantiateNode(node.path, node.x + 64, node.y + 64, false);
+                newNode.parameters = structuredClone(unwrap(node.parameters));
+                if (emitEvent) {
+                    events.emit("nodeAdded", { node: newNode });
+                }
+            });
+
+            return newNode;
+        },
+
+        /**
+         * Duplicates a set of nodes and all edges connecthing them together.
+         *
+         * @param nodeIds
+         * @returns
+         */
+        duplicateNodes(nodeIds: Array<number>): Array<MaterialNode> {
+            const duplicatedNodes: Array<MaterialNode | undefined> = [];
+
+            // Duplicating nodes and edges must be done is separate stages
+            // because we can not guarantee that the order of nodes in `nodeIds`
+            // is correct.
+
+            nodeIds.forEach((nodeId) => {
+                duplicatedNodes.push(this.duplicateNode(nodeId));
+            });
+
+            nodeIds.forEach((originalNodeId, i) => {
+                const duplicatedNode = duplicatedNodes[i];
+                if (!duplicatedNode) {
+                    return;
+                }
+
+                material.connections
+                    .filter((edge) => edge.from[0] === originalNodeId)
+                    .forEach((edge) => {
+                        // Find corresponding destination node.
+                        const destinationNodeIdx = nodeIds.indexOf(edge.to[0]);
+                        const duplicatedDestinationNode = duplicatedNodes[destinationNodeIdx];
+
+                        // If the destination node was not duplicated then skip this edge.
+                        if (!duplicatedDestinationNode) {
+                            return;
+                        }
+
+                        this.addEdge({
+                            from: [duplicatedNode.id, edge.from[1]],
+                            to: [duplicatedDestinationNode.id, edge.to[1]],
+                        });
+                    });
+            });
+
+            return duplicatedNodes.filter((x): x is MaterialNode => !!x);
         },
 
         /**
@@ -131,9 +198,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                     });
 
                     if (emitEvent) {
-                        events.emit("nodeRemoved", {
-                            node,
-                        });
+                        events.emit("nodeRemoved", { node });
                     }
                 }
             });
@@ -152,9 +217,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 node.parameters[parameterId] = value;
 
                 if (emitEvent) {
-                    events.emit("nodeParameterChanged", {
-                        node,
-                    });
+                    events.emit("nodeParameterChanged", { node });
                 }
             });
         },

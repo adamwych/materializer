@@ -37,4 +37,16 @@ export default function registerEditorCanvasShortcuts() {
             });
         },
     });
+
+    handler.add({
+        key: "d",
+        ctrl: true,
+        scope: "editor",
+        handler: () => {
+            const ids = [...selection.selectedNodes()];
+            selection.clear();
+            const addedNodes = materialActions.duplicateNodes(ids).map((x) => x!.id);
+            selection.setSelectedNodes(addedNodes);
+        },
+    });
 }

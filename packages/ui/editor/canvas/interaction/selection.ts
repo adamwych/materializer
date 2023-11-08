@@ -82,7 +82,9 @@ export const [EditorSelectionManager, useEditorSelectionManager] = createContext
         },
 
         multiselectRect,
+
         selectedNodes,
+        setSelectedNodes,
 
         snapToGrid,
         setSnapToGrid,
