@@ -105,6 +105,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 }
             } else {
                 nodeRenderer.clearNodeCache(ev.data.nodeId);
+                nodeThumbnailsRenderer.clearNodeTransformCache(ev.data.nodeId);
                 jobScheduler.scheduleOutputs(ev.data.nodeId, true);
                 material.nodes.delete(ev.data.nodeId);
 
