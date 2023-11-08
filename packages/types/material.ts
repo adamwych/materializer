@@ -39,7 +39,7 @@ export function createEmptyMaterial(): Material {
                     id: 0,
                     name: "Solid color",
                     path: "materializer/solid-color",
-                    x: EDITOR_GRAPH_WIDTH / 2 - 128,
+                    x: EDITOR_GRAPH_WIDTH / 2 - 64 - 128,
                     y: EDITOR_GRAPH_HEIGHT / 2 - 64,
                     parameters: {
                         color: [0.27, 0.27, 1],
@@ -53,7 +53,7 @@ export function createEmptyMaterial(): Material {
                     id: 1,
                     name: "Output",
                     path: "materializer/output",
-                    x: EDITOR_GRAPH_WIDTH / 2 + 128,
+                    x: EDITOR_GRAPH_WIDTH / 2 - 64 + 128,
                     y: EDITOR_GRAPH_HEIGHT / 2 - 64,
                     parameters: {
                         color: [1, 0, 0],
