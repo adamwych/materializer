@@ -26,6 +26,7 @@ export default {
             zIndex: {
                 dialog: "90",
                 snackbars: "100",
+                menubar: "110",
             },
         },
         colors: {

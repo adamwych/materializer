@@ -58,7 +58,7 @@ export default function MenuBarSubmenu(props: ParentProps<Props>) {
                         "border border-gray-300",
                         "rounded-md m-1",
                         "animate-fade-scale-in origin-top-left",
-                        "z-10",
+                        "z-menubar",
                     )}
                 >
                     <EventContextProvider handle={onItemEvent}>
