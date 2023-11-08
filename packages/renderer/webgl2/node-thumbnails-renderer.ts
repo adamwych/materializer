@@ -36,7 +36,7 @@ void main(void) {
     outColor.a = uAlpha;
 }`;
 
-export default class WebGLNodePreviewsRenderer {
+export default class WebGLNodeThumbnailsRenderer {
     private shaderProgram?: WebGLProgram;
     private vao?: WebGLVertexArrayObject;
     private vbo?: WebGLBuffer;

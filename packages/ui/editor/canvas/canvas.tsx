@@ -10,7 +10,7 @@ import { useEditorCameraState } from "./interaction/camera";
 import { useEditorInteractionManager } from "./interaction/manager";
 import registerEditorCanvasShortcuts from "./interaction/shortcuts";
 import EditorCanvasMultiselectRect from "./multiselect-rect";
-import EditorNodePreviewsCanvas from "./node-previews-canvas";
+import EditorNodeThumbnailsCanvas from "./node-thumbnails-canvas";
 import EditorCanvasNodes from "./nodes";
 
 type Props = {
@@ -32,7 +32,7 @@ export default function EditorCanvas(props: Props) {
             onPointerDown={interactionManager.onPointerDown}
             onWheel={interactionManager.onWheel}
         >
-            <EditorNodePreviewsCanvas />
+            <EditorNodeThumbnailsCanvas />
             <EditorCanvasMultiselectRect />
             <EditorCanvasControls />
 

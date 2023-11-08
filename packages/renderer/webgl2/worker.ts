@@ -2,7 +2,7 @@ import { RenderWorkerCommand } from "../commands";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
 import WebGLEnvironmentalPreviewRenderer from "./env-preview-renderer";
-import WebGLNodePreviewsRenderer from "./node-previews-renderer";
+import WebGLNodeThumbnailsRenderer from "./node-thumbnails-renderer";
 import WebGLNodeRenderer from "./node-renderer";
 
 /**
@@ -24,7 +24,7 @@ let canvas: OffscreenCanvas;
 let gl: WebGL2RenderingContext;
 let material: MaterialSnapshot;
 let nodeRenderer: WebGLNodeRenderer;
-let nodePreviewsRenderer: WebGLNodePreviewsRenderer;
+let nodeThumbnailsRenderer: WebGLNodeThumbnailsRenderer;
 let envPreviewRenderer: WebGLEnvironmentalPreviewRenderer;
 let jobScheduler: RenderJobScheduler;
 
@@ -36,7 +36,7 @@ function renderQueuedNodes(nodeIds: Array<number>) {
         }
     });
 
-    nodePreviewsRenderer.render(material);
+    nodeThumbnailsRenderer.render(material);
     envPreviewRenderer?.render(material);
 }
 
@@ -51,7 +51,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             nodeRenderer = new WebGLNodeRenderer(gl);
-            nodePreviewsRenderer = new WebGLNodePreviewsRenderer(canvas, gl, nodeRenderer);
+            nodeThumbnailsRenderer = new WebGLNodeThumbnailsRenderer(canvas, gl, nodeRenderer);
 
             jobScheduler = new RenderJobScheduler(material);
 
@@ -86,7 +86,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                     if (justMoved) {
                         // If we don't schedule any render job for this node then
                         // the preview will not update, so we must update it manually.
-                        nodePreviewsRenderer.render(material);
+                        nodeThumbnailsRenderer.render(material);
                     } else {
                         jobScheduler.scheduleOutputs(ev.data.nodeId);
                     }
@@ -111,7 +111,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 // It seems like sometimes the preview is not updated after
                 // removing a node. It's possible that the scheduler callback
                 // runs right before `delete`. Very difficult to reproduce.
-                nodePreviewsRenderer.render(material);
+                nodeThumbnailsRenderer.render(material);
             }
 
             break;
@@ -141,14 +141,14 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
         case "setEditorUIViewportSize": {
             canvas.width = ev.data.width;
             canvas.height = ev.data.height;
-            nodePreviewsRenderer.updateCameraMatrix();
-            nodePreviewsRenderer.render(material);
+            nodeThumbnailsRenderer.updateCameraMatrix();
+            nodeThumbnailsRenderer.render(material);
             break;
         }
 
         case "setEditorUITransform": {
-            nodePreviewsRenderer.updateCamera(ev.data.x, ev.data.y, ev.data.scale);
-            nodePreviewsRenderer.render(material);
+            nodeThumbnailsRenderer.updateCamera(ev.data.x, ev.data.y, ev.data.scale);
+            nodeThumbnailsRenderer.render(material);
             break;
         }
 

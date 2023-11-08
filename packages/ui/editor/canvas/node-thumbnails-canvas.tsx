@@ -5,7 +5,7 @@ import { useWorkspaceStore } from "../../../stores/workspace";
 import { useEditorCameraState } from "./interaction/camera";
 import { WebGL2RenderWorker } from "../../../renderer/types";
 
-export default function EditorNodePreviewsCanvas() {
+export default function EditorNodeThumbnailsCanvas() {
     const workspaceManager = useWorkspaceStore()!;
     const renderEngine = useRenderEngine()!;
     const cameraState = useEditorCameraState()!;
