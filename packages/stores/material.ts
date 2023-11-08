@@ -104,6 +104,8 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
 
             modifyNode(nodeId, (node) => {
                 newNode = this.instantiateNode(node.path, node.x + 64, node.y + 64, false);
+                newNode.name = node.name + " (Copy)";
+                newNode.textureSize = node.textureSize;
                 newNode.parameters = structuredClone(unwrap(node.parameters));
                 if (emitEvent) {
                     events.emit("nodeAdded", { node: newNode });
