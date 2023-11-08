@@ -115,6 +115,11 @@ export default class WebGLEnvironmentalPreviewRenderer {
             this.shaderProgram,
             "uTransformMatrix",
         )!;
+
+        this.transformMatrixUniformLoc = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "uTransformMatrix",
+        )!;
     }
 
     private initializeQuad() {

@@ -3,10 +3,10 @@ import { useNodeBlueprintsStore } from "../../../stores/blueprints";
 import { MaterialNode } from "../../../types/node";
 import cn from "../../../utils/cn";
 import { EDITOR_NODE_HEIGHT, EDITOR_NODE_WIDTH } from "../consts";
+import { useEditorRuntimeCache } from "./cache";
 import { useEditorInteractionManager } from "./interaction/manager";
 import { useEditorSelectionManager } from "./interaction/selection";
 import EditorCanvasNodeSocket from "./node-socket";
-import { useEditorRuntimeCache } from "./cache";
 
 type Props = {
     node: MaterialNode;
@@ -48,7 +48,7 @@ export default function EditorCanvasNodeBox(props: Props) {
                         "rounded-t-md",
                     )}
                     style={{
-                        transition: "all 70ms, backdrop-filter 0ms",
+                        transition: "all 70ms",
                     }}
                 >
                     <div class="whitespace-nowrap text-ellipsis overflow-hidden">

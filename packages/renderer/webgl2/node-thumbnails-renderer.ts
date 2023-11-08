@@ -1,9 +1,7 @@
 import * as glMatrix from "gl-matrix";
 import { XY_QUAD_VERTICES } from "../quads";
+import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
 import WebGLNodeRenderer from "./node-renderer";
-import { easingSmoothstep } from "culori";
-import { clamp } from "../../utils/math";
-import { MaterialSnapshot } from "../types";
 
 const VERTEX_SHADER_CODE = `
 #version 300 es
@@ -33,7 +31,6 @@ out vec4 outColor;
 
 void main(void) {
     outColor = texture(uNodeTexture, vTexCoords);
-    outColor.a = uAlpha;
 }`;
 
 export default class WebGLNodeThumbnailsRenderer {
@@ -41,7 +38,7 @@ export default class WebGLNodeThumbnailsRenderer {
     private vao?: WebGLVertexArrayObject;
     private vbo?: WebGLBuffer;
     private transformMatrixUniformLoc?: WebGLUniformLocation;
-    private enterAnimationTimers = new Map<number, number>();
+    private nodeTransformMatrixCache = new Map<number, glMatrix.mat4>();
 
     private cameraMatrix = glMatrix.mat4.create();
     private cameraOffsetX = 0;
@@ -116,29 +113,10 @@ export default class WebGLNodeThumbnailsRenderer {
         this.gl.useProgram(this.shaderProgram!);
         this.gl.bindVertexArray(this.vao!);
 
-        const nodeSize = 128;
-
+        const temporaryMatrix = glMatrix.mat4.create();
         for (const snapshot of material.nodes.values()) {
-            let animationTimer = clamp(this.enterAnimationTimers.get(snapshot.node.id) ?? 0, 0, 1);
-            if (animationTimer < 1) {
-                animationTimer += 0.05;
-                requestAnimationFrame(() => {
-                    this.render(material);
-                });
-            }
-            this.enterAnimationTimers.set(snapshot.node.id, animationTimer);
-            const scaleMultiplier = 0.95 + (1 - 0.95) * easingSmoothstep(animationTimer);
-
-            const transformMatrix = glMatrix.mat4.mul(
-                glMatrix.mat4.create(),
-                this.cameraMatrix,
-                glMatrix.mat4.fromRotationTranslationScale(
-                    glMatrix.mat4.create(),
-                    glMatrix.quat.create(),
-                    [snapshot.node.x + nodeSize / 2, snapshot.node.y + nodeSize / 2, 0],
-                    [(nodeSize / 2) * scaleMultiplier, (nodeSize / 2) * scaleMultiplier, 1],
-                ),
-            );
+            const transformMatrix = this.getNodeTransformMatrix(snapshot);
+            glMatrix.mat4.mul(temporaryMatrix, this.cameraMatrix, transformMatrix);
 
             const texture = this.nodeRenderer.getNodeOutputTexture(snapshot.node.id);
             if (texture) {
@@ -149,15 +127,32 @@ export default class WebGLNodeThumbnailsRenderer {
                 this.gl.bindTexture(this.gl.TEXTURE_2D, null);
             }
 
-            this.gl.uniform1f(
-                this.gl.getUniformLocation(this.shaderProgram!, "uAlpha"),
-                animationTimer,
-            );
-            this.gl.uniformMatrix4fv(this.transformMatrixUniformLoc!, false, transformMatrix);
+            this.gl.uniformMatrix4fv(this.transformMatrixUniformLoc!, false, temporaryMatrix);
             this.gl.drawArrays(this.gl.TRIANGLES, 0, XY_QUAD_VERTICES.length);
         }
 
         this.gl.bindVertexArray(null);
+    }
+
+    private getNodeTransformMatrix(snapshot: MaterialNodeSnapshot) {
+        const cachedMatrix = this.nodeTransformMatrixCache.get(snapshot.node.id);
+        if (cachedMatrix) {
+            return cachedMatrix;
+        }
+
+        const nodeSize = 128;
+        const matrix = glMatrix.mat4.fromRotationTranslationScale(
+            glMatrix.mat4.create(),
+            glMatrix.quat.create(),
+            [snapshot.node.x + nodeSize / 2, snapshot.node.y + nodeSize / 2, 0],
+            [nodeSize / 2, nodeSize / 2, 1],
+        );
+        this.nodeTransformMatrixCache.set(snapshot.node.id, matrix);
+        return matrix;
+    }
+
+    public clearNodeTransformCache(nodeId: number) {
+        this.nodeTransformMatrixCache.delete(nodeId);
     }
 
     public updateCamera(offsetX: number, offsetY: number, scale: number) {

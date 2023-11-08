@@ -86,6 +86,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                     if (justMoved) {
                         // If we don't schedule any render job for this node then
                         // the preview will not update, so we must update it manually.
+                        nodeThumbnailsRenderer.clearNodeTransformCache(ev.data.nodeId);
                         nodeThumbnailsRenderer.render(material);
                     } else {
                         jobScheduler.scheduleOutputs(ev.data.nodeId);
