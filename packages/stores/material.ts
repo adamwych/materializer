@@ -26,29 +26,31 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
     return {
         instantiateNode(path: string, x: number, y: number) {
             const spec = pkgsRegistry.getBlueprintByPath(path)!;
+            const parameters: Record<string, unknown> = {};
+            Object.values(spec.parameters).forEach((info) => {
+                parameters[info.id] = info.default;
+            });
+
+            const nextNodeId = Math.max(0, ...Array.from(material.nodes.keys())) + 1;
+            const node: MaterialNode = createMutable({
+                id: nextNodeId,
+                name: spec.name,
+                path: path,
+                x,
+                y,
+                parameters,
+                textureSize: spec.preferredTextureSize,
+            });
 
             workspace.modifyMaterial(material.id, (material) => {
-                const parameters: Record<string, unknown> = {};
-                Object.values(spec.parameters).forEach((info) => {
-                    parameters[info.id] = info.default;
-                });
-
-                const nextNodeId = Math.max(0, ...Array.from(material.nodes.keys())) + 1;
-                const node: MaterialNode = createMutable({
-                    id: nextNodeId,
-                    name: spec.name,
-                    path: path,
-                    x,
-                    y,
-                    parameters,
-                    textureSize: spec.preferredTextureSize,
-                });
                 material.nodes.set(nextNodeId, node);
 
                 events.emit("nodeAdded", {
                     node,
                 });
             });
+
+            return node;
         },
 
         moveNode(id: number, x: number, y: number) {

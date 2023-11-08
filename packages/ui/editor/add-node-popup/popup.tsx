@@ -16,8 +16,8 @@ export default function EditorAddNodePopup() {
 
     function onItemClick(packageId: string, nodeId: string) {
         const coords = cameraState.mapCoordsToGraphSpace(ref.coords()!.x, ref.coords()!.y);
-        materialActions.instantiateNode(packageId + "/" + nodeId, coords.x, coords.y);
-        ref.hide();
+        const node = materialActions.instantiateNode(packageId + "/" + nodeId, coords.x, coords.y);
+        ref.hide(node);
     }
 
     return (

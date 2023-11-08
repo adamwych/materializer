@@ -5,12 +5,13 @@ import { useEditorRuntimeCache } from "../cache";
 import { useMaterialStore } from "../../../../stores/material";
 import { Point2D } from "../../../../utils/math";
 import makeDragListener from "../../../../utils/makeDragListener";
+import { useEditorAddNodePopupRef } from "../../add-node-popup/ref";
 
 export type PendingConnectionInfo = {
-    nodeId: number;
-    socketId: string;
-    from: Point2D;
-    to: Point2D;
+    fromNodeId: number;
+    fromSocketId: string;
+    fromCoords: Point2D;
+    pointerCoords: Point2D;
 };
 
 /**
@@ -19,7 +20,8 @@ export type PendingConnectionInfo = {
 export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createContextProvider(() => {
     const runtimeCache = useEditorRuntimeCache()!;
     const cameraState = useEditorCameraState()!;
-    const materialActions = useMaterialStore()!;
+    const materialStore = useMaterialStore()!;
+    const addNodePopupRef = useEditorAddNodePopupRef()!;
     const [info, setInfo] = createSignal<PendingConnectionInfo>();
     let clearDragListener: VoidFunction;
 
@@ -27,28 +29,46 @@ export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createConte
         begin(ev: PointerEvent, nodeId: number, socketId: string) {
             ev.stopPropagation();
 
-            const node = materialActions.getNodeById(nodeId)!;
+            const node = materialStore.getNodeById(nodeId)!;
             const socketElement = runtimeCache.getNodeSocketDOMElement(nodeId, socketId)!;
 
             setInfo({
-                nodeId,
-                socketId,
-                from: {
+                fromNodeId: nodeId,
+                fromSocketId: socketId,
+                fromCoords: {
                     x: node.x + socketElement.offsetLeft + socketElement.clientWidth / 2,
                     y: node.y + socketElement.offsetTop + socketElement.clientHeight / 2,
                 },
-                to: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
+                pointerCoords: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
             });
 
             clearDragListener = makeDragListener(
                 (ev) => {
                     setInfo((info) => ({
                         ...info!,
-                        to: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
+                        pointerCoords: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
                     }));
                 },
-                () => {
-                    setInfo(undefined);
+                (ev) => {
+                    // Handle case when the user started building a connection, but did not
+                    // release the pointer on a socket element.
+                    // If pointer was released on a socket, the event would not propagate here.
+                    addNodePopupRef.show(ev.pageX, ev.pageY).then((result) => {
+                        if (result) {
+                            const resultNodeBlueprint = materialStore.getNodeBlueprint(result.id)!;
+                            const resultNodeInputSockets = Object.keys(resultNodeBlueprint.inputs);
+                            if (resultNodeInputSockets.length > 0) {
+                                materialStore.addConnection(
+                                    info()!.fromNodeId,
+                                    info()!.fromSocketId,
+                                    result.id,
+                                    resultNodeInputSockets[0],
+                                );
+                            }
+                        }
+
+                        setInfo(undefined);
+                    });
                 },
             );
         },
@@ -56,7 +76,12 @@ export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createConte
         end(ev: PointerEvent, nodeId: number, socketId: string) {
             if (info()) {
                 ev.stopPropagation();
-                materialActions.addConnection(info()!.nodeId, info()!.socketId, nodeId, socketId);
+                materialStore.addConnection(
+                    info()!.fromNodeId,
+                    info()!.fromSocketId,
+                    nodeId,
+                    socketId,
+                );
                 clearDragListener();
                 setInfo(undefined);
             }

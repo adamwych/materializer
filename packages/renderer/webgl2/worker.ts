@@ -2,8 +2,8 @@ import { RenderWorkerCommand } from "../commands";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
 import WebGLEnvironmentalPreviewRenderer from "./env-preview-renderer";
-import WebGLNodeThumbnailsRenderer from "./node-thumbnails-renderer";
 import WebGLNodeRenderer from "./node-renderer";
+import WebGLNodeThumbnailsRenderer from "./node-thumbnails-renderer";
 
 /**
  * Currently the only available render worker uses WebGL2, which unfortunately does

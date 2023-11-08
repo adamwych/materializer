@@ -9,8 +9,8 @@ export default function EditorCanvasConnectionBuilderCurve() {
     return (
         <Show when={info()}>
             <EditorCanvasConnectionCurve
-                fromCoords={[info()!.from.x, info()!.from.y]}
-                toCoords={[info()!.to.x, info()!.to.y]}
+                fromCoords={[info()!.fromCoords.x, info()!.fromCoords.y]}
+                toCoords={[info()!.pointerCoords.x, info()!.pointerCoords.y]}
             />
         </Show>
     );
