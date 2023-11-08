@@ -34,7 +34,7 @@ export default class WebGLNodeRenderer {
     public clearNodeCache(nodeId: number) {
         const texture = this.textures.get(nodeId);
         if (texture) {
-            this.gl.deleteTexture(texture);
+            this.gl.deleteTexture(texture.texture);
         }
 
         this.textures.delete(nodeId);
