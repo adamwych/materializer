@@ -5,3 +5,4 @@ export const EDITOR_MAX_ZOOM = 6.0;
 export const EDITOR_NODE_WIDTH = 128;
 export const EDITOR_NODE_HEIGHT = 128;
 export const EDITOR_ELEMENT_ID = "editor-root";
+export const EDITOR_GRID_SIZE = 32;

@@ -1,8 +1,9 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createSignal } from "solid-js";
-import makeDragListener from "../../../../utils/makeDragListener";
-import { useEditorRuntimeCache } from "../cache";
 import { useMaterialStore } from "../../../../stores/material";
+import makeDragListener from "../../../../utils/makeDragListener";
+import { EDITOR_GRID_SIZE } from "../../consts";
+import { useEditorRuntimeCache } from "../cache";
 import { useEditorCameraState } from "./camera";
 
 export const [EditorSelectionManager, useEditorSelectionManager] = createContextProvider(() => {
@@ -11,6 +12,7 @@ export const [EditorSelectionManager, useEditorSelectionManager] = createContext
     const cameraState = useEditorCameraState()!;
     const [multiselectRect, setMultiselectRect] = createSignal<DOMRect | undefined>();
     const [selectedNodes, setSelectedNodes] = createSignal<Array<number>>([]);
+    const [snapToGrid, setSnapToGrid] = createSignal(true);
 
     return {
         beginCanvasInteraction(downEvent: PointerEvent) {
@@ -38,20 +40,34 @@ export const [EditorSelectionManager, useEditorSelectionManager] = createContext
 
         beginNodeInteraction(_: PointerEvent, nodeId: number) {
             let didMove = false;
+            let accumulatedMovementX = 0;
+            let accumulatedMovementY = 0;
+
+            const nodesToMove = (selectedNodes().includes(nodeId) ? selectedNodes() : [nodeId])
+                .map((id) => materialActions.getNodeById(id)!)
+                .map((node) => ({
+                    node,
+                    startX: node.x,
+                    startY: node.y,
+                }));
+
             makeDragListener(
                 (ev) => {
                     didMove = true;
+                    accumulatedMovementX += ev.movementX;
+                    accumulatedMovementY += ev.movementY;
 
-                    const nodesToMove = selectedNodes().includes(nodeId)
-                        ? selectedNodes()
-                        : [nodeId];
-                    nodesToMove.forEach((nodeId) => {
-                        materialActions.moveNode(
-                            nodeId,
-                            ev.movementX / cameraState.smoothScale(),
-                            ev.movementY / cameraState.smoothScale(),
-                        );
-                    });
+                    for (const info of nodesToMove) {
+                        let newX = info.startX + accumulatedMovementX / cameraState.smoothScale();
+                        let newY = info.startY + accumulatedMovementY / cameraState.smoothScale();
+
+                        if (snapToGrid()) {
+                            newX = Math.round(newX / EDITOR_GRID_SIZE) * EDITOR_GRID_SIZE;
+                            newY = Math.round(newY / EDITOR_GRID_SIZE) * EDITOR_GRID_SIZE;
+                        }
+
+                        materialActions.moveNodeTo(info.node.id, newX, newY);
+                    }
                 },
                 () => {
                     if (!didMove) {
@@ -67,6 +83,9 @@ export const [EditorSelectionManager, useEditorSelectionManager] = createContext
 
         multiselectRect,
         selectedNodes,
+
+        snapToGrid,
+        setSnapToGrid,
     };
 });
 

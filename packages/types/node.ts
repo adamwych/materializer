@@ -24,6 +24,7 @@ export type MaterialNode = {
      */
     parameters: Record<string, unknown>;
 
+    /** Size of the output texture. */
     textureSize: number;
 };
 
@@ -72,3 +73,19 @@ export type MaterialNodeBlueprint = {
 };
 
 export type MaterialNodeBlueprintsPackage = Map<string, MaterialNodeBlueprint>;
+
+/**
+ * Creates a record of each parameter within given blueprint and its default value.
+ *
+ * @param blueprint
+ * @returns
+ */
+export function makeDefaultBlueprintParameters(blueprint: MaterialNodeBlueprint) {
+    const parameters: Record<string, unknown> = {};
+
+    Object.values(blueprint.parameters).forEach((info) => {
+        parameters[info.id] = info.default;
+    });
+
+    return parameters;
+}

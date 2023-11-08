@@ -4,11 +4,12 @@ import { createMutable, unwrap } from "solid-js/store";
 import {
     MaterialGraphEdge,
     areGraphEdgesSimilar,
-    isGraphEdgeValid,
     invertGraphEdgeIfApplicable,
+    isGraphEdgeValid,
 } from "../types/graph";
+import { Material } from "../types/material";
 import { MaterialEvents } from "../types/material-events";
-import { MaterialNode } from "../types/node";
+import { MaterialNode, makeDefaultBlueprintParameters } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
 import {
     EDITOR_GRAPH_HEIGHT,
@@ -29,6 +30,21 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
     const pkgsRegistry = useNodeBlueprintsStore()!;
     const events = createEmitter<MaterialEvents>();
 
+    function modifyMaterial(setter: (current: Material) => void) {
+        workspace.modifyMaterial(material.id, setter);
+    }
+
+    function modifyNode(nodeId: number, setter: (node: MaterialNode, material: Material) => void) {
+        workspace.modifyMaterial(material.id, (material) => {
+            const node = material.nodes.get(nodeId);
+            if (node) {
+                setter(node, material);
+            } else {
+                console.warn("Attempted to modify a node that does not exist in the material.");
+            }
+        });
+    }
+
     function notifyGraphEdgeChanged(edge: MaterialGraphEdge) {
         events.emit("nodeConnectionsChanged", {
             node: material.nodes.get(edge.from[0])!,
@@ -39,68 +55,103 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
     }
 
     return {
-        instantiateNode(path: string, x: number, y: number) {
-            const spec = pkgsRegistry.getBlueprintByPath(path)!;
-            const parameters: Record<string, unknown> = {};
-            Object.values(spec.parameters).forEach((info) => {
-                parameters[info.id] = info.default;
-            });
-
-            const nextNodeId = Math.max(0, ...Array.from(material.nodes.keys())) + 1;
+        /**
+         * Creates a new node based on given blueprint, places it at
+         * specified X/Y position and then returns it.
+         *
+         * @param blueprintPath Path to the blueprint in `package_id/blueprint_id` format.
+         * @param x Initial X position.
+         * @param y Initial y position.
+         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: true)
+         * @returns Added node.
+         */
+        instantiateNode(blueprintPath: string, x: number, y: number, emitEvent = true) {
+            const blueprint = pkgsRegistry.getBlueprintByPath(blueprintPath)!;
+            const id = Math.max(0, ...Array.from(material.nodes.keys())) + 1;
             const node: MaterialNode = createMutable({
-                id: nextNodeId,
-                name: spec.name,
-                path: path,
+                id,
+                name: blueprint.name,
+                path: blueprintPath,
                 x,
                 y,
-                parameters,
-                textureSize: spec.preferredTextureSize,
+                parameters: makeDefaultBlueprintParameters(blueprint),
+                textureSize: blueprint.preferredTextureSize,
             });
 
-            workspace.modifyMaterial(material.id, (material) => {
-                material.nodes.set(nextNodeId, node);
+            modifyMaterial((material) => {
+                material.nodes.set(id, node);
 
-                events.emit("nodeAdded", {
-                    node,
-                });
+                if (emitEvent) {
+                    events.emit("nodeAdded", {
+                        node,
+                    });
+                }
             });
 
             return node;
         },
 
-        moveNode(id: number, x: number, y: number) {
-            workspace.modifyMaterial(material.id, (material) => {
-                const node = material.nodes.get(id);
-                if (node) {
-                    node.x = clamp(node.x + x, 0, EDITOR_GRAPH_WIDTH - EDITOR_NODE_WIDTH);
-                    node.y = clamp(node.y + y, 0, EDITOR_GRAPH_HEIGHT - EDITOR_NODE_HEIGHT);
+        /**
+         * Moves node by given ID to specified position.
+         *
+         * @param nodeId ID of the node to move.
+         * @param x New X position.
+         * @param y New Y position.
+         * @param emitEvent Whether a `nodeMoved` event should be emitted. (Default: true)
+         */
+        moveNodeTo(nodeId: number, x: number, y: number, emitEvent = true) {
+            modifyNode(nodeId, (node) => {
+                if (node.x === x && node.y === y) {
+                    return;
+                }
+
+                node.x = clamp(x, 0, EDITOR_GRAPH_WIDTH - EDITOR_NODE_WIDTH);
+                node.y = clamp(y, 0, EDITOR_GRAPH_HEIGHT - EDITOR_NODE_HEIGHT);
+
+                if (emitEvent) {
                     events.emit("nodeMoved", { node });
                 }
             });
         },
 
-        removeNode(id: number) {
-            workspace.modifyMaterial(material.id, (material) => {
-                const node = material.nodes.get(id);
+        /**
+         * Removes a node by given ID from the material.
+         *
+         * @param nodeId ID of the node to remove.
+         * @param emitEvent Whether a `nodeRemoved` event should be emitted. (Default: true)
+         */
+        removeNode(nodeId: number, emitEvent = true) {
+            modifyMaterial((material) => {
+                const node = material.nodes.get(nodeId);
                 if (node) {
-                    material.nodes.delete(id);
+                    material.nodes.delete(nodeId);
 
                     material.connections = material.connections.filter((connection) => {
-                        return connection.from[0] !== id && connection.to[0] !== id;
+                        return connection.from[0] !== nodeId && connection.to[0] !== nodeId;
                     });
 
-                    events.emit("nodeRemoved", {
-                        node,
-                    });
+                    if (emitEvent) {
+                        events.emit("nodeRemoved", {
+                            node,
+                        });
+                    }
                 }
             });
         },
 
-        setNodeParameter<T>(nodeId: number, parameterId: string, value: T) {
-            workspace.modifyMaterial(material.id, (material) => {
-                const node = material.nodes.get(nodeId);
-                if (node) {
-                    node.parameters[parameterId] = value;
+        /**
+         * Changes the value of a parameter for given node.
+         *
+         * @param nodeId ID of the node.
+         * @param parameterId ID of the parameter.
+         * @param value New value.
+         * @param emitEvent Whether a `nodeParameterChanged` event should be emitted. (Default: true)
+         */
+        setNodeParameter<T>(nodeId: number, parameterId: string, value: T, emitEvent = true) {
+            modifyNode(nodeId, (node) => {
+                node.parameters[parameterId] = value;
+
+                if (emitEvent) {
                     events.emit("nodeParameterChanged", {
                         node,
                     });
@@ -122,7 +173,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * will be removed.
          *
          * @param edge Edge to add.
-         * @param emitEvents
+         * @param emitEvents Whether `nodeConnectionsChanged` events should be emitted.
          */
         addEdge(edge: MaterialGraphEdge, emitEvents = true) {
             let sourceNodeBlueprint = this.getNodeBlueprint(edge.from[0])!;
@@ -140,7 +191,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 return;
             }
 
-            workspace.modifyMaterial(material.id, (material) => {
+            modifyMaterial((material) => {
                 // Remove existing connection to the destination socket.
                 this.removeEdgeTo(edge.to[0], edge.to[1], false);
 
@@ -155,12 +206,15 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         /**
          * Removes the edge connecting any socket from any node to the specified socket.
          *
-         * @param nodeId
-         * @param socketId
-         * @param emitEvents
+         * Optionally emits `nodeConnectionsChanged` events for both source and
+         * destination nodes.
+         *
+         * @param nodeId ID of the destination node.
+         * @param socketId ID of the destination socket.
+         * @param emitEvents Whether `nodeConnectionsChanged` events should be emitted.
          */
         removeEdgeTo(nodeId: number, socketId: string, emitEvents = true) {
-            workspace.modifyMaterial(material.id, (material) => {
+            modifyMaterial((material) => {
                 const index = material.connections.findIndex(
                     (edge) => edge.to[0] === nodeId && edge.to[1] === socketId,
                 );
@@ -177,11 +231,11 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         /**
          * Removes specified edge from the material.
          *
-         * @param edge
-         * @param emitEvents
+         * @param edge Edge to remove.
+         * @param emitEvents Whether `nodeConnectionsChanged` events should be emitted.
          */
         removeEdge(edge: MaterialGraphEdge, emitEvents = true) {
-            workspace.modifyMaterial(material.id, (material) => {
+            modifyMaterial((material) => {
                 const index = material.connections.findIndex((otherEdge) =>
                     areGraphEdgesSimilar(edge, otherEdge),
                 );
@@ -236,7 +290,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         },
 
         setName(name: string) {
-            workspace.modifyMaterial(material.id, (material) => {
+            modifyMaterial((material) => {
                 material.name = name;
             });
         },
