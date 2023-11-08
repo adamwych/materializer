@@ -1,6 +1,12 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createEmitter } from "@solid-primitives/event-bus";
 import { createMutable, unwrap } from "solid-js/store";
+import {
+    MaterialGraphEdge,
+    areGraphEdgesSimilar,
+    isGraphEdgeValid,
+    invertGraphEdgeIfApplicable,
+} from "../types/graph";
 import { MaterialEvents } from "../types/material-events";
 import { MaterialNode } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
@@ -22,6 +28,15 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
     const material = workspace.getActiveMaterial()!;
     const pkgsRegistry = useNodeBlueprintsStore()!;
     const events = createEmitter<MaterialEvents>();
+
+    function notifyGraphEdgeChanged(edge: MaterialGraphEdge) {
+        events.emit("nodeConnectionsChanged", {
+            node: material.nodes.get(edge.from[0])!,
+        });
+        events.emit("nodeConnectionsChanged", {
+            node: material.nodes.get(edge.to[0])!,
+        });
+    }
 
     return {
         instantiateNode(path: string, x: number, y: number) {
@@ -93,63 +108,90 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             });
         },
 
-        addConnection(
-            sourceNodeId: number,
-            sourceSocketId: string,
-            destinationNodeId: number,
-            destinationSocketId: string,
-        ) {
+        /**
+         * Adds a {@link MaterialGraphEdge} to the material and optionally emits
+         * `nodeConnectionsChanged` events for both source and destination nodes.
+         *
+         * The edge will be automatically swapped if the `from` socket is an
+         * input and the `to` socket is an output.
+         *
+         * Sockets within the edge must be from distinct nodes, otherwise it
+         * will not be added.
+         *
+         * If the destination socket is already connected to an output, that edge
+         * will be removed.
+         *
+         * @param edge Edge to add.
+         * @param emitEvents
+         */
+        addEdge(edge: MaterialGraphEdge, emitEvents = true) {
+            let sourceNodeBlueprint = this.getNodeBlueprint(edge.from[0])!;
+            let destinationNodeBlueprint = this.getNodeBlueprint(edge.to[0])!;
+
+            if (invertGraphEdgeIfApplicable(edge, sourceNodeBlueprint, destinationNodeBlueprint)) {
+                [sourceNodeBlueprint, destinationNodeBlueprint] = [
+                    destinationNodeBlueprint,
+                    sourceNodeBlueprint,
+                ];
+            }
+
+            if (!isGraphEdgeValid(edge, sourceNodeBlueprint, destinationNodeBlueprint)) {
+                console.warn("Attempted to add an invalid edge to the material.", edge);
+                return;
+            }
+
             workspace.modifyMaterial(material.id, (material) => {
-                // Prevent from connecting sockets from the same node with each other.
-                if (sourceNodeId === destinationNodeId) {
-                    return;
+                // Remove existing connection to the destination socket.
+                this.removeEdgeTo(edge.to[0], edge.to[1], false);
+
+                material.connections.push(edge);
+
+                if (emitEvents) {
+                    notifyGraphEdgeChanged(edge);
                 }
+            });
+        },
 
-                // Swap source and destination if they are in wrong order.
-                const sourceNodeBlueprint = this.getNodeBlueprint(sourceNodeId)!;
-                const isSourceAnInput = sourceSocketId in sourceNodeBlueprint.inputs;
-                const isSourceAnOutput = sourceSocketId in sourceNodeBlueprint.outputs;
+        /**
+         * Removes the edge connecting any socket from any node to the specified socket.
+         *
+         * @param nodeId
+         * @param socketId
+         * @param emitEvents
+         */
+        removeEdgeTo(nodeId: number, socketId: string, emitEvents = true) {
+            workspace.modifyMaterial(material.id, (material) => {
+                const index = material.connections.findIndex(
+                    (edge) => edge.to[0] === nodeId && edge.to[1] === socketId,
+                );
+                if (index >= 0) {
+                    const [removedEdge] = material.connections.splice(index, 1);
 
-                const destinationNodeBlueprint = this.getNodeBlueprint(destinationNodeId)!;
-                const isDestinationAnInput = destinationSocketId in destinationNodeBlueprint.inputs;
-                const isDestinationAnOutput =
-                    destinationSocketId in destinationNodeBlueprint.outputs;
-
-                if (isSourceAnInput && isDestinationAnOutput) {
-                    [sourceNodeId, destinationNodeId] = [destinationNodeId, sourceNodeId];
-                    [sourceSocketId, destinationSocketId] = [destinationSocketId, sourceSocketId];
+                    if (emitEvents) {
+                        notifyGraphEdgeChanged(removedEdge);
+                    }
                 }
+            });
+        },
 
-                // Prevent from connecting sockets of the same kind with each other.
-                if (
-                    (isSourceAnOutput && isDestinationAnOutput) ||
-                    (isSourceAnInput && isDestinationAnInput)
-                ) {
-                    return;
+        /**
+         * Removes specified edge from the material.
+         *
+         * @param edge
+         * @param emitEvents
+         */
+        removeEdge(edge: MaterialGraphEdge, emitEvents = true) {
+            workspace.modifyMaterial(material.id, (material) => {
+                const index = material.connections.findIndex((otherEdge) =>
+                    areGraphEdgesSimilar(edge, otherEdge),
+                );
+                if (index >= 0) {
+                    material.connections.splice(index, 1);
+
+                    if (emitEvents) {
+                        notifyGraphEdgeChanged(edge);
+                    }
                 }
-
-                // Removing existing connection to the destination socket if there is one.
-                const existingConnectionIdx = material.connections.findIndex((connection) => {
-                    return (
-                        connection.to[0] === destinationNodeId &&
-                        connection.to[1] === destinationSocketId
-                    );
-                });
-                if (existingConnectionIdx > -1) {
-                    material.connections.splice(existingConnectionIdx, 1);
-                }
-
-                // Finally add it to the list.
-                material.connections.push({
-                    from: [sourceNodeId, sourceSocketId],
-                    to: [destinationNodeId, destinationSocketId],
-                });
-
-                // TODO: Maybe a single `nodeConnectionAdded` event would be better?
-                events.emit("nodeConnectionsChanged", { node: this.getNodeById(sourceNodeId)! });
-                events.emit("nodeConnectionsChanged", {
-                    node: this.getNodeById(destinationNodeId)!,
-                });
             });
         },
 

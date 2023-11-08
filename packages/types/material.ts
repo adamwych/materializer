@@ -1,9 +1,9 @@
-import { v4 as uuidv4 } from "uuid";
-import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "../ui/editor/consts";
-import { MaterialNode } from "./node";
-import { MaterialNodeSocketAddr } from "./node-socket";
 import { ReactiveMap } from "@solid-primitives/map";
 import { createMutable } from "solid-js/store";
+import { v4 as uuidv4 } from "uuid";
+import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "../ui/editor/consts";
+import { MaterialGraphEdge } from "./graph";
+import { MaterialNode } from "./node";
 
 /**
  * A material is a set of interconnected nodes, that combined together
@@ -21,11 +21,6 @@ export type Material = {
 
     /** List of connections between nodes. */
     connections: Array<MaterialGraphEdge>;
-};
-
-export type MaterialGraphEdge = {
-    from: MaterialNodeSocketAddr;
-    to: MaterialNodeSocketAddr;
 };
 
 export function createEmptyMaterial(): Material {

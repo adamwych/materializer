@@ -1,11 +1,11 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createSignal } from "solid-js";
-import { useEditorCameraState } from "./camera";
-import { useEditorRuntimeCache } from "../cache";
 import { useMaterialStore } from "../../../../stores/material";
-import { Point2D } from "../../../../utils/math";
 import makeDragListener from "../../../../utils/makeDragListener";
+import { Point2D } from "../../../../utils/math";
 import { useEditorAddNodePopupRef } from "../../add-node-popup/ref";
+import { useEditorRuntimeCache } from "../cache";
+import { useEditorCameraState } from "./camera";
 
 export type PendingConnectionInfo = {
     fromNodeId: number;
@@ -30,17 +30,39 @@ export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createConte
             ev.stopPropagation();
 
             const node = materialStore.getNodeById(nodeId)!;
-            const socketElement = runtimeCache.getNodeSocketDOMElement(nodeId, socketId)!;
 
-            setInfo({
-                fromNodeId: nodeId,
-                fromSocketId: socketId,
-                fromCoords: {
-                    x: node.x + socketElement.offsetLeft + socketElement.clientWidth / 2,
-                    y: node.y + socketElement.offsetTop + socketElement.clientHeight / 2,
-                },
-                pointerCoords: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
-            });
+            const nodeInputs = materialStore.getInputsMap(node);
+            const beganOnInputSocket = nodeInputs.has(socketId);
+            if (beganOnInputSocket) {
+                const connection = nodeInputs.get(socketId)!;
+                const startNode = materialStore.getNodeById(connection[0])!;
+                const socketElement = runtimeCache.getNodeSocketDOMElement(
+                    connection[0],
+                    connection[1],
+                )!;
+                setInfo({
+                    fromNodeId: connection[0],
+                    fromSocketId: connection[1],
+                    fromCoords: {
+                        x: startNode.x + socketElement.offsetLeft + socketElement.clientWidth / 2,
+                        y: startNode.y + socketElement.offsetTop + socketElement.clientHeight / 2,
+                    },
+                    pointerCoords: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
+                });
+
+                materialStore.removeEdge({ from: connection, to: [nodeId, socketId] });
+            } else {
+                const socketElement = runtimeCache.getNodeSocketDOMElement(nodeId, socketId)!;
+                setInfo({
+                    fromNodeId: nodeId,
+                    fromSocketId: socketId,
+                    fromCoords: {
+                        x: node.x + socketElement.offsetLeft + socketElement.clientWidth / 2,
+                        y: node.y + socketElement.offsetTop + socketElement.clientHeight / 2,
+                    },
+                    pointerCoords: cameraState.mapCoordsToGraphSpace(ev.pageX, ev.pageY),
+                });
+            }
 
             clearDragListener = makeDragListener(
                 (ev) => {
@@ -58,12 +80,10 @@ export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createConte
                             const resultNodeBlueprint = materialStore.getNodeBlueprint(result.id)!;
                             const resultNodeInputSockets = Object.keys(resultNodeBlueprint.inputs);
                             if (resultNodeInputSockets.length > 0) {
-                                materialStore.addConnection(
-                                    info()!.fromNodeId,
-                                    info()!.fromSocketId,
-                                    result.id,
-                                    resultNodeInputSockets[0],
-                                );
+                                materialStore.addEdge({
+                                    from: [info()!.fromNodeId, info()!.fromSocketId],
+                                    to: [result.id, resultNodeInputSockets[0]],
+                                });
                             }
                         }
 
@@ -76,12 +96,10 @@ export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createConte
         end(ev: PointerEvent, nodeId: number, socketId: string) {
             if (info()) {
                 ev.stopPropagation();
-                materialStore.addConnection(
-                    info()!.fromNodeId,
-                    info()!.fromSocketId,
-                    nodeId,
-                    socketId,
-                );
+                materialStore.addEdge({
+                    from: [info()!.fromNodeId, info()!.fromSocketId],
+                    to: [nodeId, socketId],
+                });
                 clearDragListener();
                 setInfo(undefined);
             }
