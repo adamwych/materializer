@@ -15,6 +15,13 @@ const PAINTER_CTORS: Record<MaterialNodePainterType, ConstructorOf<MaterialNodeP
 
 export type NodeTextureInfo = {
     texture: WebGLTexture;
+    /**
+     * Whether this texture was forwarded from another cache entry, so it doesn't
+     * actually belong to the node to which it is assigned in the cache.
+     * This is used for output nodes, which do not render anything but only
+     * pass-through whatever input they are given.
+     */
+    forwarded: boolean;
     width: number;
     height: number;
 };
@@ -32,9 +39,16 @@ export default class WebGLNodeRenderer {
     }
 
     public clearNodeCache(nodeId: number) {
-        const texture = this.textures.get(nodeId);
-        if (texture) {
-            this.gl.deleteTexture(texture.texture);
+        const cacheEntry = this.textures.get(nodeId);
+        if (cacheEntry && !cacheEntry.forwarded) {
+            this.gl.deleteTexture(cacheEntry.texture);
+
+            // Delete of all cache entries that forwarded this texture.
+            for (const [id, otherCacheEntry] of this.textures) {
+                if (otherCacheEntry.forwarded && otherCacheEntry.texture === cacheEntry.texture) {
+                    this.textures.delete(id);
+                }
+            }
         }
 
         this.textures.delete(nodeId);
@@ -55,7 +69,7 @@ export default class WebGLNodeRenderer {
             false,
         );
 
-        this.textures.set(nodeId, { texture, width, height });
+        this.textures.set(nodeId, { texture, width, height, forwarded: false });
         return texture;
     }
 
@@ -69,7 +83,12 @@ export default class WebGLNodeRenderer {
             if (connectedInput) {
                 const inputTexture = this.textures.get(connectedInput[0]);
                 if (inputTexture) {
-                    this.textures.set(node.id, inputTexture);
+                    this.textures.set(node.id, {
+                        texture: inputTexture.texture,
+                        width: inputTexture.width,
+                        height: inputTexture.height,
+                        forwarded: true,
+                    });
                 }
             }
 
