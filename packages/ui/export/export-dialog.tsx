@@ -32,12 +32,21 @@ function ExportDialogInner() {
     const renderer = useRenderEngine()!;
     const materialStore = useMaterialStore()!;
     const dialogs = useDialogsStore()!;
-    const selectedNodes = new ReactiveSet<number>();
-    const fileNames = new ReactiveMap<number, string>();
+
+    const material = () => materialStore.getMaterial();
+    const allOutputNodes = () =>
+        Array.from(material().nodes.values()).filter((x) => x.path === "materializer/output");
+
     const [fileFormat, setFileFormat] = createSignal(ExportImageFormat.Png);
     const [exportProgress, setExportProgress] = createSignal(0);
     const [isExporting, setExporting] = createSignal(false);
-    const material = () => materialStore.getMaterial();
+    const selectedNodes = new ReactiveSet<number>();
+    const fileNames = new ReactiveMap<number, string>(
+        allOutputNodes().map((node) => [node.id, material().name + "_" + node.name]),
+    );
+    const outputSizes = new ReactiveMap<number, number>(
+        allOutputNodes().map((node) => [node.id, node.textureSize]),
+    );
 
     async function exportSelectedNodes() {
         setExporting(true);
@@ -51,7 +60,8 @@ function ExportDialogInner() {
 
         for (const nodeId of selectedNodes) {
             // Render node and get its pixels data from the worker.
-            const imageData = await renderer.renderAndGetImage(nodeId);
+            const outputSize = outputSizes.get(nodeId) ?? 1;
+            const imageData = await renderer.renderAndGetImage(nodeId, outputSize, outputSize);
 
             // Render image data to a canvas and retrieve it as a Blob.
             const canvas = new OffscreenCanvas(imageData.width, imageData.height);
@@ -65,7 +75,7 @@ function ExportDialogInner() {
             const fileName = fileNames.get(nodeId) + "." + extension;
             saveBlobToFile(fileName, blob);
 
-            setExportProgress((++numberOfRenderedNodes / selectedNodes.size) * 100);
+            setExportProgress(++numberOfRenderedNodes / selectedNodes.size);
         }
 
         renderer.terminateWorker();
@@ -110,6 +120,7 @@ function ExportDialogInner() {
                     <ExportDialogOutputNodesPanel
                         material={material()}
                         fileNames={fileNames}
+                        outputSizes={outputSizes}
                         selectedNodes={selectedNodes}
                         fileFormat={fileFormat()}
                     />

@@ -10,6 +10,7 @@ import { mapDictionary as mapMap } from "../utils/map";
 import { RenderWorkerCommand } from "./commands";
 import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
+import TextureFilterMethod from "../types/texture-filter";
 
 // A re-type of `Worker`, because the original doesn't support specifying message type...
 interface RenderWorker extends Omit<Worker, "postMessage"> {
@@ -157,8 +158,16 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
          * so this operation will be slow for nodes that output large textures.
          *
          * @param nodeId ID of the node to render.
+         * @param outputWidth Width of the output image. Defaults to node's texture size.
+         * @param outputHeight Height of the output image. Defaults to node's texture size.
+         * @param outputFilterMethod Filter method of the output image. Matters only if resizing.
          */
-        renderAndGetImage(nodeId: number): Promise<ImageData> {
+        renderAndGetImage(
+            nodeId: number,
+            outputWidth?: number,
+            outputHeight?: number,
+            outputFilterMethod = TextureFilterMethod.Linear,
+        ): Promise<ImageData> {
             return new Promise((resolve) => {
                 if (!worker) {
                     throw "A worker must first be started before retriving node bitmap.";
@@ -171,6 +180,9 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 worker.postMessage({
                     command: "renderNodeAndGetImage",
                     nodeId,
+                    outputWidth,
+                    outputHeight,
+                    outputFilterMethod,
                 });
             });
         },

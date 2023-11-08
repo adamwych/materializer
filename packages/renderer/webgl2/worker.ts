@@ -50,7 +50,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
-            nodeRenderer = new WebGLNodeRenderer(gl);
+            nodeRenderer = new WebGLNodeRenderer(canvas, gl);
             nodeThumbnailsRenderer = new WebGLNodeThumbnailsRenderer(canvas, gl, nodeRenderer);
 
             jobScheduler = new RenderJobScheduler(material);
@@ -118,7 +118,13 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
         }
 
         case "renderNodeAndGetImage": {
-            const requestedNodeId = ev.data.nodeId;
+            const {
+                nodeId: requestedNodeId,
+                outputWidth,
+                outputHeight,
+                outputFilterMethod,
+            } = ev.data;
+
             const tempScheduler = new RenderJobScheduler(material);
             tempScheduler.scheduleChain(ev.data.nodeId);
             tempScheduler.runOnce((ids) => {
@@ -126,7 +132,12 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                     const node = material.nodes.get(nodeId);
                     if (node) {
                         if (nodeId === requestedNodeId) {
-                            const imageData = nodeRenderer.renderToImageData(node);
+                            const imageData = nodeRenderer.renderToImageData(
+                                node,
+                                outputWidth,
+                                outputHeight,
+                                outputFilterMethod,
+                            );
                             self.postMessage(imageData, { transfer: [imageData.data.buffer] });
                             break;
                         } else {

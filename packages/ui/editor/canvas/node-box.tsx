@@ -44,7 +44,6 @@ export default function EditorCanvasNodeBox(props: Props) {
                 <div
                     class={cn(
                         "p-2 text-center font-semibold",
-                        "backdrop-blur group-hover:backdrop-blur-0",
                         !isHighlighted() && "bg-opacity-50 bg-black group-hover:bg-transparent",
                         "rounded-t-md",
                     )}

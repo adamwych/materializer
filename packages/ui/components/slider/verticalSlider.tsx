@@ -1,3 +1,4 @@
+import cn from "../../../utils/cn.ts";
 import makeDeferredDragListener from "../../../utils/makeDeferredDragListener.ts";
 import { clamp, mapFrom01, mapTo01 } from "../../../utils/math.ts";
 import { SliderProps } from "./props.ts";
@@ -9,7 +10,7 @@ export default function VerticalSlider(props: SliderProps) {
     const mappedValue = () => mapTo01(props.min, props.max, props.value);
 
     const onMouseDown = makeDeferredDragListener((ev) => {
-        if (!trackElementRef) {
+        if (!trackElementRef || props.disabled) {
             return;
         }
 
@@ -27,7 +28,7 @@ export default function VerticalSlider(props: SliderProps) {
     return (
         <div
             ref={(e) => (trackElementRef = e)}
-            class={styles().track}
+            class={cn(styles().track, props.disabled && "pointer-events-none")}
             style={{
                 position: "relative",
                 width: styles().thickness + "px",

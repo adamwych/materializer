@@ -1,3 +1,4 @@
+import TextureFilterMethod from "../types/texture-filter";
 import { MinimalMaterialNodeSnapshot, MaterialNodeSnapshot, MaterialSnapshot } from "./types";
 
 export type InitializeWorkerCommand = {
@@ -16,6 +17,9 @@ export type SynchronizeNodeCommand = {
 export type RenderNodeAndGetImageCommand = {
     command: "renderNodeAndGetImage";
     nodeId: number;
+    outputWidth?: number;
+    outputHeight?: number;
+    outputFilterMethod?: TextureFilterMethod;
 };
 
 export type SetEditorUIViewportSizeCommand = {

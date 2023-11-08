@@ -15,6 +15,8 @@ export type SliderProps = {
     /** Color of the slider. Defaults to gray. */
     color?: TailwindColorName;
 
+    disabled?: boolean;
+
     /**
      * Called whenever the value is changed.
      * @param value New value.

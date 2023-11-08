@@ -34,7 +34,7 @@ export default class GLSLMaterialNodePainter implements MaterialNodePainter {
     public render(
         gl: WebGL2RenderingContext,
         node: MaterialNodeSnapshot,
-        inputTextures: ReadonlyMap<string, WebGLTexture>,
+        inputTextures: ReadonlyMap<string, WebGLTexture | null>,
     ): void {
         this.shaderProgram.bind();
 

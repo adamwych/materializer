@@ -123,7 +123,7 @@ export default abstract class PatternMaterialNodePainter implements MaterialNode
     public render(
         gl: WebGL2RenderingContext,
         node: MaterialNodeSnapshot,
-        inputTextures: ReadonlyMap<string, WebGLTexture>,
+        inputTextures: ReadonlyMap<string, WebGLTexture | null>,
     ): void {
         this.shaderProgram.bind();
 
