@@ -142,13 +142,21 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             canvas.width = ev.data.width;
             canvas.height = ev.data.height;
             nodeThumbnailsRenderer.updateCameraMatrix();
-            nodeThumbnailsRenderer.render(material);
+
+            requestAnimationFrame(() => {
+                nodeThumbnailsRenderer.render(material);
+            });
+
             break;
         }
 
         case "setEditorUITransform": {
             nodeThumbnailsRenderer.updateCamera(ev.data.x, ev.data.y, ev.data.scale);
-            nodeThumbnailsRenderer.render(material);
+
+            requestAnimationFrame(() => {
+                nodeThumbnailsRenderer.render(material);
+            });
+
             break;
         }
 
@@ -158,7 +166,11 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 gl,
                 nodeRenderer,
             );
-            envPreviewRenderer.render(material);
+
+            requestAnimationFrame(() => {
+                envPreviewRenderer.render(material);
+            });
+
             break;
         }
 
@@ -168,7 +180,11 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 ev.data.rotationY,
                 ev.data.zoom,
             );
-            envPreviewRenderer?.render(material);
+
+            requestAnimationFrame(() => {
+                envPreviewRenderer?.render(material);
+            });
+
             break;
         }
     }
