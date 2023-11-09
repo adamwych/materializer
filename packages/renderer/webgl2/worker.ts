@@ -128,6 +128,10 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 material.edges = material.edges.filter(
                     (edge) => edge.from[0] !== nodeId && edge.to[0] !== nodeId,
                 );
+
+                requestAnimationFrame(() => {
+                    nodeThumbnailsRenderer.render(material);
+                });
             }
 
             break;
