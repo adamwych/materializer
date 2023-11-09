@@ -37,7 +37,7 @@ export default function EditorCanvas(props: Props) {
             <EditorCanvasControls />
 
             <div
-                class="absolute origin-top-left"
+                class="absolute origin-top-left will-change-transform"
                 style={{ transform: cameraState.transformMatrixCss() }}
             >
                 <EditorCanvasBackground />
@@ -45,7 +45,7 @@ export default function EditorCanvas(props: Props) {
             </div>
 
             <div
-                class="absolute origin-top-left z-10"
+                class="absolute origin-top-left z-10 will-change-transform"
                 style={{ transform: cameraState.transformMatrixCss() }}
             >
                 <EditorCanvasNodes />
