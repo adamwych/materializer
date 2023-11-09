@@ -63,3 +63,8 @@ export type RenderWorkerCommand =
     | SetEditorUITransformCommand
     | SetEnvironmentPreviewDestinationCommand
     | SetEnvironmentPreviewCameraTransformCommand;
+
+export enum RenderWorkerResponse {
+    OK = 0,
+    WebGLContextNotAvailable = 1,
+}

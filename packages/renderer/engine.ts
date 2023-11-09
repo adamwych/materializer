@@ -6,11 +6,11 @@ import { useMaterialStore } from "../stores/material";
 import { Material } from "../types/material";
 import { MaterialNodeEvent } from "../types/material-events";
 import { MaterialNode } from "../types/node";
+import TextureFilterMethod from "../types/texture-filter";
 import { mapDictionary as mapMap } from "../utils/map";
-import { RenderWorkerCommand } from "./commands";
+import { RenderWorkerCommand, RenderWorkerResponse } from "./commands";
 import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
-import TextureFilterMethod from "../types/texture-filter";
 
 // A re-type of `Worker`, because the original doesn't support specifying message type...
 interface RenderWorker extends Omit<Worker, "postMessage"> {
@@ -119,6 +119,19 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
             worker?.terminate();
 
             worker = new WebGL2RenderWorkerImpl();
+            worker.onmessage = (ev: MessageEvent<RenderWorkerResponse>) => {
+                if (ev.data === RenderWorkerResponse.WebGLContextNotAvailable) {
+                    alert(
+                        [
+                            "It looks like your browser does not support WebGL2, which is required to run Materializer.\n\n",
+                            "If you're on Mac/iPhone/iPad, please update your system to Sonoma/17+.",
+                        ].join(""),
+                    );
+
+                    worker?.terminate();
+                    worker = undefined;
+                }
+            };
             worker.postMessage(
                 {
                     command: "initialize",

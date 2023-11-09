@@ -1,4 +1,4 @@
-import { RenderWorkerCommand } from "../commands";
+import { RenderWorkerCommand, RenderWorkerResponse } from "../commands";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
 import WebGLEnvironmentalPreviewRenderer from "./env-preview-renderer";
@@ -46,7 +46,13 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             material = ev.data.material;
             canvas = ev.data.canvas;
 
-            gl = canvas.getContext("webgl2")!;
+            let context = canvas.getContext("webgl2");
+            if (!context) {
+                self.postMessage(RenderWorkerResponse.WebGLContextNotAvailable);
+                return;
+            }
+
+            gl = context;
             gl.clearColor(0, 0, 0, 1);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -59,6 +65,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 jobScheduler.start(renderQueuedNodes);
             }
 
+            self.postMessage(RenderWorkerResponse.OK);
             break;
         }
 
