@@ -9,7 +9,11 @@ import {
 } from "../types/graph";
 import { Material } from "../types/material";
 import { MaterialEvents } from "../types/material-events";
-import { MaterialNode, makeDefaultBlueprintParameters } from "../types/node";
+import {
+    MaterialNode,
+    calculateNodesBoundingRect,
+    makeDefaultBlueprintParameters,
+} from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
 import {
     EDITOR_GRAPH_HEIGHT,
@@ -19,7 +23,7 @@ import {
 } from "../ui/editor/consts";
 import { clamp } from "../utils/math";
 import { useNodeBlueprintsStore } from "./blueprints";
-import { useWorkspaceStore } from "./workspace";
+import { WorkspaceClipboardState, useWorkspaceStore } from "./workspace";
 
 /**
  * Provides access to the active {@link Material} and functions that modify it.
@@ -138,7 +142,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                     return;
                 }
 
-                material.connections
+                material.edges
                     .filter((edge) => edge.from[0] === originalNodeId)
                     .forEach((edge) => {
                         // Find corresponding destination node.
@@ -195,7 +199,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 if (node) {
                     material.nodes.delete(nodeId);
 
-                    material.connections = material.connections.filter((connection) => {
+                    material.edges = material.edges.filter((connection) => {
                         return connection.from[0] !== nodeId && connection.to[0] !== nodeId;
                     });
 
@@ -260,7 +264,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 // Remove existing connection to the destination socket.
                 this.removeEdgeTo(edge.to[0], edge.to[1], false);
 
-                material.connections.push(edge);
+                material.edges.push(edge);
 
                 if (emitEvents) {
                     notifyGraphEdgeChanged(edge);
@@ -280,11 +284,11 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          */
         removeEdgeTo(nodeId: number, socketId: string, emitEvents = true) {
             modifyMaterial((material) => {
-                const index = material.connections.findIndex(
+                const index = material.edges.findIndex(
                     (edge) => edge.to[0] === nodeId && edge.to[1] === socketId,
                 );
                 if (index >= 0) {
-                    const [removedEdge] = material.connections.splice(index, 1);
+                    const [removedEdge] = material.edges.splice(index, 1);
 
                     if (emitEvents) {
                         notifyGraphEdgeChanged(removedEdge);
@@ -301,11 +305,11 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          */
         removeEdge(edge: MaterialGraphEdge, emitEvents = true) {
             modifyMaterial((material) => {
-                const index = material.connections.findIndex((otherEdge) =>
+                const index = material.edges.findIndex((otherEdge) =>
                     areGraphEdgesSimilar(edge, otherEdge),
                 );
                 if (index >= 0) {
-                    material.connections.splice(index, 1);
+                    material.edges.splice(index, 1);
 
                     if (emitEvents) {
                         notifyGraphEdgeChanged(edge);
@@ -314,8 +318,59 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             });
         },
 
+        /**
+         * Adds nodes and edges stored in given clipboard state into the material.
+         * All nodes will be offset so that the center point of a rectangle that
+         * they make together will be at given `centerX` and `centerY` coordinates.
+         *
+         * @param state
+         * @param centerX
+         * @param centerY
+         * @returns List of added nodes.
+         */
+        pasteClipboardState(
+            state: WorkspaceClipboardState,
+            centerX: number,
+            centerY: number,
+        ): Array<MaterialNode> {
+            const addedNodes = new Map<number, MaterialNode>();
+
+            const rect = calculateNodesBoundingRect(state.nodes);
+            const rectCenterX = rect.x + rect.width / 2;
+            const rectCenterY = rect.y + rect.height / 2;
+            const offsetFromCenterX = centerX - rectCenterX;
+            const offsetFromCenterY = centerY - rectCenterY;
+
+            state.nodes.forEach((node) => {
+                const pastedNode = this.instantiateNode(
+                    node.path,
+                    node.x + offsetFromCenterX,
+                    node.y + offsetFromCenterY,
+                    false,
+                );
+                pastedNode.name = node.name;
+                pastedNode.parameters = node.parameters;
+                pastedNode.textureSize = node.textureSize;
+                addedNodes.set(node.id, pastedNode);
+                events.emit("nodeAdded", { node: pastedNode });
+            });
+
+            state.edges.forEach((edge) => {
+                const fromNode = addedNodes.get(edge.from[0]);
+                const toNode = addedNodes.get(edge.to[0]);
+                if (fromNode && toNode) {
+                    this.addEdge({
+                        from: [fromNode.id, edge.from[1]],
+                        to: [toNode.id, edge.to[1]],
+                    });
+                }
+            });
+
+            return Array.from(addedNodes.values());
+        },
+
         anyConnectionToSocket(nodeId: number, socketId: string) {
-            return material.connections.some(
+            return material.edges.some(
                 (x) =>
                     (x.from[0] === nodeId && x.from[1] === socketId) ||
                     (x.to[0] === nodeId && x.to[1] === socketId),
@@ -324,7 +379,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
 
         getInputsMap(node: MaterialNode): Map<string, MaterialNodeSocketAddr> {
             return new Map<string, MaterialNodeSocketAddr>(
-                material.connections
+                material.edges
                     .filter((connection) => connection.to[0] === node.id)
                     .map((connection) => [connection.to[1], unwrap(connection.from)]),
             );
@@ -332,7 +387,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
 
         getOutputsMap(node: MaterialNode): Map<string, MaterialNodeSocketAddr> {
             return new Map<string, MaterialNodeSocketAddr>(
-                material.connections
+                material.edges
                     .filter((connection) => connection.from[0] === node.id)
                     .map((connection) => [connection.from[1], unwrap(connection.to)]),
             );

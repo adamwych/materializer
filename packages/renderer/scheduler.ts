@@ -76,12 +76,14 @@ export default class RenderJobScheduler {
     }
 
     private getInputNodes(nodeId: number): Array<number> {
-        const node = this.material.nodes.get(nodeId);
-        return node ? Array.from(node.inputs.values()).map((x) => x[0]) : [];
+        return this.material.edges
+            .filter((edge) => edge.to[0] === nodeId)
+            .map((edge) => edge.from[0]);
     }
 
     private getOutputNodes(nodeId: number): Array<number> {
-        const node = this.material.nodes.get(nodeId);
-        return node ? Array.from(node.outputs.values()).map((x) => x[0]) : [];
+        return this.material.edges
+            .filter((edge) => edge.from[0] === nodeId)
+            .map((edge) => edge.to[0]);
     }
 }

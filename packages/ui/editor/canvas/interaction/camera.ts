@@ -147,6 +147,17 @@ export const [EditorCameraState, useEditorCameraState] = createContextProvider((
             };
         },
 
+        /**
+         * Returns coordinates of the graph point, that is currently
+         * at the center of the editor view.
+         */
+        getScreenCenterPoint() {
+            return {
+                x: (smoothOffsetX() - rootElement.clientWidth / 2) / smoothScale(),
+                y: (smoothOffsetY() - rootElement.clientHeight / 2) / smoothScale(),
+            };
+        },
+
         smoothScale,
         smoothOffsetX,
         smoothOffsetY,

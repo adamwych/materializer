@@ -1,3 +1,4 @@
+import { MaterialGraphEdge } from "../types/graph";
 import TextureFilterMethod from "../types/texture-filter";
 import { MinimalMaterialNodeSnapshot, MaterialNodeSnapshot, MaterialSnapshot } from "./types";
 
@@ -12,6 +13,12 @@ export type SynchronizeNodeCommand = {
     command: "synchronizeNode";
     nodeId: number;
     nodeSnapshot: MaterialNodeSnapshot | MinimalMaterialNodeSnapshot | null;
+};
+
+export type SynchronizeEdgesCommand = {
+    command: "synchronizeEdges";
+    nodeId: number;
+    edges: Array<MaterialGraphEdge>;
 };
 
 export type RenderNodeAndGetImageCommand = {
@@ -50,6 +57,7 @@ export type SetEnvironmentPreviewCameraTransformCommand = {
 export type RenderWorkerCommand =
     | InitializeWorkerCommand
     | SynchronizeNodeCommand
+    | SynchronizeEdgesCommand
     | RenderNodeAndGetImageCommand
     | SetEditorUIViewportSizeCommand
     | SetEditorUITransformCommand

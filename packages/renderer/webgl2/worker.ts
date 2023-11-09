@@ -32,7 +32,7 @@ function renderQueuedNodes(nodeIds: Array<number>) {
     nodeIds.forEach((id) => {
         const node = material.nodes.get(id);
         if (node) {
-            nodeRenderer.render(node);
+            nodeRenderer.render(material, node);
         }
     });
 
@@ -77,8 +77,6 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                         node.node.y !== ev.data.nodeSnapshot.node.y;
 
                     node.node = ev.data.nodeSnapshot.node;
-                    node.inputs = ev.data.nodeSnapshot.inputs;
-                    node.outputs = ev.data.nodeSnapshot.outputs;
 
                     // Don't re-render the node if all we did was change its position.
                     // Because of this it won't re-render if we change some parameter
@@ -101,21 +99,29 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                         return;
                     }
 
-                    jobScheduler.schedule(ev.data.nodeId);
+                    jobScheduler.scheduleChain(ev.data.nodeId);
                 }
             } else {
-                nodeRenderer.clearNodeCache(ev.data.nodeId);
-                nodeThumbnailsRenderer.clearNodeTransformCache(ev.data.nodeId);
-                jobScheduler.scheduleOutputs(ev.data.nodeId, true);
-                material.nodes.delete(ev.data.nodeId);
+                const { nodeId } = ev.data;
 
-                // FIXME:
-                // It seems like sometimes the preview is not updated after
-                // removing a node. It's possible that the scheduler callback
-                // runs right before `delete`. Very difficult to reproduce.
-                nodeThumbnailsRenderer.render(material);
+                nodeRenderer.clearNodeCache(nodeId);
+                nodeThumbnailsRenderer.clearNodeTransformCache(nodeId);
+
+                jobScheduler.scheduleOutputs(nodeId, true);
+
+                material.nodes.delete(nodeId);
+                material.edges = material.edges.filter(
+                    (edge) => edge.from[0] !== nodeId && edge.to[0] !== nodeId,
+                );
             }
 
+            break;
+        }
+
+        case "synchronizeEdges": {
+            jobScheduler.scheduleOutputs(ev.data.nodeId);
+            material.edges = ev.data.edges;
+            jobScheduler.scheduleOutputs(ev.data.nodeId);
             break;
         }
 
@@ -135,6 +141,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                     if (node) {
                         if (nodeId === requestedNodeId) {
                             const imageData = nodeRenderer.renderToImageData(
+                                material,
                                 node,
                                 outputWidth,
                                 outputHeight,
@@ -143,7 +150,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                             self.postMessage(imageData, { transfer: [imageData.data.buffer] });
                             break;
                         } else {
-                            nodeRenderer.render(node);
+                            nodeRenderer.render(material, node);
                         }
                     }
                 }

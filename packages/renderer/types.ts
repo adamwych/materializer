@@ -1,26 +1,17 @@
+import { MaterialGraphEdge } from "../types/graph";
 import { MaterialNode, MaterialNodeBlueprint } from "../types/node";
-import { MaterialNodeSocketAddr } from "../types/node-socket";
 
 export type MaterialSnapshot = {
     nodes: Map<number, MaterialNodeSnapshot>;
+    edges: Array<MaterialGraphEdge>;
 };
 
-/**
- * All details about a single material node that the worker needs
- * in order to be able to render that node.
- */
 export type MaterialNodeSnapshot = {
     /** The node itself. */
     node: MaterialNode;
 
     /** Blueprint to use when rendering the node. */
     blueprint: MaterialNodeBlueprint;
-
-    /** Map of input socket IDs and addresses to output sockets connected to them. */
-    inputs: Map<string, MaterialNodeSocketAddr>;
-
-    /** Map of output socket IDs and addresses to input sockets connected to them. */
-    outputs: Map<string, MaterialNodeSocketAddr>;
 };
 
 // Minimal version is used for updates, since replacing the entire blueprint at once

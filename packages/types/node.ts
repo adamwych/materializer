@@ -89,3 +89,23 @@ export function makeDefaultBlueprintParameters(blueprint: MaterialNodeBlueprint)
 
     return parameters;
 }
+
+/**
+ * Calculates dimensions of a rectangle that contains all given nodes.
+ * @param nodes Nodes within the rectangle.
+ */
+export function calculateNodesBoundingRect(nodes: Array<MaterialNode>): DOMRect {
+    let minX = Infinity,
+        maxX = -Infinity;
+    let minY = Infinity,
+        maxY = -Infinity;
+
+    nodes.forEach((node) => {
+        minX = Math.min(minX, node.x + 64);
+        maxX = Math.max(maxX, node.x + 64);
+        minY = Math.min(minY, node.y + 64);
+        maxY = Math.max(maxY, node.y + 64);
+    });
+
+    return new DOMRect(minX, minY, maxX - minX, maxY - minY);
+}

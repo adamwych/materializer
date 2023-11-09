@@ -1,10 +1,11 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { ReactiveMap } from "@solid-primitives/map";
 import { Accessor, createSignal } from "solid-js";
 import { createMutable, unwrap } from "solid-js/store";
 import { Material } from "../types/material";
 import { MaterialNode } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
-import { ReactiveMap } from "@solid-primitives/map";
+import { WorkspaceClipboardState } from "./workspace";
 
 export type SerializedMaterialNode = {
     id: number;
@@ -30,6 +31,9 @@ export type SerializedMaterialGraphEdge = {
     to: MaterialNodeSocketAddr;
 };
 
+/**
+ * This context provides utilities for storing and reading presistent user data.
+ */
 export const [UserDataStorageProvider, useUserDataStorage] = createContextProvider(() => {
     const [savedMaterials, setSavedMaterials] = createSignal<{ [k: string]: SerializedMaterial }>(
         JSON.parse(localStorage.getItem("workspace.savedMaterials") ?? "{}"),
@@ -49,7 +53,7 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
                 parameters: structuredClone(unwrap(node.parameters)),
                 textureSize: node.textureSize,
             })),
-            connections: structuredClone(unwrap(material.connections)),
+            connections: structuredClone(unwrap(material.edges)),
             savedAt: new Date().getTime(),
         };
     }
@@ -79,13 +83,34 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
             id: material.id,
             name: material.name,
             nodes,
-            connections: structuredClone(material.connections),
+            edges: structuredClone(material.connections),
         };
     }
 
     return {
         serializeMaterial,
         deserializeMaterial,
+
+        saveClipboardState(clipboardState: WorkspaceClipboardState) {
+            localStorage.setItem("clipboard", JSON.stringify(clipboardState));
+        },
+
+        /**
+         * Reads current clipboard state from local storage and returns it.
+         * Returns `undefined` if clipboard is empty or data is malformed.
+         */
+        readClipboardState(): WorkspaceClipboardState | undefined {
+            const clipboardState = localStorage.getItem("clipboard");
+            if (clipboardState) {
+                try {
+                    return JSON.parse(clipboardState);
+                } catch (error) {
+                    return undefined;
+                }
+            }
+
+            return undefined;
+        },
 
         saveMaterial(material: Material) {
             setSavedMaterials((materials) => {

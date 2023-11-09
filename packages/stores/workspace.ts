@@ -1,11 +1,18 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { RiDeviceSave2Fill } from "solid-icons/ri";
 import { createSignal } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
+import { MaterialGraphEdge } from "../types/graph";
 import { Material } from "../types/material";
+import { MaterialNode } from "../types/node";
 import { useSnackbar } from "../ui/components/snackbar/context";
 import { useUserDataStorage } from "./storage";
 import { NotSavedResolution, useWorkspaceHistory } from "./workspace-history";
-import { RiDeviceSave2Fill } from "solid-icons/ri";
+
+export type WorkspaceClipboardState = {
+    nodes: Array<MaterialNode>;
+    edges: Array<MaterialGraphEdge>;
+};
 
 export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() => {
     const snackbar = useSnackbar()!;
@@ -100,6 +107,9 @@ export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() =
             });
         },
 
+        /**
+         * Saves active material in local storage and shows a success notification.
+         */
         saveActiveMaterial() {
             const activeMaterial = this.getActiveMaterial();
             if (activeMaterial) {
@@ -112,6 +122,33 @@ export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() =
                 });
                 history.markAsSaved(activeMaterial.id);
             }
+        },
+
+        /**
+         * Saves specified nodes and their edges in the clipboard.
+         * Clipboard data is stored in the local storage so it can be shared
+         * between multiple browser tabs.
+         *
+         * @param nodes Nodes to save.
+         */
+        saveNodesInClipboard(nodes: Array<MaterialNode>) {
+            const material = this.getActiveMaterial()!;
+            const state: WorkspaceClipboardState = {
+                nodes: nodes.map((node) => structuredClone(unwrap(node))),
+                edges: material.edges
+                    .filter(
+                        (edge) =>
+                            nodes.some((node) => node.id === edge.from[0]) &&
+                            nodes.some((node) => node.id === edge.to[0]),
+                    )
+                    .map((edge) => structuredClone(unwrap(edge))),
+            };
+
+            localStorage.setItem("clipboard", JSON.stringify(state));
+        },
+
+        getClipboardState() {
+            return userDataStorage.readClipboardState();
         },
 
         getActiveMaterial(): Readonly<Material> | undefined {

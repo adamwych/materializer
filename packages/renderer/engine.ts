@@ -39,14 +39,12 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     function createMinimalNodeSnapshot(node: MaterialNode): MinimalMaterialNodeSnapshot {
         return {
             node: unwrap(node),
-            inputs: materialStore.getInputsMap(node),
-            outputs: materialStore.getOutputsMap(node),
         };
     }
 
     function createNodeSnapshot(node: MaterialNode): MaterialNodeSnapshot {
         return {
-            ...createMinimalNodeSnapshot(node),
+            node: unwrap(node),
             blueprint: blueprintStore.getBlueprintByPath(node.path)!,
         };
     }
@@ -75,12 +73,20 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
         });
     }
 
+    function onEdgesChanged(ev: MaterialNodeEvent) {
+        worker?.postMessage({
+            command: "synchronizeEdges",
+            nodeId: ev.node.id,
+            edges: unwrap(materialStore.getMaterial().edges),
+        });
+    }
+
     // Listen to changes in the material and send updates to the worker.
     const materialEvents = materialStore.getEvents();
     materialEvents.on("nodeAdded", onNodeAdded);
     materialEvents.on("nodeRemoved", onNodeRemoved);
     materialEvents.on("nodeParameterChanged", onNodeChanged);
-    materialEvents.on("nodeConnectionsChanged", onNodeChanged);
+    materialEvents.on("nodeConnectionsChanged", onEdgesChanged);
     materialEvents.on("nodeMoved", onNodeChanged);
 
     onCleanup(() => {
@@ -119,6 +125,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                     canvas,
                     material: {
                         nodes: mapMap(material.nodes, createNodeSnapshot),
+                        edges: unwrap(material.edges),
                     },
                     start: runScheduler,
                 },

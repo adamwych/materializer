@@ -1,7 +1,7 @@
 import { MaterialNodePainterInfo, MaterialNodePainterType } from "../../types/node-painter";
 import TextureFilterMethod, { mapFilterMethodToGL } from "../../types/texture-filter";
 import { ConstructorOf } from "../../utils/ConstructorOf";
-import { MaterialNodeSnapshot } from "../types";
+import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
 import GLSLMaterialNodePainter from "./painters/glsl";
 import MaterialNodePainter from "./painters/painter";
 import ScatterMaterialNodePainter from "./painters/scatter";
@@ -73,15 +73,18 @@ export default class WebGLNodeRenderer {
         return texture;
     }
 
-    public render(nodeSnapshot: MaterialNodeSnapshot) {
+    public render(material: MaterialSnapshot, nodeSnapshot: MaterialNodeSnapshot) {
         const gl = this.gl;
         const { node, blueprint } = nodeSnapshot;
 
         // Output nodes mirror connected input, so there's no need to render them too.
         if (node.path === "materializer/output") {
-            const connectedInput = nodeSnapshot.inputs.get("color");
-            if (connectedInput) {
-                const inputTexture = this.textures.get(connectedInput[0]);
+            const edgeToColorSocket = material.edges.find(
+                (edge) => edge.to[0] === node.id && edge.to[1] === "color",
+            );
+
+            if (edgeToColorSocket) {
+                const inputTexture = this.textures.get(edgeToColorSocket.from[0]);
                 if (inputTexture) {
                     this.textures.set(node.id, {
                         texture: inputTexture.texture,
@@ -89,7 +92,11 @@ export default class WebGLNodeRenderer {
                         height: inputTexture.height,
                         forwarded: true,
                     });
+                } else {
+                    this.textures.delete(node.id);
                 }
+            } else {
+                this.textures.delete(node.id);
             }
 
             return;
@@ -133,9 +140,11 @@ export default class WebGLNodeRenderer {
         // Collect a map containing references to input textures.
         const inputTextures = new Map<string, WebGLTexture | null>();
         Object.keys(nodeSnapshot.blueprint.inputs).forEach((socketId) => {
-            const connectedInput = nodeSnapshot.inputs.get(socketId);
-            if (connectedInput) {
-                inputTextures.set(socketId, this.getNodeOutputTexture(connectedInput[0])!);
+            const edge = material.edges.find(
+                (edge) => edge.to[0] === node.id && edge.to[1] === socketId,
+            );
+            if (edge) {
+                inputTextures.set(socketId, this.getNodeOutputTexture(edge.from[0])!);
             } else {
                 inputTextures.set(socketId, null);
             }
@@ -155,12 +164,14 @@ export default class WebGLNodeRenderer {
      * using linear and nearest filters, but note that it simply
      * resizes the final image, it does not re-render the node!
      *
+     * @param material
      * @param nodeSnapshot Node to render.
      * @param outputWidth Width of the output image.
      * @param outputHeight Height of the output image.
      * @param filterMethod Filter to use when resizing.
      */
     public renderToImageData(
+        material: MaterialSnapshot,
         nodeSnapshot: MaterialNodeSnapshot,
         outputWidth?: number,
         outputHeight?: number,
@@ -171,7 +182,7 @@ export default class WebGLNodeRenderer {
 
         let texture = this.textures.get(node.id);
         if (!texture) {
-            this.render(nodeSnapshot);
+            this.render(material, nodeSnapshot);
             texture = this.textures.get(node.id)!;
         }
 

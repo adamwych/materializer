@@ -20,7 +20,7 @@ export type Material = {
     nodes: Map<number, MaterialNode>;
 
     /** List of connections between nodes. */
-    connections: Array<MaterialGraphEdge>;
+    edges: Array<MaterialGraphEdge>;
 };
 
 export function createEmptyMaterial(): Material {
@@ -50,14 +50,12 @@ export function createEmptyMaterial(): Material {
                     path: "materializer/output",
                     x: EDITOR_GRAPH_WIDTH / 2 - 64 + 128,
                     y: EDITOR_GRAPH_HEIGHT / 2 - 64,
-                    parameters: {
-                        color: [1, 0, 0],
-                    },
+                    parameters: {},
                     textureSize: 2048,
                 }),
             ],
         ]),
-        connections: [
+        edges: [
             {
                 from: [0, "color"],
                 to: [1, "color"],

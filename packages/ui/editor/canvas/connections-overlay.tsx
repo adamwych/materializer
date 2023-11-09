@@ -57,7 +57,7 @@ export default function EditorCanvasConnectionsOverlay() {
             viewBox={`0 0 ${EDITOR_GRAPH_WIDTH}px ${EDITOR_GRAPH_HEIGHT}px`}
             class="absolute pointer-events-none"
         >
-            <For each={material().connections}>
+            <For each={material().edges}>
                 {(connection) => (
                     <ConnectionLine
                         fromNodeId={connection.from[0]}
