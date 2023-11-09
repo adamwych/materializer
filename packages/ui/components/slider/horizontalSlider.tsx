@@ -20,6 +20,7 @@ export default function HorizontalSlider(props: SliderProps) {
 
         if (props.step) {
             value = Math.round(value / props.step) * props.step;
+            value = clamp(value, props.min, props.max);
         }
 
         props.onChange(value);

@@ -72,6 +72,10 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 // then we just need to update it and schedule a re-render of itself
                 // and its outputs (recursively).
                 if (node) {
+                    const didChangeTextureParams =
+                        node.node.textureSize !== ev.data.nodeSnapshot.node.textureSize ||
+                        node.node.textureFilterMethod !==
+                            ev.data.nodeSnapshot.node.textureFilterMethod;
                     const justMoved =
                         node.node.x !== ev.data.nodeSnapshot.node.x ||
                         node.node.y !== ev.data.nodeSnapshot.node.y;
@@ -87,6 +91,10 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                         nodeThumbnailsRenderer.clearNodeTransformCache(ev.data.nodeId);
                         nodeThumbnailsRenderer.render(material);
                     } else {
+                        if (didChangeTextureParams) {
+                            nodeRenderer.clearNodeCache(ev.data.nodeId);
+                        }
+
                         jobScheduler.scheduleOutputs(ev.data.nodeId);
                     }
                 } else {

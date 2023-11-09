@@ -1,12 +1,11 @@
-import { JSX } from "solid-js/jsx-runtime";
+import { ParentProps } from "solid-js";
 import { useSelectContext } from "./context.ts";
 
 interface Props {
-    children: JSX.Element;
     value: unknown;
 }
 
-export default function SelectOption(props: Props) {
+export default function SelectOption(props: ParentProps<Props>) {
     const context = useSelectContext()!;
 
     return (

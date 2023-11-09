@@ -24,6 +24,7 @@ export type NodeTextureInfo = {
     forwarded: boolean;
     width: number;
     height: number;
+    filterMethod: TextureFilterMethod;
 };
 
 export default class WebGLNodeRenderer {
@@ -55,21 +56,19 @@ export default class WebGLNodeRenderer {
         this.painters.delete(nodeId);
     }
 
-    private createNodeOutputTexture(nodeId: number, width: number, height: number): WebGLTexture {
+    private createNodeOutputTexture(
+        nodeId: number,
+        width: number,
+        height: number,
+        filterMethod: TextureFilterMethod,
+    ): WebGLTexture {
         const existingTexture = this.textures.get(nodeId);
         if (existingTexture) {
             return existingTexture.texture;
         }
 
-        const texture = this.createEmptyTexture(
-            width,
-            height,
-            TextureFilterMethod.Linear,
-            false,
-            false,
-        );
-
-        this.textures.set(nodeId, { texture, width, height, forwarded: false });
+        const texture = this.createEmptyTexture(width, height, filterMethod, false, false);
+        this.textures.set(nodeId, { texture, width, height, filterMethod, forwarded: false });
         return texture;
     }
 
@@ -90,6 +89,7 @@ export default class WebGLNodeRenderer {
                         texture: inputTexture.texture,
                         width: inputTexture.width,
                         height: inputTexture.height,
+                        filterMethod: inputTexture.filterMethod,
                         forwarded: true,
                     });
                 } else {
@@ -121,6 +121,7 @@ export default class WebGLNodeRenderer {
                 node.id,
                 node.textureSize,
                 node.textureSize,
+                node.textureFilterMethod,
             );
 
             gl.framebufferTexture2D(
@@ -175,7 +176,7 @@ export default class WebGLNodeRenderer {
         nodeSnapshot: MaterialNodeSnapshot,
         outputWidth?: number,
         outputHeight?: number,
-        filterMethod = TextureFilterMethod.Linear,
+        filterMethod?: TextureFilterMethod,
     ): ImageData {
         const gl = this.gl;
         const { node } = nodeSnapshot;
@@ -183,11 +184,25 @@ export default class WebGLNodeRenderer {
         let texture = this.textures.get(node.id);
         if (!texture) {
             this.render(material, nodeSnapshot);
-            texture = this.textures.get(node.id)!;
+            texture = this.textures.get(node.id);
+        }
+
+        // Output nodes without a color input will not render any texture
+        // and thus not add a cache entry, so in this case we have to just
+        // use a null texture.
+        if (!texture) {
+            texture = {
+                texture: null!,
+                width: 1,
+                height: 1,
+                filterMethod: TextureFilterMethod.Linear,
+                forwarded: false,
+            };
         }
 
         outputWidth = outputWidth ?? texture.width;
         outputHeight = outputHeight ?? texture.height;
+        filterMethod = filterMethod ?? texture.filterMethod;
 
         const outputFramebuffer = gl.createFramebuffer()!;
 

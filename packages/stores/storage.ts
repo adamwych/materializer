@@ -5,6 +5,7 @@ import { createMutable, unwrap } from "solid-js/store";
 import { Material } from "../types/material";
 import { MaterialNode } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
+import TextureFilterMethod from "../types/texture-filter";
 import { WorkspaceClipboardState } from "./workspace";
 
 export type SerializedMaterialNode = {
@@ -15,6 +16,7 @@ export type SerializedMaterialNode = {
     y: number;
     parameters: Record<string, unknown>;
     textureSize: number;
+    textureFilterMethod: TextureFilterMethod;
 };
 
 export type SerializedMaterial = {
@@ -52,6 +54,7 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
                 y: node.y,
                 parameters: structuredClone(unwrap(node.parameters)),
                 textureSize: node.textureSize,
+                textureFilterMethod: node.textureFilterMethod,
             })),
             connections: structuredClone(unwrap(material.edges)),
             savedAt: new Date().getTime(),
@@ -73,6 +76,7 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
                     path: node.path,
                     parameters: structuredClone(node.parameters),
                     textureSize: node.textureSize,
+                    textureFilterMethod: node.textureFilterMethod,
                     x: node.x,
                     y: node.y,
                 }),

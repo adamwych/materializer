@@ -173,7 +173,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
             nodeId: number,
             outputWidth?: number,
             outputHeight?: number,
-            outputFilterMethod = TextureFilterMethod.Linear,
+            outputFilterMethod?: TextureFilterMethod,
         ): Promise<ImageData> {
             return new Promise((resolve) => {
                 if (!worker) {

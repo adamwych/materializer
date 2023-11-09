@@ -15,6 +15,7 @@ import {
     makeDefaultBlueprintParameters,
 } from "../types/node";
 import { MaterialNodeSocketAddr } from "../types/node-socket";
+import TextureFilterMethod from "../types/texture-filter";
 import {
     EDITOR_GRAPH_HEIGHT,
     EDITOR_GRAPH_WIDTH,
@@ -80,6 +81,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 y,
                 parameters: makeDefaultBlueprintParameters(blueprint),
                 textureSize: blueprint.preferredTextureSize,
+                textureFilterMethod: TextureFilterMethod.Linear,
             });
 
             modifyMaterial((material) => {
@@ -110,6 +112,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 newNode = this.instantiateNode(node.path, node.x + 64, node.y + 64, false);
                 newNode.name = node.name + " (Copy)";
                 newNode.textureSize = node.textureSize;
+                newNode.textureFilterMethod = node.textureFilterMethod;
                 newNode.parameters = structuredClone(unwrap(node.parameters));
                 if (emitEvent) {
                     events.emit("nodeAdded", { node: newNode });
@@ -221,6 +224,26 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         setNodeParameter<T>(nodeId: number, parameterId: string, value: T, emitEvent = true) {
             modifyNode(nodeId, (node) => {
                 node.parameters[parameterId] = value;
+
+                if (emitEvent) {
+                    events.emit("nodeParameterChanged", { node });
+                }
+            });
+        },
+
+        setNodeTextureSize(nodeId: number, size: number, emitEvent = true) {
+            modifyNode(nodeId, (node) => {
+                node.textureSize = size;
+
+                if (emitEvent) {
+                    events.emit("nodeParameterChanged", { node });
+                }
+            });
+        },
+
+        setNodeTextureFilterMethod(nodeId: number, method: TextureFilterMethod, emitEvent = true) {
+            modifyNode(nodeId, (node) => {
+                node.textureFilterMethod = method;
 
                 if (emitEvent) {
                     events.emit("nodeParameterChanged", { node });
@@ -351,6 +374,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 pastedNode.name = node.name;
                 pastedNode.parameters = node.parameters;
                 pastedNode.textureSize = node.textureSize;
+                pastedNode.textureFilterMethod = node.textureFilterMethod;
                 addedNodes.set(node.id, pastedNode);
                 events.emit("nodeAdded", { node: pastedNode });
             });
@@ -367,6 +391,35 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             });
 
             return Array.from(addedNodes.values());
+        },
+
+        /**
+         * Calculates the effective size of an output node's texture.
+         * This is basically the size of the node that's connected to it.
+         *
+         * @param nodeId ID of the output node.
+         * @returns Texture size or `1` if output node is connected to any input.
+         */
+        getEffectiveOutputNodeSize(nodeId: number) {
+            const node = this.getNodeById(nodeId);
+            if (node) {
+                const edge = this.getAllEdgesTo(nodeId)[0];
+                if (edge) {
+                    const connectedNode = this.getNodeById(edge.from[0]);
+                    return connectedNode?.textureSize ?? 1;
+                }
+            }
+
+            return 1;
+        },
+
+        /**
+         * Returns a list of all edges connecting any socket of any node to
+         * any socket of the node by given ID.
+         * @param nodeId ID of the node.
+         */
+        getAllEdgesTo(nodeId: number) {
+            return material.edges.filter((edge) => edge.to[0] === nodeId);
         },
 
         anyConnectionToSocket(nodeId: number, socketId: string) {

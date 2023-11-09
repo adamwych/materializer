@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "../ui/editor/consts";
 import { MaterialGraphEdge } from "./graph";
 import { MaterialNode } from "./node";
+import TextureFilterMethod from "./texture-filter";
 
 /**
  * A material is a set of interconnected nodes, that combined together
@@ -40,6 +41,7 @@ export function createDefaultMaterial(): Material {
                         color: [0.27, 0.27, 1],
                     },
                     textureSize: 1,
+                    textureFilterMethod: TextureFilterMethod.Linear,
                 }),
             ],
             [
@@ -52,6 +54,7 @@ export function createDefaultMaterial(): Material {
                     y: EDITOR_GRAPH_HEIGHT / 2 - 64,
                     parameters: {},
                     textureSize: 2048,
+                    textureFilterMethod: TextureFilterMethod.Linear,
                 }),
             ],
         ]),

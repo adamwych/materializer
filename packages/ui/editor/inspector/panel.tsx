@@ -15,7 +15,7 @@ export default function InspectorPanel(props: Props) {
     const selectedNodes = () => selectionManager.selectedNodes();
 
     return (
-        <div class={cn("overflow-auto", props.class)}>
+        <div class={cn("h-full overflow-auto", props.class)}>
             <Show when={selectedNodes().length === 0}>
                 <InspectorMaterialParameters />
             </Show>

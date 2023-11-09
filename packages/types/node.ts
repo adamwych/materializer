@@ -1,6 +1,7 @@
 import { MaterialNodePainterInfo } from "./node-painter";
 import { MaterialNodeParameterInfo } from "./node-parameter";
 import { MaterialNodeSocketInfo } from "./node-socket";
+import TextureFilterMethod from "./texture-filter";
 
 export type MaterialNode = {
     /** An incremental number uniquely identifying this node among others *in its material*. */
@@ -24,8 +25,19 @@ export type MaterialNode = {
      */
     parameters: Record<string, unknown>;
 
-    /** Size of the output texture. */
+    /**
+     * Size of the output texture
+     * Changing this has no effect for `Output` nodes, because their
+     * size is inherited from the node that they are connected to.
+     */
     textureSize: number;
+
+    /**
+     * Method used to filter the texture.
+     * Changing this has no effect for `Output` nodes, because their
+     * filter method is inherited from the node that they are connected to.
+     */
+    textureFilterMethod: TextureFilterMethod;
 };
 
 /**

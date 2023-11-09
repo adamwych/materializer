@@ -4,6 +4,7 @@ import { useMaterialStore } from "../../../stores/material";
 import { MaterialNode } from "../../../types/node";
 import InspectorNodeParameter from "./parameter";
 import PanelSection from "../../components/panel/section";
+import InspectorNodeTextureParameters from "./node-texture-params";
 
 type Props = {
     node: MaterialNode;
@@ -16,24 +17,27 @@ export default function InspectorNodeParameters(props: Props) {
     const parameters = () => Object.values(spec()!.parameters);
 
     return (
-        <PanelSection label="Parameters">
-            <Show when={parameters().length === 0}>
-                <div class="p-4 text-gray-700 text-sm">
-                    This node does not define any parameters.
-                </div>
-            </Show>
+        <>
+            <InspectorNodeTextureParameters node={props.node} />
+            <PanelSection label="Parameters">
+                <Show when={parameters().length === 0}>
+                    <div class="p-4 text-gray-700 text-sm">
+                        This node does not define any parameters.
+                    </div>
+                </Show>
 
-            <For each={parameters()}>
-                {(parameter) => (
-                    <InspectorNodeParameter
-                        parameter={parameter}
-                        value={() => props.node.parameters[parameter.id] ?? parameter.default}
-                        onChange={(v) =>
-                            materialActions.setNodeParameter(props.node.id, parameter.id, v)
-                        }
-                    />
-                )}
-            </For>
-        </PanelSection>
+                <For each={parameters()}>
+                    {(parameter) => (
+                        <InspectorNodeParameter
+                            parameter={parameter}
+                            value={() => props.node.parameters[parameter.id] ?? parameter.default}
+                            onChange={(v) =>
+                                materialActions.setNodeParameter(props.node.id, parameter.id, v)
+                            }
+                        />
+                    )}
+                </For>
+            </PanelSection>
+        </>
     );
 }

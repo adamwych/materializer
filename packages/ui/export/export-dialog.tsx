@@ -45,7 +45,10 @@ function ExportDialogInner() {
         allOutputNodes().map((node) => [node.id, material().name + "_" + node.name]),
     );
     const outputSizes = new ReactiveMap<number, number>(
-        allOutputNodes().map((node) => [node.id, node.textureSize]),
+        allOutputNodes().map((node) => [
+            node.id,
+            materialStore.getEffectiveOutputNodeSize(node.id),
+        ]),
     );
 
     async function exportSelectedNodes() {
