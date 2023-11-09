@@ -7,14 +7,14 @@ import TextInput from "../components/input/text-input.tsx";
 import HorizontalSlider from "../components/slider/horizontalSlider.tsx";
 import { ExportImageFormat, getExportImageFileExtension } from "./format.ts";
 
-interface Props {
+type Props = {
     material: Material;
     node: MaterialNode;
     fileNames: ReactiveMap<number, string>;
     outputSizes: ReactiveMap<number, number>;
     fileFormat: ExportImageFormat;
     selectedNodes: ReactiveSet<number>;
-}
+};
 
 export default function ExportDialogOutputNodesItem(props: Props) {
     const isSelected = () => props.selectedNodes.has(props.node.id);

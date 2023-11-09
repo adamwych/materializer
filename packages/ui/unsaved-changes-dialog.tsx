@@ -1,12 +1,12 @@
 import Button from "./components/button/button";
 import Dialog from "./components/dialog/dialog";
 
-interface Props {
+type Props = {
     materialName: string;
     onSave(): void;
     onClose(): void;
     onCancel(): void;
-}
+};
 
 export default function UnsavedChangesDialog(props: Props) {
     return (

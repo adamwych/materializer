@@ -46,7 +46,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             material = ev.data.material;
             canvas = ev.data.canvas;
 
-            let context = canvas.getContext("webgl2");
+            const context = canvas.getContext("webgl2");
             if (!context) {
                 self.postMessage(RenderWorkerResponse.WebGLContextNotAvailable);
                 return;

@@ -5,11 +5,11 @@ import capitalize from "../../../utils/capitalize";
 import { useEditorConnectionBuilder } from "./interaction/connection-builder";
 import { useEditorRuntimeCache } from "./cache";
 
-interface Props {
+type Props = {
     nodeId: number;
     socket: MaterialNodeSocketInfo;
     alignment: "left" | "right";
-}
+};
 
 export default function EditorCanvasNodeSocket(props: Props) {
     const runtimeCache = useEditorRuntimeCache()!;

@@ -1,9 +1,9 @@
 import { ParentProps } from "solid-js";
 import { useSelectContext } from "./context.ts";
 
-interface Props {
+type Props = {
     value: unknown;
-}
+};
 
 export default function SelectOption(props: ParentProps<Props>) {
     const context = useSelectContext()!;

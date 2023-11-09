@@ -3,12 +3,12 @@ import { clamp, distance2d, toDegrees, toRadians } from "../../../utils/math.ts"
 import makeDeferredDragListener from "../../../utils/makeDeferredDragListener.ts";
 import ColorWheelChannelSliders from "./channel-sliders.tsx";
 
-interface Props {
+type Props = {
     size?: number;
     value: [number, number, number];
 
     onChange(value: [number, number, number]): void;
-}
+};
 
 export default function ColorWheel(props: Props) {
     let wheelElementRef: HTMLElement | undefined;

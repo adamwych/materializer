@@ -3,12 +3,12 @@ import { JSX } from "solid-js/jsx-runtime";
 import { RiArrowsArrowDropDownLine } from "solid-icons/ri";
 import { SelectContextProvider } from "./context.ts";
 
-interface Props<V> {
+type Props<V> = {
     children: JSX.Element;
     value: V;
     label: string;
     onChange(value: V): void;
-}
+};
 
 export default function Select<V>(props: Props<V>) {
     const [optionsVisible, setOptionsVisible] = createSignal(false);

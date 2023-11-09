@@ -5,13 +5,13 @@ import { Material } from "../../types/material.ts";
 import { ExportImageFormat } from "./format.ts";
 import ExportDialogOutputNodesItem from "./output-nodes-item.tsx";
 
-interface Props {
+type Props = {
     material: Material;
     fileNames: ReactiveMap<number, string>;
     outputSizes: ReactiveMap<number, number>;
     selectedNodes: ReactiveSet<number>;
     fileFormat: ExportImageFormat;
-}
+};
 
 export default function ExportDialogOutputNodesPanel(props: Props) {
     const allOutputNodes = () =>

@@ -1,5 +1,5 @@
-interface Props {
-    ref: HTMLInputElement | ((element: HTMLInputElement) => void);
+type Props = {
+    ref?: HTMLInputElement | ((element: HTMLInputElement) => void);
     value: string;
     center?: boolean;
     readOnly?: boolean;
@@ -7,7 +7,7 @@ interface Props {
     class?: string;
     onChange?(value: string): void;
     onInput?(value: string): void;
-}
+};
 
 export default function TextInput(props: Props) {
     return (

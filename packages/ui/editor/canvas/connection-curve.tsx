@@ -1,9 +1,9 @@
 import { EDITOR_GRAPH_HEIGHT, EDITOR_GRAPH_WIDTH } from "../consts";
 
-interface Props {
+type Props = {
     fromCoords: [number, number];
     toCoords: [number, number];
-}
+};
 
 export default function EditorCanvasConnectionCurve(props: Props) {
     const commands = () => [

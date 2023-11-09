@@ -18,13 +18,13 @@ export type InputProps<I extends ParameterInputInfo = any, V = any> = {
     onChange(value: V): void;
 };
 
-interface Props<V> {
+type Props<V> = {
     children?: JSX.Element;
     parameter: MaterialNodeParameterInfo;
     value: Accessor<V>;
     onChange(value: V): void;
     onResetToDefault(): void;
-}
+};
 
 const InputComponents: Record<ParameterInputType, Component<InputProps>> = {
     rgb: MaterialNodeInspectorRGBInput,
