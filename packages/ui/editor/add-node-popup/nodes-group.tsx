@@ -1,5 +1,5 @@
 import { For } from "solid-js";
-import { MaterialNodeBlueprint } from "../../../types/node";
+import { MaterialNodeBlueprint } from "../../../material/node";
 import EditorAddNodePopupNodesGroupItem from "./nodes-group-item";
 
 type Props = {

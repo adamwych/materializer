@@ -1,4 +1,4 @@
-import { MaterialNodePainterInfo, MaterialNodePainterType } from "../../types/node-painter";
+import { MaterialNodePainterInfo, MaterialNodePainterType } from "../../material/node-painter";
 import TextureFilterMethod, { mapFilterMethodToGL } from "../../types/texture-filter";
 import { ConstructorOf } from "../../utils/ConstructorOf";
 import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";

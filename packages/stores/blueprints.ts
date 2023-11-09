@@ -9,7 +9,7 @@ import tile from "../../resources/builtin/layout/tile";
 import transform from "../../resources/builtin/layout/transform";
 import noise from "../../resources/builtin/noises/noise";
 import invert from "../../resources/builtin/utilities/invert";
-import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../types/node";
+import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../material/node";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodeBlueprintsPackage = new Map<string, MaterialNodeBlueprint>(
     [

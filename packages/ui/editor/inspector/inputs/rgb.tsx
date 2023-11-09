@@ -1,5 +1,5 @@
 import ColorWheel from "../../../components/color-wheel/color-wheel";
-import { RgbParameterInputInfo } from "../../../../types/node-parameter";
+import { RgbParameterInputInfo } from "../../../../material/node-parameter";
 import { InputProps } from "../parameter";
 
 export default function MaterialNodeInspectorRGBInput(

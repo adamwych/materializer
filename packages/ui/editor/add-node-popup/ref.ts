@@ -1,7 +1,7 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createSignal } from "solid-js";
 import { Point2D } from "../../../utils/math";
-import { MaterialNode } from "../../../types/node";
+import { MaterialNode } from "../../../material/node";
 
 type Result = MaterialNode | undefined;
 

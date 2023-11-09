@@ -1,5 +1,5 @@
 import BlendMode from "../../../packages/types/blend-mode";
-import { MaterialNodeBlueprint } from "../../../packages/types/node";
+import { MaterialNodeBlueprint } from "../../../packages/material/node";
 
 export default {
     id: "blend",

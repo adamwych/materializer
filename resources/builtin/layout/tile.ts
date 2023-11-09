@@ -1,4 +1,4 @@
-import { MaterialNodeBlueprint } from "../../../packages/types/node";
+import { MaterialNodeBlueprint } from "../../../packages/material/node";
 
 export default {
     id: "tile",

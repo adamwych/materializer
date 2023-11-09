@@ -1,6 +1,6 @@
 import { RiArrowsArrowRightLine } from "solid-icons/ri";
 import { useMaterialStore } from "../../../stores/material";
-import { MaterialNodeSocketInfo } from "../../../types/node-socket";
+import { MaterialNodeSocketInfo } from "../../../material/node-socket";
 import capitalize from "../../../utils/capitalize";
 import { useEditorConnectionBuilder } from "./interaction/connection-builder";
 import { useEditorRuntimeCache } from "./cache";

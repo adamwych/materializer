@@ -1,4 +1,4 @@
-import { MaterialGraphEdge } from "../types/graph";
+import { MaterialGraphEdge } from "../material/graph";
 import TextureFilterMethod from "../types/texture-filter";
 import { MinimalMaterialNodeSnapshot, MaterialNodeSnapshot, MaterialSnapshot } from "./types";
 

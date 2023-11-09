@@ -2,9 +2,9 @@ import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
 import { Accessor, createSignal } from "solid-js";
 import { createMutable, unwrap } from "solid-js/store";
-import { Material } from "../types/material";
-import { MaterialNode } from "../types/node";
-import { MaterialNodeSocketAddr } from "../types/node-socket";
+import { Material } from "../material/material";
+import { MaterialNode } from "../material/node";
+import { MaterialNodeSocketAddr } from "../material/node-socket";
 import TextureFilterMethod from "../types/texture-filter";
 import { WorkspaceClipboardState } from "./workspace";
 

@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 import { useMaterialStore } from "../../../stores/material";
-import { MaterialNode } from "../../../types/node";
+import { MaterialNode } from "../../../material/node";
 import TextureFilterMethod from "../../../types/texture-filter";
 import PanelSection from "../../components/panel/section";
 import SelectOption from "../../components/select/option";

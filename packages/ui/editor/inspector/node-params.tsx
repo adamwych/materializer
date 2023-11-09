@@ -1,7 +1,7 @@
 import { For, Show } from "solid-js";
 import { useNodeBlueprintsStore } from "../../../stores/blueprints";
 import { useMaterialStore } from "../../../stores/material";
-import { MaterialNode } from "../../../types/node";
+import { MaterialNode } from "../../../material/node";
 import InspectorNodeParameter from "./parameter";
 import PanelSection from "../../components/panel/section";
 import InspectorNodeTextureParameters from "./node-texture-params";

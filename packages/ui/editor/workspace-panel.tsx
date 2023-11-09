@@ -4,7 +4,7 @@ import PanelSection from "../components/panel/section";
 import WorkspacePanelItem from "./workspace-panel-item";
 import Button from "../components/button/button";
 import { RiSystemAddFill } from "solid-icons/ri";
-import { createDefaultMaterial } from "../../types/material";
+import { createDefaultMaterial } from "../../material/material";
 
 export default function WorkspacePanel() {
     const workspace = useWorkspaceStore()!;

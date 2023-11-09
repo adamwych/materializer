@@ -1,4 +1,4 @@
-import { MaterialNodePainterInfo } from "../../../types/node-painter";
+import { MaterialNodePainterInfo } from "../../../material/node-painter";
 import { MaterialNodeSnapshot } from "../../types";
 import MaterialNodeShaderProgram from "../node-shader";
 import MaterialNodePainter from "./painter";

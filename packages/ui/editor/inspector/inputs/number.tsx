@@ -1,5 +1,5 @@
 import { createEffect, createSignal } from "solid-js";
-import { NumberParameterInputInfo } from "../../../../types/node-parameter";
+import { NumberParameterInputInfo } from "../../../../material/node-parameter";
 import HorizontalSlider from "../../../components/slider/horizontalSlider";
 import { InputProps } from "../parameter";
 

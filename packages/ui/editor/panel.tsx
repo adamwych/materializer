@@ -4,7 +4,7 @@ import { RenderEngineProvider } from "../../renderer/engine";
 import { MaterialProvider } from "../../stores/material";
 import { ShortcutsProvider } from "../../stores/shortcuts";
 import { useWorkspaceStore } from "../../stores/workspace";
-import { Material } from "../../types/material";
+import { Material } from "../../material/material";
 import EditorAddNodePopup from "./add-node-popup/popup";
 import { EditorAddNodePopupRef } from "./add-node-popup/ref";
 import { EditorRuntimeCache } from "./canvas/cache";

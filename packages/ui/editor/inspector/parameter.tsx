@@ -4,7 +4,7 @@ import {
     MaterialNodeParameterInfo,
     ParameterInputInfo,
     ParameterInputType,
-} from "../../../types/node-parameter.ts";
+} from "../../../material/node-parameter.ts";
 import Button from "../../components/button/button.tsx";
 import InspectorPanelField from "./field.tsx";
 import MaterialNodeInspectorNumberInput from "./inputs/number.tsx";

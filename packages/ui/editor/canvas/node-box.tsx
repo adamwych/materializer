@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 import { useNodeBlueprintsStore } from "../../../stores/blueprints";
-import { MaterialNode } from "../../../types/node";
+import { MaterialNode } from "../../../material/node";
 import cn from "../../../utils/cn";
 import { EDITOR_NODE_HEIGHT, EDITOR_NODE_WIDTH } from "../consts";
 import { useEditorRuntimeCache } from "./cache";

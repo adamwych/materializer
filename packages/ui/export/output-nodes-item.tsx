@@ -1,7 +1,7 @@
 import { ReactiveMap } from "@solid-primitives/map";
 import { ReactiveSet } from "@solid-primitives/set";
-import { Material } from "../../types/material.ts";
-import { MaterialNode } from "../../types/node.ts";
+import { Material } from "../../material/material.ts";
+import { MaterialNode } from "../../material/node.ts";
 import Checkbox from "../components/input/checkbox.tsx";
 import TextInput from "../components/input/text-input.tsx";
 import HorizontalSlider from "../components/slider/horizontalSlider.tsx";

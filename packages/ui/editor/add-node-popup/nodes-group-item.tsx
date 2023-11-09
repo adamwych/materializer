@@ -1,5 +1,5 @@
 import { RiMediaImage2Fill } from "solid-icons/ri";
-import { MaterialNodeBlueprint } from "../../../types/node";
+import { MaterialNodeBlueprint } from "../../../material/node";
 import cn from "../../../utils/cn";
 
 type Props = {

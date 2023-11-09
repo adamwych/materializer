@@ -1,7 +1,7 @@
 import { MaterialNodePainterInfo } from "./node-painter";
 import { MaterialNodeParameterInfo } from "./node-parameter";
 import { MaterialNodeSocketInfo } from "./node-socket";
-import TextureFilterMethod from "./texture-filter";
+import TextureFilterMethod from "../types/texture-filter";
 
 export type MaterialNode = {
     /** An incremental number uniquely identifying this node among others *in its material*. */

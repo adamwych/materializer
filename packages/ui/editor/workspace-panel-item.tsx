@@ -1,7 +1,7 @@
 import { RiSystemCloseFill } from "solid-icons/ri";
 import { useWorkspaceStore } from "../../stores/workspace";
 import { useWorkspaceHistory } from "../../stores/workspace-history";
-import { Material } from "../../types/material";
+import { Material } from "../../material/material";
 import cn from "../../utils/cn";
 
 type Props = {

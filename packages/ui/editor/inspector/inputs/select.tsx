@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 import SelectOption from "../../../components/select/option";
 import Select from "../../../components/select/select";
-import { SelectParameterInputInfo } from "../../../../types/node-parameter";
+import { SelectParameterInputInfo } from "../../../../material/node-parameter";
 import { InputProps } from "../parameter";
 
 export default function MaterialNodeInspectorSelectInput(

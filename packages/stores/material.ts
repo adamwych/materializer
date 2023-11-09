@@ -6,15 +6,15 @@ import {
     areGraphEdgesSimilar,
     invertGraphEdgeIfApplicable,
     isGraphEdgeValid,
-} from "../types/graph";
-import { Material } from "../types/material";
-import { MaterialEvents } from "../types/material-events";
+} from "../material/graph";
+import { Material } from "../material/material";
+import { MaterialEvents } from "../material/material-events";
 import {
     MaterialNode,
     calculateNodesBoundingRect,
     makeDefaultBlueprintParameters,
-} from "../types/node";
-import { MaterialNodeSocketAddr } from "../types/node-socket";
+} from "../material/node";
+import { MaterialNodeSocketAddr } from "../material/node-socket";
 import TextureFilterMethod from "../types/texture-filter";
 import {
     EDITOR_GRAPH_HEIGHT,

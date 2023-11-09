@@ -1,7 +1,7 @@
 import { ReactiveMap } from "@solid-primitives/map";
 import { ReactiveSet } from "@solid-primitives/set";
 import { For, Show } from "solid-js";
-import { Material } from "../../types/material.ts";
+import { Material } from "../../material/material.ts";
 import { ExportImageFormat } from "./format.ts";
 import ExportDialogOutputNodesItem from "./output-nodes-item.tsx";
 

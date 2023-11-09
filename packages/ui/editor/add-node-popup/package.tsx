@@ -1,6 +1,6 @@
 import { RiOthersBox1Fill } from "solid-icons/ri";
 import { For } from "solid-js";
-import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../../../types/node";
+import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../../../material/node";
 import EditorAddNodePopupNodesGroup from "./nodes-group";
 
 type Props = {

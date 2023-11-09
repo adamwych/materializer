@@ -1,5 +1,5 @@
 import { DeepReadonly } from "ts-essentials";
-import { MaterialNodeParameterInfo } from "../../types/node-parameter";
+import { MaterialNodeParameterInfo } from "../../material/node-parameter";
 
 const PREFIX_PARAMETER = "p_";
 const PREFIX_INPUT_TEXTURE = "i_";

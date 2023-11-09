@@ -1,5 +1,5 @@
-import { MaterialGraphEdge } from "../types/graph";
-import { MaterialNode, MaterialNodeBlueprint } from "../types/node";
+import { MaterialGraphEdge } from "../material/graph";
+import { MaterialNode, MaterialNodeBlueprint } from "../material/node";
 
 export type MaterialSnapshot = {
     nodes: Map<number, MaterialNodeSnapshot>;
