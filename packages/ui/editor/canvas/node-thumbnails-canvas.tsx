@@ -15,20 +15,20 @@ export default function EditorNodeThumbnailsCanvas() {
     function initialize(canvasElement: HTMLCanvasElement) {
         const material = workspaceManager.getActiveMaterial()!;
 
-        worker = renderEngine.initializeWebGLWorker(
-            canvasElement.transferControlToOffscreen(),
-            material,
-            true,
-        );
-
-        worker.setEditorUITransform(
-            cameraState.smoothOffsetX(),
-            cameraState.smoothOffsetY(),
-            cameraState.smoothScale(),
-        );
+        renderEngine
+            .initializeWebGLWorker(canvasElement.transferControlToOffscreen(), material, true)
+            .then((w) => {
+                worker = w;
+                worker.setEditorUITransform(
+                    cameraState.smoothOffsetX(),
+                    cameraState.smoothOffsetY(),
+                    cameraState.smoothScale(),
+                );
+                worker.setEditorUIViewportSize(sizeElement.clientWidth, sizeElement.clientHeight);
+            });
 
         createResizeObserver(sizeElement, ({ width, height }) => {
-            worker.setEditorUIViewportSize(width, height);
+            worker?.setEditorUIViewportSize(width, height);
         });
     }
 

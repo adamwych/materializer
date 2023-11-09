@@ -36,6 +36,18 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     const blueprintStore = useNodeBlueprintsStore()!;
     let worker: RenderWorker | undefined;
 
+    function sendCommandAndWaitForResponse(command: RenderWorkerCommand, transfer: Transferable[]) {
+        return new Promise((resolve) => {
+            if (worker) {
+                worker.onmessage = (ev: MessageEvent<RenderWorkerResponse>) => {
+                    resolve(ev.data);
+                };
+
+                worker.postMessage(command, transfer);
+            }
+        });
+    }
+
     function createMinimalNodeSnapshot(node: MaterialNode): MinimalMaterialNodeSnapshot {
         return {
             node: unwrap(node),
@@ -111,28 +123,16 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
          * @param material Material that will be rendered.
          * @param runScheduler Whether worker should start its render job scheduler.
          */
-        initializeWebGLWorker(
+        async initializeWebGLWorker(
             canvas: OffscreenCanvas,
             material: Material,
             runScheduler: boolean,
-        ): WebGL2RenderWorker {
+        ): Promise<WebGL2RenderWorker> {
             worker?.terminate();
 
             worker = new WebGL2RenderWorkerImpl();
-            worker.onmessage = (ev: MessageEvent<RenderWorkerResponse>) => {
-                if (ev.data === RenderWorkerResponse.WebGLContextNotAvailable) {
-                    alert(
-                        [
-                            "It looks like your browser does not support WebGL2, which is required to run Materializer.\n\n",
-                            "If you're on Mac/iPhone/iPad, please update your system to Sonoma/17+.",
-                        ].join(""),
-                    );
 
-                    worker?.terminate();
-                    worker = undefined;
-                }
-            };
-            worker.postMessage(
+            const response = await sendCommandAndWaitForResponse(
                 {
                     command: "initialize",
                     canvas,
@@ -144,6 +144,18 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 },
                 [canvas],
             );
+
+            if (response === RenderWorkerResponse.WebGLContextNotAvailable) {
+                alert(
+                    `
+                    It looks like your browser does not support WebGL2, which is required to run Materializer.\n\n
+                    If you're on Mac/iPhone/iPad, please update your system to Sonoma/17+.
+                `.trim(),
+                );
+
+                worker?.terminate();
+                worker = undefined;
+            }
 
             return {
                 setEditorUITransform(x, y, scale) {

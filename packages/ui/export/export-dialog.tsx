@@ -55,7 +55,7 @@ function ExportDialogInner() {
         setExporting(true);
         setExportProgress(0);
 
-        renderer.initializeWebGLWorker(new OffscreenCanvas(1, 1), material(), false);
+        await renderer.initializeWebGLWorker(new OffscreenCanvas(1, 1), material(), false);
 
         const mimeType = getExportImageFormatMimeType(fileFormat());
         const extension = getExportImageFileExtension(fileFormat());
