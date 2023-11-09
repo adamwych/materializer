@@ -23,6 +23,7 @@ export default {
             sm: "2px",
             md: "4px",
             full: "100%",
+            none: "0",
         },
         extend: {
             boxShadow: {

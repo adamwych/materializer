@@ -6,6 +6,7 @@ import EditorAddNodePopupNodesGroup from "./nodes-group";
 type Props = {
     id: string;
     package: MaterialNodeBlueprintsPackage;
+    searchQuery: string;
     onItemClick(packageId: string, nodeId: string): void;
 };
 
@@ -14,7 +15,11 @@ export default function EditorAddNodePopupPackage(props: Props) {
         const groups = new Map<string, Map<string, MaterialNodeBlueprint>>();
         for (const [path, spec] of props.package.entries()) {
             const group = groups.get(spec.groupName) ?? new Map<string, MaterialNodeBlueprint>();
-            group.set(path, spec);
+
+            if (spec.name.toLowerCase().includes(props.searchQuery)) {
+                group.set(path, spec);
+            }
+
             groups.set(spec.groupName, group);
         }
         return Array.from(groups);
