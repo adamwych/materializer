@@ -40,7 +40,7 @@ export default function MenuBarSubmenu(props: ParentProps<Props>) {
                     "flex items-center gap-2",
                     "px-3 py-2.5",
                     "text-sm",
-                    open() ? "bg-gray-200" : "hover:bg-gray-300 active:bg-gray-200",
+                    open() ? "bg-blue-500" : "hover:bg-gray-300 active:bg-gray-200",
                 )}
                 onClick={() => setOpen((open) => !open)}
             >

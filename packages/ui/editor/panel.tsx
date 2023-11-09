@@ -1,9 +1,10 @@
 import { MultiProvider } from "@solid-primitives/context";
-import { Show } from "solid-js";
+import { JSX, Show } from "solid-js";
 import { RenderEngineProvider } from "../../renderer/engine";
 import { MaterialProvider } from "../../stores/material";
 import { ShortcutsProvider } from "../../stores/shortcuts";
 import { useWorkspaceStore } from "../../stores/workspace";
+import { Material } from "../../types/material";
 import EditorAddNodePopup from "./add-node-popup/popup";
 import { EditorAddNodePopupRef } from "./add-node-popup/ref";
 import { EditorRuntimeCache } from "./canvas/cache";
@@ -15,10 +16,8 @@ import { EditorInteractionManager } from "./canvas/interaction/manager";
 import { EditorSelectionManager } from "./canvas/interaction/selection";
 import EditorEnvironmentPreviewPanel from "./env-preview-panel";
 import InspectorPanel from "./inspector/panel";
-import WorkspacePanel from "./workspace-panel";
-import { Material } from "../../types/material";
-import { JSX } from "solid-js";
 import EditorSidebar from "./sidebar";
+import WorkspacePanel from "./workspace-panel";
 
 function Wrapper(props: { children: (material: Material) => JSX.Element }) {
     const workspaceStore = useWorkspaceStore()!;

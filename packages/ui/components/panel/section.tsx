@@ -10,7 +10,7 @@ type Props = {
 export default function PanelSection(props: ParentProps<Props>) {
     return (
         <section class={cn("border-b border-gray-200", props.class)}>
-            <div class="px-4 py-2 bg-gray-100 border-b border-gray-200">
+            <div class="px-3 py-2 bg-gray-100 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-semibold uppercase text-gray-800">{props.label}</span>
                     {props.titleButtons}

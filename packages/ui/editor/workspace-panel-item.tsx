@@ -15,7 +15,7 @@ export default function WorkspacePanelItem(props: Props) {
     return (
         <div
             class={cn(
-                "px-4 py-2",
+                "px-3 py-2",
                 "flex items-center justify-between",
                 workspace.isActiveMaterial(props.material.id)
                     ? "bg-blue-500"

@@ -34,6 +34,13 @@ export default function InspectorNodeParameters(props: Props) {
                             onChange={(v) =>
                                 materialActions.setNodeParameter(props.node.id, parameter.id, v)
                             }
+                            onResetToDefault={() =>
+                                materialActions.setNodeParameter(
+                                    props.node.id,
+                                    parameter.id,
+                                    spec().parameters[parameter.id]?.default,
+                                )
+                            }
                         />
                     )}
                 </For>

@@ -1,13 +1,15 @@
+import { RiSystemRefreshLine } from "solid-icons/ri";
 import { Accessor, Component, JSX, Show } from "solid-js";
 import {
     MaterialNodeParameterInfo,
     ParameterInputInfo,
     ParameterInputType,
 } from "../../../types/node-parameter.ts";
+import Button from "../../components/button/button.tsx";
+import InspectorPanelField from "./field.tsx";
 import MaterialNodeInspectorNumberInput from "./inputs/number.tsx";
 import MaterialNodeInspectorRGBInput from "./inputs/rgb.tsx";
 import MaterialNodeInspectorSelectInput from "./inputs/select.tsx";
-import InspectorPanelField from "./field.tsx";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type InputProps<I extends ParameterInputInfo = any, V = any> = {
@@ -16,11 +18,12 @@ export type InputProps<I extends ParameterInputInfo = any, V = any> = {
     onChange(value: V): void;
 };
 
-interface Props {
+interface Props<V> {
     children?: JSX.Element;
     parameter: MaterialNodeParameterInfo;
-    value: Accessor<unknown>;
-    onChange(value: unknown): void;
+    value: Accessor<V>;
+    onChange(value: V): void;
+    onResetToDefault(): void;
 }
 
 const InputComponents: Record<ParameterInputType, Component<InputProps>> = {
@@ -29,11 +32,21 @@ const InputComponents: Record<ParameterInputType, Component<InputProps>> = {
     select: MaterialNodeInspectorSelectInput,
 };
 
-export default function InspectorNodeParameter(props: Props) {
+export default function InspectorNodeParameter<V>(props: Props<V>) {
     const InputComponent = InputComponents[props.parameter.inputType];
 
     return (
-        <InspectorPanelField label={props.parameter.name}>
+        <InspectorPanelField
+            label={props.parameter.name}
+            titleButtons={[
+                <Button
+                    hint="Reset to default"
+                    icon={RiSystemRefreshLine}
+                    size="tiny"
+                    onClick={props.onResetToDefault}
+                />,
+            ]}
+        >
             <Show when={InputComponent}>
                 <InputComponent
                     parameter={props.parameter}

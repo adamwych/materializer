@@ -6,10 +6,9 @@ type Props = {
     icon?: IconTypes;
     iconSide?: "left" | "right";
     iconProps?: IconProps;
-
     size?: "inline" | "tiny" | "small" | "default";
-
     disabled?: boolean;
+    hint?: string;
 
     onClick(): void;
 };
@@ -45,6 +44,7 @@ export default function Button(props: ParentProps<Props>) {
                     : "bg-gray-200 hover:bg-gray-300 active:bg-gray-100",
             )}
             disabled={props.disabled}
+            title={props.hint}
             onClick={props.onClick}
         >
             {renderIcon("left")}
