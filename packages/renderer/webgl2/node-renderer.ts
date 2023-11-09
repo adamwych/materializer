@@ -262,7 +262,10 @@ export default class WebGLNodeRenderer {
 
             this.canvas.width = previousCanvasWidth;
             this.canvas.height = previousCanvasHeight;
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, outputFramebuffer);
         } else {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, outputFramebuffer);
             gl.framebufferTexture2D(
                 gl.FRAMEBUFFER,
                 gl.COLOR_ATTACHMENT0,
@@ -271,8 +274,6 @@ export default class WebGLNodeRenderer {
                 0,
             );
         }
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, outputFramebuffer);
 
         const pixels = new Uint8Array(outputWidth * outputHeight * 4);
         this.gl.readBuffer(this.gl.COLOR_ATTACHMENT0);
