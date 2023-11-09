@@ -11,7 +11,9 @@ export default function EditorEnvironmentPreviewPanel() {
     const renderer = useRenderEngine()!;
 
     function initialize(canvas: HTMLCanvasElement) {
-        renderer.setEnvironmentPreviewDestination(canvas.transferControlToOffscreen());
+        requestAnimationFrame(() => {
+            renderer.setEnvironmentPreviewDestination(canvas.transferControlToOffscreen());
+        });
     }
 
     function onPointerDown() {

@@ -1,5 +1,4 @@
 import { onMount } from "solid-js";
-import { Material } from "../../../types/material";
 import cn from "../../../utils/cn";
 import { EDITOR_ELEMENT_ID } from "../consts";
 import EditorCanvasBackground from "./background";
@@ -14,7 +13,6 @@ import EditorNodeThumbnailsCanvas from "./node-thumbnails-canvas";
 import EditorCanvasNodes from "./nodes";
 
 type Props = {
-    material: Material;
     class?: string;
 };
 

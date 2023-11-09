@@ -23,7 +23,7 @@ export type Material = {
     edges: Array<MaterialGraphEdge>;
 };
 
-export function createEmptyMaterial(): Material {
+export function createDefaultMaterial(): Material {
     return {
         id: uuidv4(),
         name: "New Material",

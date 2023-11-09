@@ -32,7 +32,7 @@ export const [EditorInteractionManager, useEditorInteractionManager] = createCon
 
         onWheel(ev: WheelEvent) {
             const isZoomingIn = ev.deltaY < 0;
-            cameraState.zoomAtOrigin(ev.pageX, ev.pageY - 70, isZoomingIn ? 1.2 : 1 / 1.2);
+            cameraState.zoomAtOrigin(ev.pageX - 340, ev.pageY - 36, isZoomingIn ? 1.2 : 1 / 1.2);
         },
     };
 });

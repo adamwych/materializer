@@ -46,7 +46,7 @@ export const [EditorGesturesHandler, useEditorGesturesHandler] = createContextPr
         if (!justStartedPinchZoom) {
             cameraState.zoomAtOrigin(
                 centerPointX,
-                centerPointY - 70,
+                centerPointY - 36,
                 distance / lastPinchZoomDistance,
             );
         }

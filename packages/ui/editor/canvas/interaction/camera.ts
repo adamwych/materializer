@@ -142,7 +142,7 @@ export const [EditorCameraState, useEditorCameraState] = createContextProvider((
          */
         mapCoordsToGraphSpace(pageX: number, pageY: number): Point2D {
             return {
-                x: (pageX - smoothOffsetX()) / smoothScale(),
+                x: (pageX - smoothOffsetX() - rootElement.offsetLeft) / smoothScale(),
                 y: (pageY - smoothOffsetY() - rootElement.offsetTop) / smoothScale(),
             };
         },

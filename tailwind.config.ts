@@ -19,6 +19,11 @@ export default {
             lg: "1.125rem",
             xl: "1.25rem",
         },
+        borderRadius: {
+            sm: "2px",
+            md: "4px",
+            full: "100%",
+        },
         extend: {
             boxShadow: {
                 md: "0px 10px 40px -10px rgba(0, 0, 0, 0.5)",

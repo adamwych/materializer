@@ -11,8 +11,8 @@ export default function EditorCanvasMultiselectRect() {
                 class="bg-white bg-opacity-5 border border-gray-400"
                 style={{
                     position: "absolute",
-                    top: rect()!.y - 70 + "px",
-                    left: rect()!.x + "px",
+                    top: rect()!.y - 36 + "px",
+                    left: rect()!.x - 340 + "px",
                     width: rect()!.width + "px",
                     height: rect()!.height + "px",
                     "z-index": Number.MAX_SAFE_INTEGER,

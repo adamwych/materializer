@@ -9,7 +9,7 @@ import { Show } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { useUserDataStorage } from "../stores/storage.ts";
 import { useWorkspaceStore } from "../stores/workspace.ts";
-import { createEmptyMaterial } from "../types/material.ts";
+import { createDefaultMaterial } from "../types/material.ts";
 import { useDialogsStore } from "./components/dialog/store.ts";
 import MenuBar from "./components/menuBar/menu-bar.tsx";
 import MenuBarSubmenuItem from "./components/menuBar/submenu-item.tsx";
@@ -67,7 +67,7 @@ export default function AppMenuBar() {
             <MenuBarSubmenu label="File" icon={RiDocumentFileLine}>
                 <MenuBarSubmenuItem
                     label="New"
-                    onClick={() => workspace.addMaterial(createEmptyMaterial())}
+                    onClick={() => workspace.addMaterial(createDefaultMaterial())}
                 />
 
                 <MenuBarSubmenuItem
