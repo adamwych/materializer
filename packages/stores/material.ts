@@ -250,11 +250,13 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             modifyMaterial((material) => {
                 const node = material.nodes.get(nodeId);
                 if (node) {
-                    material.nodes.delete(nodeId);
+                    for (const edge of material.edges.values()) {
+                        if (edge.from[0] === nodeId || edge.to[0] === nodeId) {
+                            this.removeEdge(edge);
+                        }
+                    }
 
-                    material.edges = material.edges.filter((connection) => {
-                        return connection.from[0] !== nodeId && connection.to[0] !== nodeId;
-                    });
+                    material.nodes.delete(nodeId);
 
                     if (emitEvent) {
                         events.emit("nodeRemoved", { node });
