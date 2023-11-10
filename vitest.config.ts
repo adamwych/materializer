@@ -17,6 +17,19 @@ const vitestConfig = defineVitestConfig({
         environment: "jsdom",
         globals: true,
         testTransformMode: { web: ["/.[jt]sx?$/"] },
+        onConsoleLog(log, type) {
+            if (type === "stderr") {
+                // These errors seem like a bug inside either Solid or Vitest.
+                if (
+                    log.includes("You appear to have multiple instances of Solid.") ||
+                    log.includes("computations created outside a `createRoot`")
+                ) {
+                    return false;
+                }
+            }
+
+            return true as unknown as undefined;
+        },
     },
 });
 

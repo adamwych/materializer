@@ -8,7 +8,8 @@
         "build": "tsc && vite build",
         "preview": "vite preview",
         "lint": "eslint ./packages/**/*.{ts,tsx}",
-        "test": "vitest"
+        "test:watch": "vitest",
+        "test": "vitest run"
     },
     "dependencies": {
         "@solid-primitives/context": "^0.2.1",
