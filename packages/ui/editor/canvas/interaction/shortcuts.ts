@@ -3,6 +3,7 @@ import { useShortcutsStore } from "../../../../stores/shortcuts";
 import { useWorkspaceStore } from "../../../../stores/workspace";
 import { useEditorAddNodePopupRef } from "../../add-node-popup/ref";
 import { useEditorCameraState } from "./camera";
+import { useEditorHistory } from "./history";
 import { useEditorSelectionManager } from "./selection";
 
 /**
@@ -15,6 +16,7 @@ export default function registerEditorCanvasShortcuts() {
     const materialStore = useMaterialStore()!;
     const workspace = useWorkspaceStore()!;
     const cameraState = useEditorCameraState()!;
+    const history = useEditorHistory()!;
 
     handler.add({
         key: " ",
@@ -95,6 +97,24 @@ export default function registerEditorCanvasShortcuts() {
                 );
                 selection.setSelectedNodes(pasedNodes.map((node) => node.id));
             }
+        },
+    });
+
+    handler.add({
+        key: "z",
+        ctrl: true,
+        scope: "editor",
+        handler: () => {
+            history.moveDown(1);
+        },
+    });
+
+    handler.add({
+        key: "y",
+        ctrl: true,
+        scope: "editor",
+        handler: () => {
+            history.moveUp(1);
         },
     });
 }

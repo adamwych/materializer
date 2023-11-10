@@ -17,6 +17,9 @@ export type SliderProps = {
 
     disabled?: boolean;
 
+    onPointerDown?(): void;
+    onPointerUp?(): void;
+
     /**
      * Called whenever the value is changed.
      * @param value New value.

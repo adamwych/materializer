@@ -7,7 +7,7 @@ export default function InspectorMaterialParameters() {
     const materialStore = useMaterialStore()!;
 
     return (
-        <PanelSection label="Material">
+        <PanelSection label="Material" class="border-none">
             <InspectorPanelField label="Name">
                 <TextInput value={materialStore.getName()} onInput={materialStore.setName} />
             </InspectorPanelField>

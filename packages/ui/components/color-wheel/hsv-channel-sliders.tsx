@@ -4,6 +4,8 @@ import ColorWheelChannelSlider from "./channel-slider.tsx";
 export default function ColorWheelHSVChannelSliders(props: {
     value: [number, number, number];
     onChange(value: [number, number, number]): void;
+    onFocus?(): void;
+    onBlur?(): void;
 }) {
     const hsv = () =>
         culori.convertRgbToHsv({
@@ -47,6 +49,8 @@ export default function ColorWheelHSVChannelSliders(props: {
                 min={0}
                 max={360}
                 onChange={onHueChannelChange}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
             />
             <ColorWheelChannelSlider
                 label="S"
@@ -55,6 +59,8 @@ export default function ColorWheelHSVChannelSliders(props: {
                 min={0}
                 max={1}
                 onChange={onSaturationChannelChange}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
             />
             <ColorWheelChannelSlider
                 label="V"
@@ -63,6 +69,8 @@ export default function ColorWheelHSVChannelSliders(props: {
                 min={0}
                 max={1}
                 onChange={onValueChannelChange}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
             />
         </>
     );

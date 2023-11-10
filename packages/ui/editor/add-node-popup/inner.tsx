@@ -1,11 +1,11 @@
 import { RiSystemAddFill, RiSystemCloseFill } from "solid-icons/ri";
 import { For, createSignal, onMount } from "solid-js";
+import { useNodeBlueprintsStore } from "../../../stores/blueprints";
+import { useMaterialStore } from "../../../stores/material";
 import TextInput from "../../components/input/text-input";
+import { useEditorCameraState } from "../canvas/interaction/camera";
 import EditorAddNodePopupPackage from "./package";
 import { useEditorAddNodePopupRef } from "./ref";
-import { useNodeBlueprintsStore } from "../../../stores/blueprints";
-import { useEditorCameraState } from "../canvas/interaction/camera";
-import { useMaterialStore } from "../../../stores/material";
 
 export default function EditorAddNodePopupInner() {
     const ref = useEditorAddNodePopupRef()!;

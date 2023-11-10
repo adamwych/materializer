@@ -7,6 +7,8 @@ type Props = {
     class?: string;
     onChange?(value: string): void;
     onInput?(value: string): void;
+    onFocus?(): void;
+    onBlur?(): void;
 };
 
 export default function TextInput(props: Props) {
@@ -22,6 +24,8 @@ export default function TextInput(props: Props) {
             placeholder={props.placeholder}
             onChange={(ev) => props.onChange?.(ev.target.value)}
             onInput={(ev) => props.onInput?.(ev.target.value)}
+            onFocus={props.onFocus}
+            onBlur={props.onBlur}
         />
     );
 }

@@ -9,22 +9,34 @@ export default function VerticalSlider(props: SliderProps) {
     const styles = () => defaultStyles(props.color ?? "gray");
     const mappedValue = () => mapTo01(props.min, props.max, props.value);
 
-    const onMouseDown = makeDeferredDragListener((ev) => {
-        if (!trackElementRef || props.disabled) {
-            return;
-        }
+    const registerDragListener = makeDeferredDragListener(
+        (ev) => {
+            if (!trackElementRef || props.disabled) {
+                return;
+            }
 
-        const trackBoundingBox = trackElementRef.getBoundingClientRect();
-        let value = 1 - (ev.pageY - trackBoundingBox.y) / trackBoundingBox.height;
-        value = mapFrom01(props.min, props.max, clamp(value, 0, 1));
+            const trackBoundingBox = trackElementRef.getBoundingClientRect();
+            let value = 1 - (ev.pageY - trackBoundingBox.y) / trackBoundingBox.height;
+            value = mapFrom01(props.min, props.max, clamp(value, 0, 1));
 
-        if (props.step) {
-            value = Math.round(value / props.step) * props.step;
-            value = clamp(value, props.min, props.max);
-        }
+            if (props.step) {
+                value = Math.round(value / props.step) * props.step;
+                value = clamp(value, props.min, props.max);
+            }
 
-        props.onChange(value);
-    });
+            if (value !== props.value) {
+                props.onChange(value);
+            }
+        },
+        () => {
+            props.onPointerUp?.();
+        },
+    );
+
+    function onPointerDown(ev: PointerEvent) {
+        props.onPointerDown?.();
+        registerDragListener(ev);
+    }
 
     return (
         <div
@@ -35,7 +47,7 @@ export default function VerticalSlider(props: SliderProps) {
                 width: styles().thickness + "px",
                 height: "100%",
             }}
-            onMouseDown={onMouseDown}
+            onPointerDown={onPointerDown}
         >
             <div
                 class={styles().handle}

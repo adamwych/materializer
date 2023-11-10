@@ -1,4 +1,5 @@
 import { Show } from "solid-js";
+import { MaterialNode } from "../../../material/node";
 import { useMaterialStore } from "../../../stores/material";
 import cn from "../../../utils/cn";
 import { useEditorSelectionManager } from "../canvas/interaction/selection";
@@ -11,17 +12,21 @@ type Props = {
 
 export default function InspectorPanel(props: Props) {
     const selectionManager = useEditorSelectionManager()!;
-    const materialActions = useMaterialStore()!;
-    const selectedNodes = () => selectionManager.selectedNodes();
+    const materialStore = useMaterialStore()!;
+    const selectedNodes = () =>
+        selectionManager
+            .selectedNodes()
+            .map((id) => materialStore.getNodeById(id))
+            .filter((x): x is MaterialNode => x !== undefined);
 
     return (
-        <div class={cn("h-full overflow-auto", props.class)}>
+        <div class={cn("flex-1 overflow-auto border-b border-gray-200", props.class)}>
             <Show when={selectedNodes().length === 0}>
                 <InspectorMaterialParameters />
             </Show>
 
             <Show when={selectedNodes().length === 1}>
-                <InspectorNodeParameters node={materialActions.getNodeById(selectedNodes()[0])!} />
+                <InspectorNodeParameters node={selectedNodes()[0]} />
             </Show>
         </div>
     );

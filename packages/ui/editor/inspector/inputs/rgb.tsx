@@ -5,5 +5,12 @@ import { InputProps } from "../parameter";
 export default function MaterialNodeInspectorRGBInput(
     props: InputProps<RgbParameterInputInfo, [number, number, number]>,
 ) {
-    return <ColorWheel value={props.value()} onChange={props.onChange} />;
+    return (
+        <ColorWheel
+            value={props.value()}
+            onChange={props.onChange}
+            onFocus={props.onFocus}
+            onBlur={props.onBlur}
+        />
+    );
 }

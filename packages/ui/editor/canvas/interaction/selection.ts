@@ -1,18 +1,33 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { RiArrowsDragMoveFill } from "solid-icons/ri";
 import { createSignal } from "solid-js";
 import { useMaterialStore } from "../../../../stores/material";
 import makeDragListener from "../../../../utils/makeDragListener";
 import { EDITOR_GRID_SIZE } from "../../consts";
 import { useEditorRuntimeCache } from "../cache";
 import { useEditorCameraState } from "./camera";
+import { useEditorHistory } from "./history";
+import { unwrap } from "solid-js/store";
 
 export const [EditorSelectionManager, useEditorSelectionManager] = createContextProvider(() => {
     const runtimeCache = useEditorRuntimeCache()!;
-    const materialActions = useMaterialStore()!;
+    const materialStore = useMaterialStore()!;
     const cameraState = useEditorCameraState()!;
+    const history = useEditorHistory()!;
     const [multiselectRect, setMultiselectRect] = createSignal<DOMRect | undefined>();
     const [selectedNodes, setSelectedNodes] = createSignal<Array<number>>([]);
     const [snapToGrid, setSnapToGrid] = createSignal(true);
+
+    // Clear selection if selected nodes are deleted from the material.
+    materialStore.getEvents().on("nodeRemoved", (ev) => {
+        if (selectedNodes().includes(ev.node.id)) {
+            setSelectedNodes((current) => {
+                const updated = [...current];
+                updated.splice(updated.indexOf(ev.node.id), 1);
+                return updated;
+            });
+        }
+    });
 
     return {
         beginCanvasInteraction(downEvent: PointerEvent) {
@@ -44,7 +59,7 @@ export const [EditorSelectionManager, useEditorSelectionManager] = createContext
             let accumulatedMovementY = 0;
 
             const nodesToMove = (selectedNodes().includes(nodeId) ? selectedNodes() : [nodeId])
-                .map((id) => materialActions.getNodeById(id)!)
+                .map((id) => materialStore.getNodeById(id)!)
                 .map((node) => ({
                     node,
                     startX: node.x,
@@ -66,11 +81,26 @@ export const [EditorSelectionManager, useEditorSelectionManager] = createContext
                             newY = Math.round(newY / EDITOR_GRID_SIZE) * EDITOR_GRID_SIZE;
                         }
 
-                        materialActions.moveNodeTo(info.node.id, newX, newY);
+                        materialStore.moveNodeTo(info.node.id, newX, newY);
                     }
                 },
                 () => {
-                    if (!didMove) {
+                    if (didMove) {
+                        const previousPositions = nodesToMove.map((x) =>
+                            unwrap({ nodeId: x.node.id, x: x.startX, y: x.startY }),
+                        );
+                        const finalPositions = nodesToMove.map((x) => {
+                            const node = materialStore.getNodeById(x.node.id)!;
+                            return unwrap({ nodeId: node.id, x: node.x, y: node.y });
+                        });
+
+                        history.pushAction(
+                            `Move ${nodesToMove.length} node(s)`,
+                            RiArrowsDragMoveFill,
+                            ["material.moveNodesTo", finalPositions],
+                            ["material.moveNodesTo", previousPositions],
+                        );
+                    } else {
                         setSelectedNodes([nodeId]);
                     }
                 },

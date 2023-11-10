@@ -1,6 +1,6 @@
 import * as culori from "culori";
-import { clamp, distance2d, toDegrees, toRadians } from "../../../utils/math.ts";
 import makeDeferredDragListener from "../../../utils/makeDeferredDragListener.ts";
+import { clamp, distance2d, toDegrees, toRadians } from "../../../utils/math.ts";
 import ColorWheelChannelSliders from "./channel-sliders.tsx";
 
 type Props = {
@@ -8,6 +8,8 @@ type Props = {
     value: [number, number, number];
 
     onChange(value: [number, number, number]): void;
+    onFocus?(): void;
+    onBlur?(): void;
 };
 
 export default function ColorWheel(props: Props) {
@@ -28,7 +30,7 @@ export default function ColorWheel(props: Props) {
         };
     };
 
-    const onMouseDown = makeDeferredDragListener((ev) => {
+    const registerDragListener = makeDeferredDragListener((ev) => {
         const wheelRect = wheelElementRef!.getBoundingClientRect()!;
         const wheelCenter = {
             x: wheelRect.x + wheelRect.width / 2,
@@ -52,6 +54,11 @@ export default function ColorWheel(props: Props) {
         props.onChange([rgb.r, rgb.g, rgb.b]);
     });
 
+    function onPointerDown(ev: PointerEvent) {
+        props.onFocus?.();
+        registerDragListener(ev);
+    }
+
     return (
         <div class="flex items-center justify-center gap-8" style={{ height: size() + "px" }}>
             <div class="relative">
@@ -65,7 +72,8 @@ export default function ColorWheel(props: Props) {
                         "background-repeat": "no-repeat",
                         filter: `brightness(${hsv().v})`,
                     }}
-                    onMouseDown={onMouseDown}
+                    onPointerDown={onPointerDown}
+                    onPointerUp={() => props.onBlur?.()}
                 />
                 <div
                     class="absolute bg-opacity-25 bg-white rounded-full border border-white pointer-events-none"
@@ -79,7 +87,12 @@ export default function ColorWheel(props: Props) {
                 />
             </div>
 
-            <ColorWheelChannelSliders value={props.value} onChange={props.onChange} />
+            <ColorWheelChannelSliders
+                value={props.value}
+                onChange={props.onChange}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
+            />
         </div>
     );
 }

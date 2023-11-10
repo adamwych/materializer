@@ -96,10 +96,12 @@ export const [EditorConnectionBuilder, useEditorConnectionBuilder] = createConte
         end(ev: PointerEvent, nodeId: number, socketId: string) {
             if (info()) {
                 ev.stopPropagation();
+
                 materialStore.addEdge({
                     from: [info()!.fromNodeId, info()!.fromSocketId],
                     to: [nodeId, socketId],
                 });
+
                 clearDragListener();
                 setInfo(undefined);
             }

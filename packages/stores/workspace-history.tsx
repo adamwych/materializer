@@ -1,6 +1,8 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveSet } from "@solid-primitives/set";
+import { createStore, produce } from "solid-js/store";
 import { useDialogsStore } from "../ui/components/dialog/store";
+import { EditorHistoryStack } from "../ui/editor/canvas/interaction/history";
 import UnsavedChangesDialog from "../ui/unsaved-changes-dialog";
 
 export enum NotSavedResolution {
@@ -11,6 +13,7 @@ export enum NotSavedResolution {
 export const [WorkspaceHistoryProvider, useWorkspaceHistory] = createContextProvider(() => {
     const dialogs = useDialogsStore()!;
     const changedMaterials = new ReactiveSet<string>();
+    const [editorStacks, setEditorStacks] = createStore<Record<string, EditorHistoryStack>>({});
 
     return {
         warnIfNotSaved(id: string, name: string): Promise<NotSavedResolution> {
@@ -49,6 +52,31 @@ export const [WorkspaceHistoryProvider, useWorkspaceHistory] = createContextProv
 
         hasUnsavedChanges(id: string) {
             return changedMaterials.has(id);
+        },
+
+        initializeEditorHistoryStack(materialId: string) {
+            setEditorStacks(
+                produce((state) => {
+                    if (!(materialId in state)) {
+                        state[materialId] = {
+                            entries: [],
+                            top: 0,
+                        };
+                    }
+                }),
+            );
+        },
+
+        setEditorHistoryStack(materialId: string, setter: (current: EditorHistoryStack) => void) {
+            setEditorStacks(
+                produce((state) => {
+                    setter(state[materialId]);
+                }),
+            );
+        },
+
+        getEditorHistoryStack(materialId: string) {
+            return editorStacks[materialId];
         },
     };
 });

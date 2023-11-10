@@ -1,10 +1,10 @@
 import { For, Show } from "solid-js";
+import { MaterialNode } from "../../../material/node";
 import { useNodeBlueprintsStore } from "../../../stores/blueprints";
 import { useMaterialStore } from "../../../stores/material";
-import { MaterialNode } from "../../../material/node";
-import InspectorNodeParameter from "./parameter";
 import PanelSection from "../../components/panel/section";
 import InspectorNodeTextureParameters from "./node-texture-params";
+import InspectorNodeParameter from "./parameter";
 
 type Props = {
     node: MaterialNode;
@@ -29,10 +29,17 @@ export default function InspectorNodeParameters(props: Props) {
                 <For each={parameters()}>
                     {(parameter) => (
                         <InspectorNodeParameter
+                            node={props.node}
                             parameter={parameter}
                             value={() => props.node.parameters[parameter.id] ?? parameter.default}
-                            onChange={(v) =>
-                                materialActions.setNodeParameter(props.node.id, parameter.id, v)
+                            onChange={(nodeId, v) =>
+                                materialActions.setNodeParameter(
+                                    nodeId,
+                                    parameter.id,
+                                    v,
+                                    true,
+                                    false,
+                                )
                             }
                             onResetToDefault={() =>
                                 materialActions.setNodeParameter(

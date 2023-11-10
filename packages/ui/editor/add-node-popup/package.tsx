@@ -7,7 +7,7 @@ type Props = {
     id: string;
     package: MaterialNodeBlueprintsPackage;
     searchQuery: string;
-    onItemClick(packageId: string, nodeId: string): void;
+    onItemClick(packageId: string, nodeId: string, blueprint: MaterialNodeBlueprint): void;
 };
 
 export default function EditorAddNodePopupPackage(props: Props) {
@@ -36,7 +36,7 @@ export default function EditorAddNodePopupPackage(props: Props) {
                     <EditorAddNodePopupNodesGroup
                         name={groupName}
                         nodes={nodes}
-                        onItemClick={(id) => props.onItemClick(props.id, id)}
+                        onItemClick={(id, blueprint) => props.onItemClick(props.id, id, blueprint)}
                     />
                 )}
             </For>

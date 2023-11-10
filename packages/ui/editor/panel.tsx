@@ -1,20 +1,23 @@
 import { MultiProvider } from "@solid-primitives/context";
 import { JSX, Show } from "solid-js";
+import { Material } from "../../material/material";
 import { RenderEngineProvider } from "../../renderer/engine";
 import { MaterialProvider } from "../../stores/material";
 import { ShortcutsProvider } from "../../stores/shortcuts";
 import { useWorkspaceStore } from "../../stores/workspace";
-import { Material } from "../../material/material";
 import EditorAddNodePopup from "./add-node-popup/popup";
 import { EditorAddNodePopupRef } from "./add-node-popup/ref";
 import { EditorRuntimeCache } from "./canvas/cache";
 import EditorCanvas from "./canvas/canvas";
 import { EditorCameraState } from "./canvas/interaction/camera";
+import { EditorCommandsRegistry } from "./canvas/interaction/commands";
 import { EditorConnectionBuilder } from "./canvas/interaction/connection-builder";
 import { EditorGesturesHandler } from "./canvas/interaction/gestures";
+import { EditorHistoryProvider } from "./canvas/interaction/history";
 import { EditorInteractionManager } from "./canvas/interaction/manager";
 import { EditorSelectionManager } from "./canvas/interaction/selection";
 import EditorEnvironmentPreviewPanel from "./env-preview-panel";
+import HistoryPanel from "./history-panel";
 import InspectorPanel from "./inspector/panel";
 import EditorSidebar from "./sidebar";
 import WorkspacePanel from "./workspace-panel";
@@ -31,6 +34,8 @@ export default function EditorPanel() {
                 <Show when={material}>
                     <MultiProvider
                         values={[
+                            EditorCommandsRegistry,
+                            EditorHistoryProvider,
                             MaterialProvider,
                             RenderEngineProvider,
                             EditorRuntimeCache,
@@ -60,6 +65,7 @@ export default function EditorPanel() {
 
                             <EditorSidebar side="right">
                                 <InspectorPanel />
+                                <HistoryPanel />
                             </EditorSidebar>
                         </div>
                     </MultiProvider>

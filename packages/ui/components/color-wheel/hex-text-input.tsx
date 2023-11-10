@@ -4,6 +4,8 @@ import TextInput from "../input/text-input.tsx";
 export default function ColorWheelHexTextInput(props: {
     value: [number, number, number];
     onChange(value: [number, number, number]): void;
+    onFocus?(): void;
+    onBlur?(): void;
 }) {
     const hexValue = () => {
         return culori.formatHex({
@@ -21,5 +23,13 @@ export default function ColorWheelHexTextInput(props: {
         }
     }
 
-    return <TextInput center value={hexValue()} onChange={onHexValueChanged} />;
+    return (
+        <TextInput
+            center
+            value={hexValue()}
+            onChange={onHexValueChanged}
+            onFocus={props.onFocus}
+            onBlur={props.onBlur}
+        />
+    );
 }

@@ -1,5 +1,12 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { createEmitter } from "@solid-primitives/event-bus";
+import {
+    RiEditorLink,
+    RiEditorLinkUnlink,
+    RiOthersBox1Line,
+    RiSystemDeleteBinLine,
+    RiSystemFilterLine,
+} from "solid-icons/ri";
 import { createMutable, unwrap } from "solid-js/store";
 import {
     MaterialGraphEdge,
@@ -16,6 +23,7 @@ import {
 } from "../material/node";
 import { MaterialNodeSocketAddr } from "../material/node-socket";
 import TextureFilterMethod from "../types/texture-filter";
+import { useEditorHistory } from "../ui/editor/canvas/interaction/history";
 import {
     EDITOR_GRAPH_HEIGHT,
     EDITOR_GRAPH_WIDTH,
@@ -33,6 +41,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
     const workspace = useWorkspaceStore()!;
     const material = workspace.getActiveMaterial()!;
     const pkgsRegistry = useNodeBlueprintsStore()!;
+    const history = useEditorHistory();
     const events = createEmitter<MaterialEvents>();
 
     function modifyMaterial(setter: (current: Material) => void) {
@@ -59,7 +68,41 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         });
     }
 
+    function calculateNextNodeId() {
+        return Math.max(0, ...Array.from(material.nodes.keys())) + 1;
+    }
+
     return {
+        /**
+         * Adds given node to the material.
+         * If a node with the same ID already exists in the material, it will be replaced.
+         *
+         * This is an internal function, generally you should prefer using the
+         * `instantiateNode` function to add new nodes.
+         *
+         * @param node Node to add.
+         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: `true`)
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
+         */
+        addNode(node: MaterialNode, emitEvent = true, pushToHistory = true) {
+            modifyMaterial((material) => {
+                material.nodes.set(node.id, node);
+
+                if (emitEvent) {
+                    events.emit("nodeAdded", { node });
+                }
+            });
+
+            if (pushToHistory) {
+                history?.pushAction(
+                    `Add "${node.name}" node`,
+                    RiOthersBox1Line,
+                    ["material.addNode", node, emitEvent, false],
+                    ["material.removeNode", node.id, emitEvent, false],
+                );
+            }
+        },
+
         /**
          * Creates a new node based on given blueprint, places it at
          * specified X/Y position and then returns it.
@@ -67,14 +110,20 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * @param blueprintPath Path to the blueprint in `package_id/blueprint_id` format.
          * @param x Initial X position.
          * @param y Initial y position.
-         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: true)
+         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: `true`)
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
          * @returns Added node.
          */
-        instantiateNode(blueprintPath: string, x: number, y: number, emitEvent = true) {
+        instantiateNode(
+            blueprintPath: string,
+            x: number,
+            y: number,
+            emitEvent = true,
+            pushToHistory = true,
+        ) {
             const blueprint = pkgsRegistry.getBlueprintByPath(blueprintPath)!;
-            const id = Math.max(0, ...Array.from(material.nodes.keys())) + 1;
             const node: MaterialNode = createMutable({
-                id,
+                id: calculateNextNodeId(),
                 name: blueprint.name,
                 path: blueprintPath,
                 x,
@@ -84,13 +133,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 textureFilterMethod: TextureFilterMethod.Linear,
             });
 
-            modifyMaterial((material) => {
-                material.nodes.set(id, node);
-
-                if (emitEvent) {
-                    events.emit("nodeAdded", { node });
-                }
-            });
+            this.addNode(node, emitEvent, pushToHistory);
 
             return node;
         },
@@ -102,21 +145,22 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * Edges from or to this node will not be duplicated.
          *
          * @param nodeId
-         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: true)
+         * @param emitEvent Whether a `nodeAdded` event should be emitted. (Default: `true`)
          * @return Added node or `undefined` if original node does not exist.
          */
         duplicateNode(nodeId: number, emitEvent = true): MaterialNode | undefined {
             let newNode: MaterialNode | undefined;
 
             modifyNode(nodeId, (node) => {
-                newNode = this.instantiateNode(node.path, node.x + 64, node.y + 64, false);
-                newNode.name = node.name + " (Copy)";
-                newNode.textureSize = node.textureSize;
-                newNode.textureFilterMethod = node.textureFilterMethod;
-                newNode.parameters = structuredClone(unwrap(node.parameters));
-                if (emitEvent) {
-                    events.emit("nodeAdded", { node: newNode });
-                }
+                newNode = createMutable({
+                    ...structuredClone(unwrap(node)),
+                    id: calculateNextNodeId(),
+                    name: node.name + " (Copy)",
+                    parameters: structuredClone(unwrap(node.parameters)),
+                    x: node.x + 64,
+                    y: node.y + 64,
+                });
+                this.addNode(newNode, emitEvent);
             });
 
             return newNode;
@@ -130,6 +174,8 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          */
         duplicateNodes(nodeIds: Array<number>): Array<MaterialNode> {
             const duplicatedNodes: Array<MaterialNode | undefined> = [];
+
+            // TODO: Combine into a single history action.
 
             // Duplicating nodes and edges must be done is separate stages
             // because we can not guarantee that the order of nodes in `nodeIds`
@@ -173,7 +219,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * @param nodeId ID of the node to move.
          * @param x New X position.
          * @param y New Y position.
-         * @param emitEvent Whether a `nodeMoved` event should be emitted. (Default: true)
+         * @param emitEvent Whether a `nodeMoved` event should be emitted. (Default: `true`)
          */
         moveNodeTo(nodeId: number, x: number, y: number, emitEvent = true) {
             modifyNode(nodeId, (node) => {
@@ -194,9 +240,10 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * Removes a node by given ID from the material.
          *
          * @param nodeId ID of the node to remove.
-         * @param emitEvent Whether a `nodeRemoved` event should be emitted. (Default: true)
+         * @param emitEvent Whether a `nodeRemoved` event should be emitted. (Default: `true`)
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
          */
-        removeNode(nodeId: number, emitEvent = true) {
+        removeNode(nodeId: number, emitEvent = true, pushToHistory = true) {
             modifyMaterial((material) => {
                 const node = material.nodes.get(nodeId);
                 if (node) {
@@ -209,6 +256,15 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                     if (emitEvent) {
                         events.emit("nodeRemoved", { node });
                     }
+
+                    if (pushToHistory) {
+                        history?.pushAction(
+                            `Remove ${node.name} node`,
+                            RiSystemDeleteBinLine,
+                            ["material.removeNode", node.id, emitEvent, false],
+                            ["material.addNode", node, emitEvent, false],
+                        );
+                    }
                 }
             });
         },
@@ -219,34 +275,75 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * @param nodeId ID of the node.
          * @param parameterId ID of the parameter.
          * @param value New value.
-         * @param emitEvent Whether a `nodeParameterChanged` event should be emitted. (Default: true)
+         * @param emitEvent Whether a `nodeParameterChanged` event should be emitted. (Default: `true`)
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
          */
-        setNodeParameter<T>(nodeId: number, parameterId: string, value: T, emitEvent = true) {
+        setNodeParameter<T>(
+            nodeId: number,
+            parameterId: string,
+            value: T,
+            emitEvent = true,
+            pushToHistory = true,
+        ) {
             modifyNode(nodeId, (node) => {
+                const previousValue = unwrap(node.parameters[parameterId]);
+
                 node.parameters[parameterId] = value;
 
                 if (emitEvent) {
                     events.emit("nodeParameterChanged", { node });
                 }
-            });
-        },
 
-        setNodeTextureSize(nodeId: number, size: number, emitEvent = true) {
-            modifyNode(nodeId, (node) => {
-                node.textureSize = size;
-
-                if (emitEvent) {
-                    events.emit("nodeParameterChanged", { node });
+                if (pushToHistory) {
+                    history?.pushNodeParameterValueChanged(node, parameterId, value, previousValue);
                 }
             });
         },
 
-        setNodeTextureFilterMethod(nodeId: number, method: TextureFilterMethod, emitEvent = true) {
+        setNodeTextureSize(nodeId: number, value: number, emitEvent = true, pushToHistory = true) {
             modifyNode(nodeId, (node) => {
-                node.textureFilterMethod = method;
+                const previousValue = unwrap(node.textureSize);
+
+                node.textureSize = value;
 
                 if (emitEvent) {
                     events.emit("nodeParameterChanged", { node });
+                }
+
+                if (pushToHistory) {
+                    history?.pushNodeTextureSizeChanged(node, value, previousValue);
+                }
+            });
+        },
+
+        setNodeTextureFilterMethod(
+            nodeId: number,
+            value: TextureFilterMethod,
+            emitEvent = true,
+            pushToHistory = true,
+        ) {
+            modifyNode(nodeId, (node) => {
+                const previousValue = unwrap(node.textureFilterMethod);
+
+                node.textureFilterMethod = value;
+
+                if (emitEvent) {
+                    events.emit("nodeParameterChanged", { node });
+                }
+
+                if (pushToHistory) {
+                    history?.pushAction(
+                        `Set ${node.name} texture filter method`,
+                        RiSystemFilterLine,
+                        ["material.setNodeTextureFilterMethod", node.id, value, true, false],
+                        [
+                            "material.setNodeTextureFilterMethod",
+                            node.id,
+                            previousValue,
+                            true,
+                            false,
+                        ],
+                    );
                 }
             });
         },
@@ -266,8 +363,9 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          *
          * @param edge Edge to add.
          * @param emitEvents Whether `nodeConnectionsChanged` events should be emitted.
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
          */
-        addEdge(edge: MaterialGraphEdge, emitEvents = true) {
+        addEdge(edge: MaterialGraphEdge, emitEvents = true, pushToHistory = true) {
             let sourceNodeBlueprint = this.getNodeBlueprint(edge.from[0])!;
             let destinationNodeBlueprint = this.getNodeBlueprint(edge.to[0])!;
 
@@ -293,6 +391,15 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                     notifyGraphEdgeChanged(edge);
                 }
             });
+
+            if (pushToHistory) {
+                history?.pushAction(
+                    `Connect ${edge.from[1]} to ${edge.to[1]}`,
+                    RiEditorLink,
+                    ["material.addEdge", edge, emitEvents, false],
+                    ["material.removeEdge", edge, emitEvents, false],
+                );
+            }
         },
 
         /**
@@ -304,20 +411,16 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          * @param nodeId ID of the destination node.
          * @param socketId ID of the destination socket.
          * @param emitEvents Whether `nodeConnectionsChanged` events should be emitted.
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
          */
-        removeEdgeTo(nodeId: number, socketId: string, emitEvents = true) {
-            modifyMaterial((material) => {
-                const index = material.edges.findIndex(
-                    (edge) => edge.to[0] === nodeId && edge.to[1] === socketId,
-                );
-                if (index >= 0) {
-                    const [removedEdge] = material.edges.splice(index, 1);
+        removeEdgeTo(nodeId: number, socketId: string, emitEvents = true, pushToHistory = true) {
+            const edge = material.edges.find(
+                (edge) => edge.to[0] === nodeId && edge.to[1] === socketId,
+            );
 
-                    if (emitEvents) {
-                        notifyGraphEdgeChanged(removedEdge);
-                    }
-                }
-            });
+            if (edge) {
+                this.removeEdge(edge, emitEvents, pushToHistory);
+            }
         },
 
         /**
@@ -325,17 +428,27 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          *
          * @param edge Edge to remove.
          * @param emitEvents Whether `nodeConnectionsChanged` events should be emitted.
+         * @param pushToHistory Whether this action should be added to the history stack. (Default: `true`)
          */
-        removeEdge(edge: MaterialGraphEdge, emitEvents = true) {
+        removeEdge(edge: MaterialGraphEdge, emitEvents = true, pushToHistory = true) {
             modifyMaterial((material) => {
                 const index = material.edges.findIndex((otherEdge) =>
                     areGraphEdgesSimilar(edge, otherEdge),
                 );
                 if (index >= 0) {
-                    material.edges.splice(index, 1);
+                    const [removedEdge] = material.edges.splice(index, 1);
 
                     if (emitEvents) {
                         notifyGraphEdgeChanged(edge);
+                    }
+
+                    if (pushToHistory) {
+                        history?.pushAction(
+                            `Disconnect ${removedEdge.from[1]} from ${removedEdge.to[1]}`,
+                            RiEditorLinkUnlink,
+                            ["material.removeEdge", edge, emitEvents, false],
+                            ["material.addEdge", edge, emitEvents, false],
+                        );
                     }
                 }
             });
@@ -365,18 +478,14 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             const offsetFromCenterY = centerY - rectCenterY;
 
             state.nodes.forEach((node) => {
-                const pastedNode = this.instantiateNode(
-                    node.path,
-                    node.x + offsetFromCenterX,
-                    node.y + offsetFromCenterY,
-                    false,
-                );
-                pastedNode.name = node.name;
-                pastedNode.parameters = node.parameters;
-                pastedNode.textureSize = node.textureSize;
-                pastedNode.textureFilterMethod = node.textureFilterMethod;
+                const pastedNode: MaterialNode = createMutable({
+                    ...structuredClone(unwrap(node)),
+                    id: calculateNextNodeId(),
+                    x: node.x + offsetFromCenterX,
+                    y: node.y + offsetFromCenterY,
+                });
+                this.addNode(pastedNode);
                 addedNodes.set(node.id, pastedNode);
-                events.emit("nodeAdded", { node: pastedNode });
             });
 
             state.edges.forEach((edge) => {
@@ -446,31 +555,20 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             );
         },
 
-        getNodeById(id: number) {
-            return material.nodes.get(id);
-        },
-
+        getNodeById: (id: number) => material.nodes.get(id),
         getNodeBlueprint(nodeId: number) {
             return pkgsRegistry.getBlueprintByPath(this.getNodeById(nodeId)!.path);
         },
 
-        getEvents() {
-            return events;
-        },
-
-        getMaterial() {
-            return material;
-        },
+        getEvents: () => events,
+        getMaterial: () => material,
 
         setName(name: string) {
             modifyMaterial((material) => {
                 material.name = name;
             });
         },
-
-        getName() {
-            return material.name;
-        },
+        getName: () => material.name,
     };
 });
 

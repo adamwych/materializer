@@ -8,6 +8,8 @@ export default function ColorWheelChannelSlider(props: {
     max: number;
     color: TailwindColorName;
     onChange(value: number): void;
+    onFocus?(): void;
+    onBlur?(): void;
 }) {
     return (
         <div class="h-full flex flex-col gap-2 items-center">
@@ -17,8 +19,10 @@ export default function ColorWheelChannelSlider(props: {
                 min={props.min}
                 max={props.max}
                 value={props.value}
-                onChange={props.onChange}
                 color={props.color}
+                onChange={props.onChange}
+                onPointerDown={props.onFocus}
+                onPointerUp={props.onBlur}
             />
 
             <span class="text-center text-sm" style={{ width: "30px" }}>

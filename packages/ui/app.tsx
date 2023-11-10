@@ -1,11 +1,11 @@
 import { MultiProvider } from "@solid-primitives/context";
 import { render } from "solid-js/web";
+import { createDefaultMaterial } from "../material/material.ts";
 import { NodeBlueprintsProvider } from "../stores/blueprints.ts";
 import { ShortcutsProvider } from "../stores/shortcuts.ts";
 import { UserDataStorageProvider } from "../stores/storage.ts";
 import { WorkspaceHistoryProvider } from "../stores/workspace-history.tsx";
 import { WorkspaceProvider, useWorkspaceStore } from "../stores/workspace.ts";
-import { createDefaultMaterial } from "../material/material.ts";
 import AppMenuBar from "./app-menu-bar.tsx";
 import DialogsOutlet from "./components/dialog/outlet.tsx";
 import { DialogsProvider } from "./components/dialog/store.ts";

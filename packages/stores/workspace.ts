@@ -44,6 +44,8 @@ export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() =
                         materials.push(material);
                     }),
                 );
+
+                history.initializeEditorHistoryStack(material.id);
             }
 
             setActiveMaterialId(material.id);

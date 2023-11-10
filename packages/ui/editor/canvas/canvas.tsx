@@ -11,6 +11,7 @@ import registerEditorCanvasShortcuts from "./interaction/shortcuts";
 import EditorCanvasMultiselectRect from "./multiselect-rect";
 import EditorNodeThumbnailsCanvas from "./node-thumbnails-canvas";
 import EditorCanvasNodes from "./nodes";
+import registerEditorMaterialCommands from "./interaction/material-commands";
 
 type Props = {
     class?: string;
@@ -21,6 +22,7 @@ export default function EditorCanvas(props: Props) {
     const cameraState = useEditorCameraState()!;
 
     registerEditorCanvasShortcuts();
+    registerEditorMaterialCommands();
 
     return (
         <div

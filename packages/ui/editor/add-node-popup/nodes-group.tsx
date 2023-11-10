@@ -5,7 +5,7 @@ import EditorAddNodePopupNodesGroupItem from "./nodes-group-item";
 type Props = {
     name: string;
     nodes: Map<string, MaterialNodeBlueprint>;
-    onItemClick(id: string): void;
+    onItemClick(id: string, blueprint: MaterialNodeBlueprint): void;
 };
 
 export default function EditorAddNodePopupNodesGroup(props: Props) {
@@ -19,7 +19,7 @@ export default function EditorAddNodePopupNodesGroup(props: Props) {
                 {([id, spec]) => (
                     <EditorAddNodePopupNodesGroupItem
                         spec={spec}
-                        onClick={() => props.onItemClick(id)}
+                        onClick={() => props.onItemClick(id, spec)}
                     />
                 )}
             </For>

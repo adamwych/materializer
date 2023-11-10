@@ -1,11 +1,14 @@
 import { RiSystemRefreshLine } from "solid-icons/ri";
-import { Accessor, Component, JSX, Show } from "solid-js";
+import { Accessor, Component, ParentProps, Show } from "solid-js";
+import { unwrap } from "solid-js/store";
 import {
     MaterialNodeParameterInfo,
     ParameterInputInfo,
     ParameterInputType,
 } from "../../../material/node-parameter.ts";
+import { MaterialNode } from "../../../material/node.ts";
 import Button from "../../components/button/button.tsx";
+import { useEditorHistory } from "../canvas/interaction/history.ts";
 import InspectorPanelField from "./field.tsx";
 import MaterialNodeInspectorNumberInput from "./inputs/number.tsx";
 import MaterialNodeInspectorRGBInput from "./inputs/rgb.tsx";
@@ -16,13 +19,15 @@ export type InputProps<I extends ParameterInputInfo = any, V = any> = {
     parameter: MaterialNodeParameterInfo & I;
     value: Accessor<V>;
     onChange(value: V): void;
+    onFocus(): void;
+    onBlur(): void;
 };
 
 type Props<V> = {
-    children?: JSX.Element;
+    node: MaterialNode;
     parameter: MaterialNodeParameterInfo;
     value: Accessor<V>;
-    onChange(value: V): void;
+    onChange(nodeId: number, value: V): void;
     onResetToDefault(): void;
 };
 
@@ -32,8 +37,19 @@ const InputComponents: Record<ParameterInputType, Component<InputProps>> = {
     select: MaterialNodeInspectorSelectInput,
 };
 
-export default function InspectorNodeParameter<V>(props: Props<V>) {
+export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) {
     const InputComponent = InputComponents[props.parameter.inputType];
+    const history = useEditorHistory()!;
+    let startValue: V;
+
+    function onFocus() {
+        startValue = structuredClone(unwrap(props.value()));
+    }
+
+    function onBlur() {
+        const newValue = structuredClone(unwrap(props.value()));
+        history.pushNodeParameterValueChanged(props.node, props.parameter.id, newValue, startValue);
+    }
 
     return (
         <InspectorPanelField
@@ -51,7 +67,9 @@ export default function InspectorNodeParameter<V>(props: Props<V>) {
                 <InputComponent
                     parameter={props.parameter}
                     value={props.value}
-                    onChange={props.onChange}
+                    onChange={(v) => props.onChange(props.node.id, v)}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
                 />
             </Show>
             <Show when={!InputComponent}>

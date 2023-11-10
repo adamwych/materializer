@@ -6,6 +6,8 @@ import ColorWheelRGBChannelSliders from "./rgb-channel-sliders.tsx";
 export default function ColorWheelChannelSliders(props: {
     value: [number, number, number];
     onChange(value: [number, number, number]): void;
+    onFocus?(): void;
+    onBlur?(): void;
 }) {
     const [mode, setMode] = createSignal<"rgb" | "hsv">("hsv");
 
@@ -23,15 +25,30 @@ export default function ColorWheelChannelSliders(props: {
                 />
 
                 <Show when={mode() === "rgb"}>
-                    <ColorWheelRGBChannelSliders value={props.value} onChange={props.onChange} />
+                    <ColorWheelRGBChannelSliders
+                        value={props.value}
+                        onChange={props.onChange}
+                        onFocus={props.onFocus}
+                        onBlur={props.onBlur}
+                    />
                 </Show>
 
                 <Show when={mode() === "hsv"}>
-                    <ColorWheelHSVChannelSliders value={props.value} onChange={props.onChange} />
+                    <ColorWheelHSVChannelSliders
+                        value={props.value}
+                        onChange={props.onChange}
+                        onFocus={props.onFocus}
+                        onBlur={props.onBlur}
+                    />
                 </Show>
             </div>
 
-            <ColorWheelHexTextInput value={props.value} onChange={props.onChange} />
+            <ColorWheelHexTextInput
+                value={props.value}
+                onChange={props.onChange}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
+            />
         </div>
     );
 }
