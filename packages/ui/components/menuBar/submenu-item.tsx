@@ -1,21 +1,27 @@
+import { Dynamic, Show } from "solid-js/web";
 import { useEventContext } from "../eventContext.ts";
 import { IconTypes } from "solid-icons";
 
 type Props = {
     label: string;
+    hint?: string;
     icon?: IconTypes;
     shortcut?: string;
+    autoClose?: boolean;
 
     onClick?(): void;
 };
 
 export default function MenuBarSubmenuItem(props: Props) {
     const events = useEventContext();
-    const IconComponent = props.icon;
+    const autoClose = () => props.autoClose ?? true;
 
     function onClick() {
         props.onClick?.();
-        events?.emit("close");
+
+        if (autoClose()) {
+            events?.emit("close");
+        }
     }
 
     return (
@@ -25,9 +31,17 @@ export default function MenuBarSubmenuItem(props: Props) {
             onClick={onClick}
         >
             <div class="flex items-center justify-between">
-                <span class="flex items-center gap-2">
-                    {IconComponent && <IconComponent size={16} />}
-                    <span>{props.label}</span>
+                <span class="flex items-center gap-4">
+                    <Show when={props.icon}>
+                        <Dynamic component={props.icon} size={16} />
+                    </Show>
+                    <div>
+                        <div>{props.label}</div>
+
+                        <Show when={props.hint}>
+                            <div class="text-gray-800 mt-1">{props.hint}</div>
+                        </Show>
+                    </div>
                 </span>
                 <span class="text-xs text-gray-700">{props.shortcut}</span>
             </div>

@@ -2,6 +2,7 @@ import { MultiProvider } from "@solid-primitives/context";
 import { render } from "solid-js/web";
 import { createDefaultMaterial } from "../material/material.ts";
 import { NodeBlueprintsProvider } from "../stores/blueprints.ts";
+import { PreferencesStore } from "../stores/preferences.ts";
 import { ShortcutsProvider } from "../stores/shortcuts.ts";
 import { UserDataStorageProvider } from "../stores/storage.ts";
 import { WorkspaceHistoryProvider } from "../stores/workspace-history.tsx";
@@ -22,6 +23,7 @@ function App() {
                 SnackbarProvider,
                 DialogsProvider,
                 NodeBlueprintsProvider,
+                PreferencesStore,
                 UserDataStorageProvider,
                 WorkspaceHistoryProvider,
                 WorkspaceProvider,

@@ -8,6 +8,7 @@ import { IconTypes } from "solid-icons";
 type Props = {
     label: string;
     icon?: IconTypes;
+    minWidth?: string;
 };
 
 export default function MenuBarSubmenu(props: ParentProps<Props>) {
@@ -53,13 +54,16 @@ export default function MenuBarSubmenu(props: ParentProps<Props>) {
 
                 <div
                     class={cn(
-                        "absolute overflow-hidden w-[150px]",
+                        "absolute overflow-hidden",
                         "bg-gray-100",
                         "border border-gray-300",
                         "rounded-md m-1",
                         "animate-fade-scale-in origin-top-left",
                         "z-menubar",
                     )}
+                    style={{
+                        "min-width": props.minWidth ? props.minWidth : "150px",
+                    }}
                 >
                     <EventContextProvider handle={onItemEvent}>
                         {props.children}

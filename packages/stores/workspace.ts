@@ -1,6 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { RiDeviceSave2Fill } from "solid-icons/ri";
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
 import { MaterialGraphEdge } from "../material/graph";
 import { Material } from "../material/material";
@@ -8,6 +8,7 @@ import { MaterialNode } from "../material/node";
 import { useSnackbar } from "../ui/components/snackbar/context";
 import { useUserDataStorage } from "./storage";
 import { NotSavedResolution, useWorkspaceHistory } from "./workspace-history";
+import { usePreferencesStore } from "./preferences";
 
 export type WorkspaceClipboardState = {
     nodes: Array<MaterialNode>;
@@ -18,15 +19,22 @@ export const [WorkspaceProvider, useWorkspaceStore] = createContextProvider(() =
     const snackbar = useSnackbar()!;
     const history = useWorkspaceHistory()!;
     const userDataStorage = useUserDataStorage()!;
+    const preferences = usePreferencesStore()!;
     const [materials, setMaterials] = createStore<Array<Material>>([]);
     const [activeMaterialId, setActiveMaterialId] = createSignal<string>();
 
-    window.onbeforeunload = () => {
-        const anyUnsavedChanges = materials.some((x) => history.hasUnsavedChanges(x.id));
-        if (anyUnsavedChanges) {
-            return "You have unsaved changes.";
+    createEffect(() => {
+        if (preferences.warnIfNotSaved) {
+            window.onbeforeunload = () => {
+                const anyUnsavedChanges = materials.some((x) => history.hasUnsavedChanges(x.id));
+                if (anyUnsavedChanges) {
+                    return "You have unsaved changes.";
+                }
+            };
+        } else {
+            window.onbeforeunload = null;
         }
-    };
+    });
 
     return {
         /**
