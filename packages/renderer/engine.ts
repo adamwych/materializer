@@ -1,11 +1,11 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { onCleanup } from "solid-js";
 import { unwrap } from "solid-js/store";
-import { useNodeBlueprintsStore } from "../stores/blueprints";
-import { useMaterialStore } from "../stores/material";
 import { Material } from "../material/material";
 import { MaterialNodeEvent } from "../material/material-events";
 import { MaterialNode } from "../material/node";
+import { useNodeBlueprintsStore } from "../stores/blueprints";
+import { useMaterialStore } from "../stores/material";
 import TextureFilterMethod from "../types/texture-filter";
 import { mapDictionary as mapMap } from "../utils/map";
 import { RenderWorkerCommand, RenderWorkerResponse } from "./commands";

@@ -122,7 +122,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 nodeRenderer.clearNodeCache(nodeId);
                 nodeThumbnailsRenderer.clearNodeTransformCache(nodeId);
 
-                jobScheduler.scheduleOutputs(nodeId, true);
+                jobScheduler.scheduleOutputs(nodeId);
 
                 material.nodes.delete(nodeId);
                 material.edges = material.edges.filter(

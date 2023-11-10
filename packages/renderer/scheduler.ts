@@ -3,7 +3,7 @@ import { MaterialSnapshot } from "./types";
 export type SubmitRenderJobsCallback = (nodeIds: Array<number>) => void;
 
 export default class RenderJobScheduler {
-    private readonly queue = new Set<number>();
+    private queue = new Array<number>();
 
     constructor(private readonly material: MaterialSnapshot) {}
 
@@ -21,9 +21,9 @@ export default class RenderJobScheduler {
     }
 
     public runOnce(callback: SubmitRenderJobsCallback) {
-        if (this.queue.size > 0) {
+        if (this.queue.length > 0) {
             callback(Array.from(this.queue));
-            this.queue.clear();
+            this.queue = [];
         }
     }
 
@@ -40,8 +40,8 @@ export default class RenderJobScheduler {
      * @param nodeId
      */
     public schedule(nodeId: number) {
-        if (!this.queue.has(nodeId)) {
-            this.queue.add(nodeId);
+        if (!this.queue.includes(nodeId)) {
+            this.queue.push(nodeId);
         }
     }
 
@@ -52,7 +52,7 @@ export default class RenderJobScheduler {
      * @param nodeId
      */
     public scheduleChain(nodeId: number) {
-        if (!this.queue.has(nodeId)) {
+        if (!this.queue.includes(nodeId)) {
             this.getInputNodes(nodeId).forEach((id) => this.scheduleChain(id));
             this.schedule(nodeId);
             this.getOutputNodes(nodeId).forEach((id) => this.scheduleChain(id));
@@ -63,16 +63,23 @@ export default class RenderJobScheduler {
      * Recursively schedules a render job for given node and its outputs.
      *
      * @param nodeId
-     * @param skipSelf
      */
-    public scheduleOutputs(nodeId: number, skipSelf = false) {
-        if (!this.queue.has(nodeId)) {
-            if (!skipSelf) {
-                this.schedule(nodeId);
-            }
+    public scheduleOutputs(nodeId: number) {
+        const chain = new Array<number>();
+        const iter = (nodeId: number) => {
+            chain.push(nodeId);
+            this.getOutputNodes(nodeId).forEach((id) => iter(id));
+        };
 
-            this.getOutputNodes(nodeId).forEach((id) => this.scheduleOutputs(id));
-        }
+        iter(nodeId);
+
+        // Enqueue the chain, but don't allow back-to-back re-renders of
+        // the same node ([1,2,3,1] is OK, [1,2,2,3,1,1,1] is not).
+        chain.forEach((value) => {
+            if (this.queue[this.queue.length - 1] !== value) {
+                this.queue.push(value);
+            }
+        });
     }
 
     private getInputNodes(nodeId: number): Array<number> {
