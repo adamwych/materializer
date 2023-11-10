@@ -7,7 +7,7 @@ import {
     RiSystemDeleteBinLine,
     RiSystemFilterLine,
 } from "solid-icons/ri";
-import { createMutable, unwrap } from "solid-js/store";
+import { createMutable, modifyMutable, produce, unwrap } from "solid-js/store";
 import {
     MaterialGraphEdge,
     areGraphEdgesSimilar,
@@ -52,7 +52,10 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
         workspace.modifyMaterial(material.id, (material) => {
             const node = material.nodes.get(nodeId);
             if (node) {
-                setter(node, material);
+                modifyMutable(
+                    node,
+                    produce((node) => setter(node, material)),
+                );
             } else {
                 console.warn("Attempted to modify a node that does not exist in the material.");
             }
@@ -86,7 +89,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
          */
         addNode(node: MaterialNode, emitEvent = true, pushToHistory = true) {
             modifyMaterial((material) => {
-                material.nodes.set(node.id, node);
+                material.nodes.set(node.id, createMutable(structuredClone(node)));
 
                 if (emitEvent) {
                     events.emit("nodeAdded", { node });
@@ -122,7 +125,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             pushToHistory = true,
         ) {
             const blueprint = pkgsRegistry.getBlueprintByPath(blueprintPath)!;
-            const node: MaterialNode = createMutable({
+            const node: MaterialNode = {
                 id: calculateNextNodeId(),
                 name: blueprint.name,
                 path: blueprintPath,
@@ -131,7 +134,7 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 parameters: makeDefaultBlueprintParameters(blueprint),
                 textureSize: blueprint.preferredTextureSize,
                 textureFilterMethod: TextureFilterMethod.Linear,
-            });
+            };
 
             this.addNode(node, emitEvent, pushToHistory);
 
@@ -152,14 +155,14 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             let newNode: MaterialNode | undefined;
 
             modifyNode(nodeId, (node) => {
-                newNode = createMutable({
+                newNode = {
                     ...structuredClone(unwrap(node)),
                     id: calculateNextNodeId(),
                     name: node.name + " (Copy)",
                     parameters: structuredClone(unwrap(node.parameters)),
                     x: node.x + 64,
                     y: node.y + 64,
-                });
+                };
                 this.addNode(newNode, emitEvent);
             });
 
@@ -478,12 +481,12 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             const offsetFromCenterY = centerY - rectCenterY;
 
             state.nodes.forEach((node) => {
-                const pastedNode: MaterialNode = createMutable({
+                const pastedNode: MaterialNode = {
                     ...structuredClone(unwrap(node)),
                     id: calculateNextNodeId(),
                     x: node.x + offsetFromCenterX,
                     y: node.y + offsetFromCenterY,
-                });
+                };
                 this.addNode(pastedNode);
                 addedNodes.set(node.id, pastedNode);
             });

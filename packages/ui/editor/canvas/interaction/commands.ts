@@ -1,5 +1,6 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
+import { unwrap } from "solid-js/store";
 
 // TODO: I'm pretty sure it's possible to do type-checking of command handlers with
 // some fancy TypeScript magic, but is it worth it?
@@ -32,7 +33,7 @@ export const [EditorCommandsRegistry, useEditorCommands] = createContextProvider
 
         runCommand(ref: EditorCommandRef) {
             const commandInfo = editorCommands.get(ref[0]);
-            commandInfo?.handler(ref.slice(1));
+            commandInfo?.handler(unwrap(ref.slice(1)));
         },
     };
 });
