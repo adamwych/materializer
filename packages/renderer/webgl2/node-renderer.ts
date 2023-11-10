@@ -1,5 +1,8 @@
 import { MaterialNodePainterInfo, MaterialNodePainterType } from "../../material/node-painter";
-import TextureFilterMethod, { mapFilterMethodToGL } from "../../types/texture-filter";
+import TextureFilterMethod, {
+    mapFilterMethodToGL,
+    mapFilterMethodToMipmapGL,
+} from "../../types/texture-filter";
 import { ConstructorOf } from "../../utils/ConstructorOf";
 import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
 import GLSLMaterialNodePainter from "./painters/glsl";
@@ -152,6 +155,9 @@ export default class WebGLNodeRenderer {
         });
 
         painter.render(this.gl, nodeSnapshot, inputTextures);
+
+        gl.bindTexture(gl.TEXTURE_2D, this.textures.get(node.id)!.texture);
+        gl.generateMipmap(gl.TEXTURE_2D);
 
         // Restore default framebuffer.
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -326,7 +332,8 @@ export default class WebGLNodeRenderer {
         );
 
         gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, mapFilterMethodToGL(filter));
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mapFilterMethodToGL(filter));
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mapFilterMethodToMipmapGL(filter));
+        gl.generateMipmap(gl.TEXTURE_2D);
 
         if (repeat) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
