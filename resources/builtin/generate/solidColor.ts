@@ -3,7 +3,7 @@ import { MaterialNodeBlueprint } from "../../../packages/material/node";
 export default {
     id: "solid-color",
     name: "Solid color",
-    groupName: "Base",
+    groupName: "Generate",
     parameters: {
         color: {
             id: "color",

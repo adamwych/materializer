@@ -3,7 +3,7 @@ import { MaterialNodeBlueprint } from "../../../packages/material/node";
 export default {
     id: "shape",
     name: "Shape",
-    groupName: "Base",
+    groupName: "Generate",
     parameters: {
         shape: {
             id: "shape",

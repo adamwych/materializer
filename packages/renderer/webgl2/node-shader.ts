@@ -7,6 +7,7 @@ const PREFIX_INPUT_TEXTURE = "i_";
 export default class MaterialNodeShaderProgram {
     private readonly program: WebGLProgram;
     private inputTextures: Array<WebGLTexture> = [];
+    private uniformLocationsCache = new Map<string, WebGLUniformLocation>();
 
     /**
      * Compiles and links a new shader program which uses the default
@@ -37,6 +38,19 @@ export default class MaterialNodeShaderProgram {
         return this.gl.getAttribLocation(this.program, name);
     }
 
+    public getUniformLocation(name: string) {
+        const cachedLocation = this.uniformLocationsCache.get(name);
+        if (cachedLocation) {
+            return cachedLocation;
+        }
+
+        const location = this.gl.getUniformLocation(this.program, name);
+        if (location) {
+            this.uniformLocationsCache.set(name, location);
+        }
+        return location;
+    }
+
     public bind() {
         this.gl.useProgram(this.program);
 
@@ -53,6 +67,7 @@ export default class MaterialNodeShaderProgram {
         }
 
         this.inputTextures = [];
+        this.uniformLocationsCache.clear();
     }
 
     public setInputTexture(name: string, texture: WebGLTexture | null) {

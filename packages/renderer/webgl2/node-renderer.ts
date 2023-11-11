@@ -5,6 +5,7 @@ import TextureFilterMethod, {
 } from "../../types/texture-filter";
 import { ConstructorOf } from "../../utils/ConstructorOf";
 import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
+import TwoPassGlslMaterialNodePainter from "./painters/two-pass-glsl";
 import GLSLMaterialNodePainter from "./painters/glsl";
 import MaterialNodePainter from "./painters/painter";
 import ScatterMaterialNodePainter from "./painters/scatter";
@@ -12,6 +13,7 @@ import TileMaterialNodePainter from "./painters/tile";
 
 const PAINTER_CTORS: Record<MaterialNodePainterType, ConstructorOf<MaterialNodePainter>> = {
     glsl: GLSLMaterialNodePainter,
+    "glsl-two-pass": TwoPassGlslMaterialNodePainter,
     scatter: ScatterMaterialNodePainter,
     tile: TileMaterialNodePainter,
 };
@@ -154,7 +156,7 @@ export default class WebGLNodeRenderer {
             }
         });
 
-        painter.render(this.gl, nodeSnapshot, inputTextures);
+        painter.render(this.gl, nodeSnapshot, inputTextures, this);
 
         gl.bindTexture(gl.TEXTURE_2D, this.textures.get(node.id)!.texture);
         gl.generateMipmap(gl.TEXTURE_2D);
@@ -309,7 +311,7 @@ export default class WebGLNodeRenderer {
      * @param rgba Whether this texture should have an alpha channel.
      * @param repeat Whether this texture should repeat when wrapping.
      */
-    private createEmptyTexture(
+    public createEmptyTexture(
         width: number,
         height: number,
         filter: TextureFilterMethod,
@@ -375,5 +377,9 @@ export default class WebGLNodeRenderer {
      */
     public getNodeOutputTexture(nodeId: number) {
         return this.textures.get(nodeId)?.texture;
+    }
+
+    public getPrimaryFramebuffer() {
+        return this.fbo;
     }
 }
