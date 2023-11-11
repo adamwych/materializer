@@ -1,37 +1,10 @@
 import * as glMatrix from "gl-matrix";
+import fragGlsl from "../../../resources/glsl/env-preview.frag.glsl?raw";
+import vertGlsl from "../../../resources/glsl/env-preview.vert.glsl?raw";
 import { toRadians } from "../../utils/math";
 import { XZ_QUAD_VERTICES } from "../quads";
-import WebGLNodeRenderer from "./node-renderer";
 import { MaterialSnapshot } from "../types";
-
-const VERTEX_SHADER_CODE = `
-#version 300 es
-precision highp float;
-
-in vec3 aPosition;
-in vec2 aTexCoords;
-
-uniform mat4 uTransformMatrix;
-out vec2 vTexCoords;
-
-void main(void) {
-    vTexCoords = aTexCoords;
-    gl_Position = uTransformMatrix * vec4(aPosition, 1);
-}`;
-
-const FRAGMENT_SHADER_CODE = `
-#version 300 es
-precision highp float;
-
-in vec2 vTexCoords;
-
-uniform sampler2D uAlbedoTexture;
-
-out vec4 outColor;
-
-void main(void) {
-    outColor = texture(uAlbedoTexture, vTexCoords);
-}`;
+import WebGLNodeRenderer from "./node-renderer";
 
 export default class WebGLEnvironmentalPreviewRenderer {
     private readonly envCanvasContext: OffscreenCanvasRenderingContext2D;
@@ -99,11 +72,11 @@ export default class WebGLEnvironmentalPreviewRenderer {
 
     private initializeShaderProgram() {
         const vertexShader = this.gl.createShader(this.gl.VERTEX_SHADER)!;
-        this.gl.shaderSource(vertexShader, VERTEX_SHADER_CODE.trim());
+        this.gl.shaderSource(vertexShader, vertGlsl);
         this.gl.compileShader(vertexShader);
 
         const fragmentShader = this.gl.createShader(this.gl.FRAGMENT_SHADER)!;
-        this.gl.shaderSource(fragmentShader, FRAGMENT_SHADER_CODE.trim());
+        this.gl.shaderSource(fragmentShader, fragGlsl);
         this.gl.compileShader(fragmentShader);
 
         this.shaderProgram = this.gl.createProgram()!;

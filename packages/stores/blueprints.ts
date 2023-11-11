@@ -1,19 +1,19 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
-import blend from "../../resources/builtin/base/blend";
-import output from "../../resources/builtin/base/output";
-import gaussianBlur from "../../resources/builtin/blur/gaussian";
-import gradient from "../../resources/builtin/generate/linear-gradient";
-import shape from "../../resources/builtin/generate/shape";
-import solidColor from "../../resources/builtin/generate/solidColor";
-import scatter from "../../resources/builtin/layout/scatter";
-import tile from "../../resources/builtin/layout/tile";
-import transform from "../../resources/builtin/layout/transform";
-import anisotropicNoise from "../../resources/builtin/noises/anisotropic";
-import noise from "../../resources/builtin/noises/noise";
-import floor from "../../resources/builtin/utilities/floor";
-import invert from "../../resources/builtin/utilities/invert";
-import passthrough from "../../resources/builtin/utilities/pass-through";
+import blend from "../../resources/nodes/base/blend";
+import output from "../../resources/nodes/base/output";
+import gaussianBlur from "../../resources/nodes/blur/gaussian";
+import gradient from "../../resources/nodes/generate/linear-gradient";
+import shape from "../../resources/nodes/generate/shape";
+import solidColor from "../../resources/nodes/generate/solid-color";
+import scatter from "../../resources/nodes/layout/scatter";
+import tile from "../../resources/nodes/layout/tile";
+import transform from "../../resources/nodes/layout/transform";
+import anisotropicNoise from "../../resources/nodes/noises/anisotropic";
+import noise from "../../resources/nodes/noises/noise";
+import floor from "../../resources/nodes/utilities/floor";
+import invert from "../../resources/nodes/utilities/invert";
+import passthrough from "../../resources/nodes/utilities/pass-through";
 import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../material/node";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodeBlueprintsPackage = new Map<string, MaterialNodeBlueprint>(

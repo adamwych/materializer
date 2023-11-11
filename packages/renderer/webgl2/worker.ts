@@ -1,9 +1,9 @@
 import { RenderWorkerCommand, RenderWorkerResponse } from "../commands";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
+import WebGLEditorUIRenderer from "./editor-ui-renderer";
 import WebGLEnvironmentalPreviewRenderer from "./env-preview-renderer";
 import WebGLNodeRenderer from "./node-renderer";
-import WebGLNodeThumbnailsRenderer from "./node-thumbnails-renderer";
 
 /**
  * Currently the only available render worker uses WebGL2, which unfortunately does
@@ -24,7 +24,7 @@ let canvas: OffscreenCanvas;
 let gl: WebGL2RenderingContext;
 let material: MaterialSnapshot;
 let nodeRenderer: WebGLNodeRenderer;
-let nodeThumbnailsRenderer: WebGLNodeThumbnailsRenderer;
+let editorUIRenderer: WebGLEditorUIRenderer;
 let envPreviewRenderer: WebGLEnvironmentalPreviewRenderer;
 let jobScheduler: RenderJobScheduler;
 
@@ -36,7 +36,7 @@ function renderQueuedNodes(nodeIds: Array<number>) {
         }
     });
 
-    nodeThumbnailsRenderer.render(material);
+    editorUIRenderer.render(material);
     envPreviewRenderer?.render(material);
 }
 
@@ -57,7 +57,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             nodeRenderer = new WebGLNodeRenderer(canvas, gl);
-            nodeThumbnailsRenderer = new WebGLNodeThumbnailsRenderer(canvas, gl, nodeRenderer);
+            editorUIRenderer = new WebGLEditorUIRenderer(canvas, gl, nodeRenderer);
 
             jobScheduler = new RenderJobScheduler(material);
 
@@ -95,8 +95,8 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                     if (justMoved) {
                         // If we don't schedule any render job for this node then
                         // the preview will not update, so we must update it manually.
-                        nodeThumbnailsRenderer.clearNodeTransformCache(ev.data.nodeId);
-                        nodeThumbnailsRenderer.render(material);
+                        editorUIRenderer.clearNodeTransformCache(ev.data.nodeId);
+                        editorUIRenderer.render(material);
                     } else {
                         if (didChangeTextureParams) {
                             nodeRenderer.clearNodeCache(ev.data.nodeId);
@@ -120,7 +120,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 const { nodeId } = ev.data;
 
                 nodeRenderer.clearNodeCache(nodeId);
-                nodeThumbnailsRenderer.clearNodeTransformCache(nodeId);
+                editorUIRenderer.clearNodeTransformCache(nodeId);
 
                 jobScheduler.scheduleOutputs(nodeId);
 
@@ -130,7 +130,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
                 );
 
                 requestAnimationFrame(() => {
-                    nodeThumbnailsRenderer.render(material);
+                    editorUIRenderer.render(material);
                 });
             }
 
@@ -180,20 +180,20 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
         case "setEditorUIViewportSize": {
             canvas.width = ev.data.width;
             canvas.height = ev.data.height;
-            nodeThumbnailsRenderer.updateCameraMatrix();
+            editorUIRenderer.updateCameraMatrix();
 
             requestAnimationFrame(() => {
-                nodeThumbnailsRenderer.render(material);
+                editorUIRenderer.render(material);
             });
 
             break;
         }
 
         case "setEditorUITransform": {
-            nodeThumbnailsRenderer.updateCamera(ev.data.x, ev.data.y, ev.data.scale);
+            editorUIRenderer.updateCamera(ev.data.x, ev.data.y, ev.data.scale);
 
             requestAnimationFrame(() => {
-                nodeThumbnailsRenderer.render(material);
+                editorUIRenderer.render(material);
             });
 
             break;

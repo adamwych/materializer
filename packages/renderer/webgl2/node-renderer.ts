@@ -3,19 +3,18 @@ import TextureFilterMethod, {
     mapFilterMethodToGL,
     mapFilterMethodToMipmapGL,
 } from "../../types/texture-filter";
-import { ConstructorOf } from "../../utils/ConstructorOf";
 import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
-import TwoPassGlslMaterialNodePainter from "./painters/two-pass-glsl";
-import GLSLMaterialNodePainter from "./painters/glsl";
-import MaterialNodePainter from "./painters/painter";
-import ScatterMaterialNodePainter from "./painters/scatter";
-import TileMaterialNodePainter from "./painters/tile";
+import SinglePassGlslNodePainter from "./painters/glsl-single-pass";
+import TwoPassGlslNodePainter from "./painters/glsl-two-pass";
+import WebGLNodePainter, { WebGLNodePainterConstructor } from "./painters/painter";
+import ScatterNodePainter from "./painters/scatter";
+import TileNodePainter from "./painters/tile";
 
-const PAINTER_CTORS: Record<MaterialNodePainterType, ConstructorOf<MaterialNodePainter>> = {
-    glsl: GLSLMaterialNodePainter,
-    "glsl-two-pass": TwoPassGlslMaterialNodePainter,
-    scatter: ScatterMaterialNodePainter,
-    tile: TileMaterialNodePainter,
+const PAINTER_CTORS: Record<MaterialNodePainterType, WebGLNodePainterConstructor> = {
+    glsl: SinglePassGlslNodePainter,
+    "glsl-two-pass": TwoPassGlslNodePainter,
+    scatter: ScatterNodePainter,
+    tile: TileNodePainter,
 };
 
 export type NodeTextureInfo = {
@@ -35,7 +34,7 @@ export type NodeTextureInfo = {
 export default class WebGLNodeRenderer {
     private fbo: WebGLFramebuffer;
     private readonly textures = new Map<number, NodeTextureInfo>();
-    private readonly painters = new Map<number, MaterialNodePainter>();
+    private readonly painters = new Map<number, WebGLNodePainter>();
 
     constructor(
         private readonly canvas: OffscreenCanvas,
@@ -156,7 +155,11 @@ export default class WebGLNodeRenderer {
             }
         });
 
-        painter.render(this.gl, nodeSnapshot, inputTextures, this);
+        painter.render({
+            renderer: this,
+            node: nodeSnapshot,
+            inputTextures,
+        });
 
         gl.bindTexture(gl.TEXTURE_2D, this.textures.get(node.id)!.texture);
         gl.generateMipmap(gl.TEXTURE_2D);
@@ -350,7 +353,7 @@ export default class WebGLNodeRenderer {
     }
 
     /**
-     * Constructs a {@link MaterialNodePainter} for given node or retrieves
+     * Constructs a {@link WebGLNodePainter} for given node or retrieves
      * it from the cache it was has already been constructed before.
      *
      * @param nodeId

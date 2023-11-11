@@ -1,8 +1,8 @@
 import seedrandom from "seedrandom";
-import PatternMaterialNodePainter, { PatternElement } from "./pattern";
+import PatternNodePainter, { PatternElement } from "./pattern";
 import { MaterialNodeSnapshot } from "../../types";
 
-export default class ScatterMaterialNodePainter extends PatternMaterialNodePainter {
+export default class ScatterNodePainter extends PatternNodePainter {
     public generatePattern(snapshot: MaterialNodeSnapshot): Array<PatternElement> {
         const { node } = snapshot;
         const amount = Math.round(node.parameters["amount"] as number);
