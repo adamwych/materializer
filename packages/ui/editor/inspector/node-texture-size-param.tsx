@@ -32,7 +32,7 @@ export default function InspectorNodeTextureSizeParameter(props: Props) {
                 <HorizontalSlider
                     min={1}
                     max={2048}
-                    step={32}
+                    step={props.node.textureSize < 128 ? 16 : 32}
                     value={props.node.textureSize}
                     onChange={(v) =>
                         materialStore.setNodeTextureSize(props.node.id, v, true, false)

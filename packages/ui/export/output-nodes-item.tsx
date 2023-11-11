@@ -46,9 +46,9 @@ export default function ExportDialogOutputNodesItem(props: Props) {
                     </div>
 
                     <HorizontalSlider
-                        min={32}
+                        min={16}
                         max={2048}
-                        step={32}
+                        step={outputSize() < 128 ? 16 : 32}
                         disabled={!isSelected()}
                         value={outputSize()}
                         onChange={(v) => props.outputSizes.set(props.node.id, v)}
