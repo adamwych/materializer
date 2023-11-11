@@ -1,3 +1,4 @@
+import { GLTF } from "@gltf-transform/core";
 import { MaterialGraphEdge } from "../material/graph";
 import TextureFilterMethod from "../types/texture-filter";
 import { MinimalMaterialNodeSnapshot, MaterialNodeSnapshot, MaterialSnapshot } from "./types";
@@ -54,6 +55,11 @@ export type SetEnvironmentPreviewCameraTransformCommand = {
     zoom: number;
 };
 
+export type SetEnvironmentPreviewModelCommand = {
+    command: "setEnvironmentPreviewModel";
+    gltf: GLTF.IGLTF;
+};
+
 export type RenderWorkerCommand =
     | InitializeWorkerCommand
     | SynchronizeNodeCommand
@@ -62,7 +68,8 @@ export type RenderWorkerCommand =
     | SetEditorUIViewportSizeCommand
     | SetEditorUITransformCommand
     | SetEnvironmentPreviewDestinationCommand
-    | SetEnvironmentPreviewCameraTransformCommand;
+    | SetEnvironmentPreviewCameraTransformCommand
+    | SetEnvironmentPreviewModelCommand;
 
 export enum RenderWorkerResponse {
     OK = 0,

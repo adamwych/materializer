@@ -1,3 +1,4 @@
+import { GLTF } from "@gltf-transform/core";
 import { createContextProvider } from "@solid-primitives/context";
 import { onCleanup } from "solid-js";
 import { unwrap } from "solid-js/store";
@@ -247,6 +248,19 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 rotationX,
                 rotationY,
                 zoom,
+            });
+        },
+
+        /**
+         * Sets the model shown in the environment preview panel.
+         * Currently supports only GLTF models.
+         *
+         * @param gltf Data of the model.
+         */
+        setEnvironmentPreviewModel(gltf: GLTF.IGLTF) {
+            worker?.postMessage({
+                command: "setEnvironmentPreviewModel",
+                gltf,
             });
         },
     };

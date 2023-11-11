@@ -1,22 +1,23 @@
+import { GLTF } from "@gltf-transform/core";
 import * as glMatrix from "gl-matrix";
 import fragGlsl from "../../../resources/glsl/env-preview.frag.glsl?raw";
 import vertGlsl from "../../../resources/glsl/env-preview.vert.glsl?raw";
+import planeGltf from "../../../resources/models/plane.gltf?raw";
 import { toRadians } from "../../utils/math";
-import { XZ_QUAD_VERTICES } from "../quads";
 import { MaterialSnapshot } from "../types";
+import WebGLEnvironmentalPreviewModel from "./env-preview-model";
 import WebGLNodeRenderer from "./node-renderer";
 
 export default class WebGLEnvironmentalPreviewRenderer {
     private readonly envCanvasContext: OffscreenCanvasRenderingContext2D;
     private fbo?: WebGLFramebuffer;
     private shaderProgram?: WebGLProgram;
-    private vao?: WebGLVertexArrayObject;
-    private vbo?: WebGLBuffer;
     private transformMatrixUniformLoc?: WebGLUniformLocation;
     private pixelsData: Uint8Array;
+    private model?: WebGLEnvironmentalPreviewModel;
 
     private cameraMatrix = glMatrix.mat4.create();
-    private cameraZoom = 4;
+    private cameraZoom = 3;
     private cameraRotationX = toRadians(225);
     private cameraRotationY = toRadians(-135);
 
@@ -30,7 +31,7 @@ export default class WebGLEnvironmentalPreviewRenderer {
 
         this.initializeFramebuffer();
         this.initializeShaderProgram();
-        this.initializeQuad();
+        this.loadModel(JSON.parse(planeGltf));
         this.updateCameraMatrix();
     }
 
@@ -68,6 +69,35 @@ export default class WebGLEnvironmentalPreviewRenderer {
             colorTexture,
             0,
         );
+
+        const depthTexture = gl.createTexture()!;
+        gl.bindTexture(gl.TEXTURE_2D, depthTexture);
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.DEPTH_COMPONENT32F,
+            this.envCanvas.width,
+            this.envCanvas.height,
+            0,
+            gl.DEPTH_COMPONENT,
+            gl.FLOAT,
+            null,
+        );
+
+        gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,
+            gl.DEPTH_ATTACHMENT,
+            gl.TEXTURE_2D,
+            depthTexture,
+            0,
+        );
     }
 
     private initializeShaderProgram() {
@@ -90,49 +120,21 @@ export default class WebGLEnvironmentalPreviewRenderer {
             this.shaderProgram,
             "uTransformMatrix",
         )!;
-
-        this.transformMatrixUniformLoc = this.gl.getUniformLocation(
-            this.shaderProgram,
-            "uTransformMatrix",
-        )!;
-    }
-
-    private initializeQuad() {
-        const buffer = new ArrayBuffer(20 * XZ_QUAD_VERTICES.length);
-        const dv = new DataView(buffer);
-        for (let i = 0; i < XZ_QUAD_VERTICES.length; i++) {
-            const v = XZ_QUAD_VERTICES[i];
-            dv.setFloat32(20 * i, v[0][0], true);
-            dv.setFloat32(20 * i + 4, v[0][1], true);
-            dv.setFloat32(20 * i + 8, v[0][2], true);
-            dv.setFloat32(20 * i + 12, v[1][0], true);
-            dv.setFloat32(20 * i + 16, v[1][1], true);
-        }
-
-        this.vao = this.gl.createVertexArray()!;
-        this.gl.bindVertexArray(this.vao);
-
-        this.vbo = this.gl.createBuffer()!;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, buffer, this.gl.STATIC_DRAW);
-
-        this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, false, 20, 0);
-        this.gl.enableVertexAttribArray(0);
-
-        this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, false, 20, 3 * 4);
-        this.gl.enableVertexAttribArray(1);
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     }
 
     public render(material: MaterialSnapshot) {
+        if (!this.model) {
+            return;
+        }
+
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo!);
 
+        this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.viewport(0, 0, this.envCanvas.width, this.envCanvas.height);
         this.gl.clearColor(0.1, 0.1, 0.1, 1);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.gl.useProgram(this.shaderProgram!);
-        this.gl.bindVertexArray(this.vao!);
+        this.gl.bindVertexArray(this.model.getVertexArrayObject());
 
         const outputNodes = Array.from(material.nodes.values()).filter(
             ({ node }) => node.path === "materializer/output",
@@ -151,7 +153,14 @@ export default class WebGLEnvironmentalPreviewRenderer {
         }
 
         this.gl.uniformMatrix4fv(this.transformMatrixUniformLoc!, false, this.cameraMatrix);
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, XZ_QUAD_VERTICES.length);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.model.getIndexBuffer());
+        this.gl.drawElements(
+            this.gl.TRIANGLES,
+            this.model.getNumberOfVertices(),
+            this.gl.UNSIGNED_SHORT,
+            0,
+        );
+        this.gl.disable(this.gl.DEPTH_TEST);
 
         // Read pixels from the color attachment and draw them onto the final canvas.
         this.gl.readBuffer(this.gl.COLOR_ATTACHMENT0);
@@ -208,5 +217,10 @@ export default class WebGLEnvironmentalPreviewRenderer {
         );
 
         glMatrix.mat4.mul(this.cameraMatrix, projection, view);
+    }
+
+    public async loadModel(gltf: GLTF.IGLTF) {
+        this.model?.cleanUp();
+        this.model = await WebGLEnvironmentalPreviewModel.fromGltf(this.gl, gltf);
     }
 }

@@ -226,5 +226,15 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
 
             break;
         }
+
+        case "setEnvironmentPreviewModel": {
+            envPreviewRenderer?.loadModel(ev.data.gltf);
+
+            requestAnimationFrame(() => {
+                envPreviewRenderer?.render(material);
+            });
+
+            break;
+        }
     }
 };

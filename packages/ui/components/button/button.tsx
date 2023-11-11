@@ -2,13 +2,14 @@ import { IconProps, IconTypes } from "solid-icons";
 import { ParentProps } from "solid-js";
 import cn from "../../../utils/cn";
 
-type Props = {
+export type ButtonProps = {
     icon?: IconTypes;
     iconSide?: "left" | "right";
     iconProps?: IconProps;
     size?: "inline" | "tiny" | "small" | "default";
     disabled?: boolean;
     hint?: string;
+    hold?: boolean;
 
     onClick(): void;
 };
@@ -20,7 +21,7 @@ const sizeStyles = {
     default: "px-4 py-2 text-sm min-w-[32px] h-[32px]",
 };
 
-export default function Button(props: ParentProps<Props>) {
+export default function Button(props: ParentProps<ButtonProps>) {
     const size = () => props.size ?? "default";
     const iconSide = () => props.iconSide ?? "left";
     const hasContent = () => !!props.children;
@@ -41,7 +42,8 @@ export default function Button(props: ParentProps<Props>) {
                 !hasContent() && "p-initial",
                 props.disabled
                     ? "outline outline-1 outline-gray-200 opacity-50 cursor-not-allowed"
-                    : "bg-gray-200 hover:bg-gray-300 active:bg-gray-100",
+                    : "bg-gray-200 hover:bg-gray-300 active:bg-gray-200",
+                props.hold && "!bg-blue-500",
             )}
             disabled={props.disabled}
             title={props.hint}
