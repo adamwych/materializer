@@ -250,7 +250,8 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             modifyMaterial((material) => {
                 const node = material.nodes.get(nodeId);
                 if (node) {
-                    for (const edge of material.edges.values()) {
+                    for (let i = material.edges.length - 1; i >= 0; i--) {
+                        const edge = material.edges[i];
                         if (edge.from[0] === nodeId || edge.to[0] === nodeId) {
                             this.removeEdge(edge);
                         }
