@@ -8,7 +8,7 @@ export default function HistoryPanel() {
 
     return (
         <PanelSection label="History">
-            <div class="h-[340px] overflow-y-auto">
+            <div class="h-[271px] overflow-y-auto">
                 <For each={history.stack().entries}>
                     {(entry) => <HistoryPanelItem entry={entry} />}
                 </For>
