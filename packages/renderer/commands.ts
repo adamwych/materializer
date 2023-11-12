@@ -1,7 +1,7 @@
-import { GLTF } from "@gltf-transform/core";
 import { MaterialGraphEdge } from "../material/graph";
 import TextureFilterMethod from "../types/texture-filter";
-import { MinimalMaterialNodeSnapshot, MaterialNodeSnapshot, MaterialSnapshot } from "./types";
+import { Preview3dSettings } from "./preview-3d";
+import { MaterialNodeSnapshot, MaterialSnapshot, MinimalMaterialNodeSnapshot } from "./types";
 
 export type InitializeWorkerCommand = {
     command: "initialize";
@@ -43,21 +43,14 @@ export type SetEditorUITransformCommand = {
     scale: number;
 };
 
-export type SetEnvironmentPreviewDestinationCommand = {
-    command: "setEnvironmentPreviewDestination";
+export type Set3dPreviewCanvasCommand = {
+    command: "set3dPreviewCanvas";
     canvas: OffscreenCanvas;
 };
 
-export type SetEnvironmentPreviewCameraTransformCommand = {
-    command: "setEnvironmentPreviewCameraTransform";
-    rotationX: number;
-    rotationY: number;
-    zoom: number;
-};
-
-export type SetEnvironmentPreviewModelCommand = {
-    command: "setEnvironmentPreviewModel";
-    gltf: GLTF.IGLTF;
+export type Set3dPreviewSettingsCommand = {
+    command: "set3dPreviewSettings";
+    settings: Partial<Preview3dSettings>;
 };
 
 export type RenderWorkerCommand =
@@ -67,9 +60,8 @@ export type RenderWorkerCommand =
     | RenderNodeAndGetImageCommand
     | SetEditorUIViewportSizeCommand
     | SetEditorUITransformCommand
-    | SetEnvironmentPreviewDestinationCommand
-    | SetEnvironmentPreviewCameraTransformCommand
-    | SetEnvironmentPreviewModelCommand;
+    | Set3dPreviewCanvasCommand
+    | Set3dPreviewSettingsCommand;
 
 export enum RenderWorkerResponse {
     OK = 0,

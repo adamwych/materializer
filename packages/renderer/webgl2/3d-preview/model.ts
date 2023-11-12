@@ -1,6 +1,6 @@
 import { GLTF, WebIO } from "@gltf-transform/core";
 
-export default class WebGLEnvironmentalPreviewModel {
+export default class WebGL3dPreviewModel {
     constructor(
         private readonly gl: WebGL2RenderingContext,
         private readonly attributeBuffers: Array<WebGLBuffer>,
@@ -61,7 +61,7 @@ export default class WebGLEnvironmentalPreviewModel {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, primitive.getIndices()!.getArray(), gl.STATIC_DRAW);
 
-        return new WebGLEnvironmentalPreviewModel(
+        return new WebGL3dPreviewModel(
             gl,
             attributeBuffers,
             indexBuffer,

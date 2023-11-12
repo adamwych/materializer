@@ -1,4 +1,3 @@
-import { GLTF } from "@gltf-transform/core";
 import { createContextProvider } from "@solid-primitives/context";
 import { onCleanup } from "solid-js";
 import { unwrap } from "solid-js/store";
@@ -10,6 +9,7 @@ import { useMaterialStore } from "../stores/material";
 import TextureFilterMethod from "../types/texture-filter";
 import { mapDictionary as mapMap } from "../utils/map";
 import { RenderWorkerCommand, RenderWorkerResponse } from "./commands";
+import { Preview3dSettings } from "./preview-3d";
 import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
 
@@ -221,46 +221,24 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
         },
 
         /**
-         * Sets the canvas to which environmental preview will be rendered.
+         * Sets the canvas to which 3D preview will be rendered.
          *
          * @param canvas
          */
-        setEnvironmentPreviewDestination(canvas: OffscreenCanvas) {
+        set3dPreviewCanvas(canvas: OffscreenCanvas) {
             worker?.postMessage(
                 {
-                    command: "setEnvironmentPreviewDestination",
+                    command: "set3dPreviewCanvas",
                     canvas,
                 },
                 [canvas],
             );
         },
 
-        /**
-         * Sets camera parameters of the environmental preview.
-         *
-         * @param rotationX
-         * @param rotationY
-         * @param zoom
-         */
-        setEnvironmentPreviewCameraTransform(rotationX: number, rotationY: number, zoom: number) {
+        update3dPreviewSettings(settings: Partial<Preview3dSettings>) {
             worker?.postMessage({
-                command: "setEnvironmentPreviewCameraTransform",
-                rotationX,
-                rotationY,
-                zoom,
-            });
-        },
-
-        /**
-         * Sets the model shown in the environment preview panel.
-         * Currently supports only GLTF models.
-         *
-         * @param gltf Data of the model.
-         */
-        setEnvironmentPreviewModel(gltf: GLTF.IGLTF) {
-            worker?.postMessage({
-                command: "setEnvironmentPreviewModel",
-                gltf,
+                command: "set3dPreviewSettings",
+                settings,
             });
         },
     };

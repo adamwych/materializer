@@ -1,11 +1,48 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
+import { PbrTargetTextureType } from "../../../packages/types/pbr";
 import glsl from "./output.glsl?raw";
 
 export default {
     id: "output",
     name: "Output",
     groupName: "Base",
-    parameters: {},
+    parameters: {
+        targetTexture: {
+            id: "targetTexture",
+            name: "Target texture",
+            default: PbrTargetTextureType.Albedo,
+            inputType: "select",
+            inputProps: {
+                options: [
+                    {
+                        label: "Albedo",
+                        value: PbrTargetTextureType.Albedo,
+                    },
+                    {
+                        label: "Normal",
+                        value: PbrTargetTextureType.Normal,
+                    },
+                    {
+                        label: "Height",
+                        value: PbrTargetTextureType.Height,
+                    },
+                    {
+                        label: "Metallic",
+                        value: PbrTargetTextureType.Metallic,
+                    },
+                    {
+                        label: "Roughness",
+                        value: PbrTargetTextureType.Roughness,
+                    },
+                    {
+                        label: "Ambient Occlusion",
+                        value: PbrTargetTextureType.AmbientOcclusion,
+                    },
+                ],
+            },
+            valueType: "int",
+        },
+    },
     inputs: {
         color: {
             id: "color",

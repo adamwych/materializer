@@ -85,10 +85,28 @@ export default class BoundShaderProgram {
         }
     }
 
+    public setUniformBool(name: string, value: boolean) {
+        const location = this.program.getUniformLocation(name);
+        if (location) {
+            this.gl.uniform1i(location, value ? 1 : 0);
+        } else {
+            console.warn(`Uniform '${name}' was not found in the shader.`);
+        }
+    }
+
     public setUniformFloat(name: string, value: number) {
         const location = this.program.getUniformLocation(name);
         if (location) {
             this.gl.uniform1f(location, value);
+        } else {
+            console.warn(`Uniform '${name}' was not found in the shader.`);
+        }
+    }
+
+    public setUniformMatrix4(name: string, transpose: boolean, value: Iterable<GLfloat>) {
+        const location = this.program.getUniformLocation(name);
+        if (location) {
+            this.gl.uniformMatrix4fv(location, transpose, value);
         } else {
             console.warn(`Uniform '${name}' was not found in the shader.`);
         }

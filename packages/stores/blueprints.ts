@@ -1,6 +1,7 @@
 import { createContextProvider } from "@solid-primitives/context";
 import { ReactiveMap } from "@solid-primitives/map";
 import blend from "../../resources/nodes/base/blend";
+import normal from "../../resources/nodes/base/normal";
 import output from "../../resources/nodes/base/output";
 import gaussianBlur from "../../resources/nodes/blur/gaussian";
 import gradient from "../../resources/nodes/generate/linear-gradient";
@@ -19,6 +20,7 @@ import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../materia
 const BUILTIN_NODES_PACKAGE: MaterialNodeBlueprintsPackage = new Map<string, MaterialNodeBlueprint>(
     [
         ["output", output],
+        ["normal", normal],
         ["blend", blend],
 
         ["solid-color", solidColor],

@@ -2,7 +2,7 @@ import { RenderWorkerCommand, RenderWorkerResponse } from "../commands";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
 import WebGLEditorUIRenderer from "./editor-ui-renderer";
-import WebGLEnvironmentalPreviewRenderer from "./env-preview-renderer";
+import WebGL3dPreviewRenderer from "./3d-preview/renderer";
 import WebGLNodeRenderer from "./node-renderer";
 
 /**
@@ -25,7 +25,7 @@ let gl: WebGL2RenderingContext;
 let material: MaterialSnapshot;
 let nodeRenderer: WebGLNodeRenderer;
 let editorUIRenderer: WebGLEditorUIRenderer;
-let envPreviewRenderer: WebGLEnvironmentalPreviewRenderer;
+let envPreviewRenderer: WebGL3dPreviewRenderer;
 let jobScheduler: RenderJobScheduler;
 
 function renderQueuedNodes(nodeIds: Array<number>) {
@@ -199,12 +199,8 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             break;
         }
 
-        case "setEnvironmentPreviewDestination": {
-            envPreviewRenderer = new WebGLEnvironmentalPreviewRenderer(
-                ev.data.canvas,
-                gl,
-                nodeRenderer,
-            );
+        case "set3dPreviewCanvas": {
+            envPreviewRenderer = new WebGL3dPreviewRenderer(ev.data.canvas, gl, nodeRenderer);
 
             requestAnimationFrame(() => {
                 envPreviewRenderer.render(material);
@@ -213,25 +209,9 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             break;
         }
 
-        case "setEnvironmentPreviewCameraTransform": {
-            envPreviewRenderer?.setCameraTransform(
-                ev.data.rotationX,
-                ev.data.rotationY,
-                ev.data.zoom,
-            );
-
-            requestAnimationFrame(() => {
-                envPreviewRenderer?.render(material);
-            });
-
-            break;
-        }
-
-        case "setEnvironmentPreviewModel": {
-            envPreviewRenderer?.loadModel(ev.data.gltf);
-
-            requestAnimationFrame(() => {
-                envPreviewRenderer?.render(material);
+        case "set3dPreviewSettings": {
+            envPreviewRenderer?.updateSettings(ev.data.settings).then(() => {
+                envPreviewRenderer.render(material);
             });
 
             break;
