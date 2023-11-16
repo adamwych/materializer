@@ -71,7 +71,7 @@ export default class WebGLNodeRenderer {
             return existingTexture.texture;
         }
 
-        const texture = this.createEmptyTexture(width, height, filterMethod, false, false);
+        const texture = this.createEmptyTexture(width, height, filterMethod, false);
         this.textures.set(nodeId, { texture, width, height, filterMethod, forwarded: false });
         return texture;
     }
@@ -224,7 +224,6 @@ export default class WebGLNodeRenderer {
                 outputHeight,
                 filterMethod,
                 false,
-                false,
             );
 
             const sourceFramebuffer = gl.createFramebuffer()!;
@@ -311,31 +310,18 @@ export default class WebGLNodeRenderer {
      * @param width Width of the texture.
      * @param height Height of the texture.
      * @param filter Filter method used by the texture.
-     * @param rgba Whether this texture should have an alpha channel.
      * @param repeat Whether this texture should repeat when wrapping.
      */
     public createEmptyTexture(
         width: number,
         height: number,
         filter: TextureFilterMethod,
-        rgba: boolean,
         repeat: boolean,
     ): WebGLTexture {
         const gl = this.gl;
         const texture = gl.createTexture()!;
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(
-            gl.TEXTURE_2D,
-            0,
-            rgba ? gl.RGBA : gl.RGB,
-            width,
-            height,
-            0,
-            rgba ? gl.RGBA : gl.RGB,
-            gl.UNSIGNED_BYTE,
-            null,
-        );
-
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
         gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, mapFilterMethodToGL(filter));
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mapFilterMethodToMipmapGL(filter));
         gl.generateMipmap(gl.TEXTURE_2D);

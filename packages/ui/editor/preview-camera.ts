@@ -9,7 +9,6 @@ export default class Preview3dCamera {
 
     private projectionMatrix = glm.mat4.create();
     private viewMatrix = glm.mat4.create();
-    private transformMatrix = glm.mat4.create();
 
     constructor(
         private viewportWidth: number,
@@ -21,10 +20,9 @@ export default class Preview3dCamera {
 
     public createSettings(): Partial<Preview3dSettings> {
         return {
-            viewportWidth: this.viewportWidth,
-            viewportHeight: this.viewportHeight,
             cameraPosition: this.calculatePosition(),
-            cameraTransform: this.updateTransformMatrix(),
+            cameraProjection: this.updateProjectionMatrix(),
+            cameraView: this.updateViewMatrix(),
         };
     }
 
@@ -32,33 +30,30 @@ export default class Preview3dCamera {
         this.rotationX += amountX;
         this.rotationY += amountY;
         this.rotationY = clamp(this.rotationY, -(Math.PI / 2), Math.PI / 2);
-        this.updateViewMatrix();
 
         return {
             cameraPosition: this.calculatePosition(),
-            cameraTransform: this.updateTransformMatrix(),
+            cameraView: this.updateViewMatrix(),
         };
     }
 
     public zoom(amount: number): Partial<Preview3dSettings> {
         this.scale *= amount;
-        this.updateViewMatrix();
 
         return {
             cameraPosition: this.calculatePosition(),
-            cameraTransform: this.updateTransformMatrix(),
+            cameraView: this.updateViewMatrix(),
         };
     }
 
-    public resize(viewportWidth: number, viewportHeight: number) {
+    public resize(viewportWidth: number, viewportHeight: number): Partial<Preview3dSettings> {
         this.viewportWidth = viewportWidth;
         this.viewportHeight = viewportHeight;
-        this.updateProjectionMatrix();
 
         return {
             viewportWidth,
             viewportHeight,
-            cameraTransform: this.updateTransformMatrix(),
+            cameraProjection: this.updateProjectionMatrix(),
         };
     }
 
@@ -74,10 +69,6 @@ export default class Preview3dCamera {
 
     private updateViewMatrix() {
         return glm.mat4.lookAt(this.viewMatrix, this.calculatePosition(), [0, 0, 0], [0, 1, 0]);
-    }
-
-    private updateTransformMatrix() {
-        return glm.mat4.mul(this.transformMatrix, this.projectionMatrix, this.viewMatrix);
     }
 
     private calculatePosition() {

@@ -12,9 +12,10 @@ import { RenderWorkerCommand, RenderWorkerResponse } from "./commands";
 import { Preview3dSettings } from "./preview-3d";
 import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
+import createRenderCommandQueue, { RenderCommandQueue } from "./command-queue";
 
 // A re-type of `Worker`, because the original doesn't support specifying message type...
-interface RenderWorker extends Omit<Worker, "postMessage"> {
+export interface RenderWorker extends Omit<Worker, "postMessage"> {
     postMessage(command: RenderWorkerCommand): void;
     postMessage(command: RenderWorkerCommand, transfer: Transferable[]): void;
     postMessage(command: RenderWorkerCommand, options?: StructuredSerializeOptions): void;
@@ -36,18 +37,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     const materialStore = useMaterialStore()!;
     const blueprintStore = useNodeBlueprintsStore()!;
     let worker: RenderWorker | undefined;
-
-    function sendCommandAndWaitForResponse(command: RenderWorkerCommand, transfer: Transferable[]) {
-        return new Promise((resolve) => {
-            if (worker) {
-                worker.onmessage = (ev: MessageEvent<RenderWorkerResponse>) => {
-                    resolve(ev.data);
-                };
-
-                worker.postMessage(command, transfer);
-            }
-        });
-    }
+    let commandQueue: RenderCommandQueue | undefined;
 
     function createMinimalNodeSnapshot(node: MaterialNode): MinimalMaterialNodeSnapshot {
         return {
@@ -63,7 +53,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     }
 
     function onNodeAdded(ev: MaterialNodeEvent) {
-        worker?.postMessage({
+        commandQueue?.enqueue({
             command: "synchronizeNode",
             nodeId: ev.node.id,
             nodeSnapshot: createNodeSnapshot(ev.node),
@@ -71,7 +61,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     }
 
     function onNodeRemoved(ev: MaterialNodeEvent) {
-        worker?.postMessage({
+        commandQueue?.enqueue({
             command: "synchronizeNode",
             nodeId: ev.node.id,
             nodeSnapshot: null,
@@ -79,7 +69,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     }
 
     function onNodeChanged(ev: MaterialNodeEvent) {
-        worker?.postMessage({
+        commandQueue?.enqueue({
             command: "synchronizeNode",
             nodeId: ev.node.id,
             nodeSnapshot: createMinimalNodeSnapshot(ev.node),
@@ -87,7 +77,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
     }
 
     function onEdgesChanged(ev: MaterialNodeEvent) {
-        worker?.postMessage({
+        commandQueue?.enqueue({
             command: "synchronizeEdges",
             nodeId: ev.node.id,
             edges: unwrap(materialStore.getMaterial().edges),
@@ -130,10 +120,12 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
             runScheduler: boolean,
         ): Promise<WebGL2RenderWorker> {
             worker?.terminate();
+            commandQueue?.clear();
 
             worker = new WebGL2RenderWorkerImpl();
+            commandQueue = createRenderCommandQueue(worker);
 
-            const response = await sendCommandAndWaitForResponse(
+            const response = await commandQueue?.enqueueAndWaitForResponse(
                 {
                     command: "initialize",
                     canvas,
@@ -160,7 +152,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
 
             return {
                 setEditorUITransform(x, y, scale) {
-                    worker?.postMessage({
+                    commandQueue?.enqueue({
                         command: "setEditorUITransform",
                         x,
                         y,
@@ -169,7 +161,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 },
 
                 setEditorUIViewportSize(width, height) {
-                    worker?.postMessage({
+                    commandQueue?.enqueue({
                         command: "setEditorUIViewportSize",
                         width,
                         height,
@@ -225,8 +217,8 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
          *
          * @param canvas
          */
-        set3dPreviewCanvas(canvas: OffscreenCanvas) {
-            worker?.postMessage(
+        async set3dPreviewCanvas(canvas: OffscreenCanvas) {
+            await commandQueue?.enqueueAndWaitForResponse(
                 {
                     command: "set3dPreviewCanvas",
                     canvas,
@@ -235,8 +227,15 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
             );
         },
 
-        update3dPreviewSettings(settings: Partial<Preview3dSettings>) {
-            worker?.postMessage({
+        async update3dPreviewSettings(settings: Partial<Preview3dSettings>) {
+            await commandQueue?.enqueueAndWaitForResponse({
+                command: "set3dPreviewSettings",
+                settings,
+            });
+        },
+
+        update3dPreviewSettingsImmediate(settings: Partial<Preview3dSettings>) {
+            commandQueue?.enqueue({
                 command: "set3dPreviewSettings",
                 settings,
             });

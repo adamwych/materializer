@@ -1,18 +1,20 @@
 #version 300 es
+precision highp float;
 
 #define M_PI 3.14159265359
-
-precision highp float;
 
 in vec3 vNormal;
 in vec2 vTexCoords;
 in mat3 vTBN;
 
-uniform sampler2D uAlbedoTexture;
+uniform sampler2D uBaseColorTexture;
 uniform sampler2D uNormalMapTexture;
 uniform sampler2D uMetallicTexture;
 uniform sampler2D uRoughnessTexture;
 uniform sampler2D uAOTexture;
+uniform samplerCube uIrradianceMap;
+uniform samplerCube uPrefilterTexture;
+uniform sampler2D uBRDFLookupTexture;
 
 uniform vec3 uCameraPos;
 uniform bool uHasNormalMap;
@@ -21,128 +23,117 @@ out vec4 outColor;
 
 struct WorldInputs {
     vec3 modelPosition;
-    vec3 lightPosition;
 };
 
 struct MaterialInputs {
-    vec3 albedo;
+    vec3 baseColor;
     vec3 normal;
     float metallic;
     float roughness;
+    float perceptualRoughness;
     float ao;
+    vec3 f0;
+    float specularWeight;
+    float environmentExposure;
 };
 
 WorldInputs collectWorldInputs() {
     vec3 modelPosition = vec3(0, 0, 0);
-    vec3 lightPosition = vec3(0.75f, 1.25f, 1.0f);
-    return WorldInputs(modelPosition, lightPosition);
+    return WorldInputs(modelPosition);
 }
 
 MaterialInputs collectMaterialInputs() {
-    vec3 normal = normalize(vNormal);
+    MaterialInputs inputs;
 
     if(uHasNormalMap) {
         vec3 tangentNormal = normalize(texture(uNormalMapTexture, vTexCoords).xyz * 2.0f - 1.0f);
-        normal = normalize(vTBN * tangentNormal);
+        inputs.normal = normalize(vTBN * tangentNormal);
+    } else {
+        inputs.normal = normalize(vNormal);
     }
 
-    // Albedo is converted from sRGB to linear space.
-    vec3 albedo = pow(texture(uAlbedoTexture, vTexCoords).rgb, vec3(2.2f));
-    float metallic = texture(uMetallicTexture, vTexCoords).r;
-    float roughness = texture(uRoughnessTexture, vTexCoords).r;
-    float ao = texture(uAOTexture, vTexCoords).r;
-    return MaterialInputs(albedo, normal, metallic, roughness, ao);
+    inputs.baseColor = pow(texture(uBaseColorTexture, vTexCoords).rgb, vec3(2.2f));
+    inputs.metallic = texture(uMetallicTexture, vTexCoords).r;
+    inputs.ao = texture(uAOTexture, vTexCoords).r;
+
+    float perceptualRoughness = texture(uRoughnessTexture, vTexCoords).r;
+    perceptualRoughness = clamp(perceptualRoughness, 0.089f, 1.0f);
+    inputs.roughness = perceptualRoughness * perceptualRoughness;
+    inputs.perceptualRoughness = perceptualRoughness;
+
+    inputs.f0 = vec3(0.04f);
+    inputs.f0 = mix(inputs.f0, inputs.baseColor, inputs.metallic);
+
+    inputs.specularWeight = 1.0f;
+    inputs.environmentExposure = 1.0f;
+
+    return inputs;
 }
 
-// Implementation based on Google's Filament rendering engine docs.
-// https://google.github.io/filament/Filament.html
-
-//
-// BRDF
-//
-
-float D_GGX(float roughness, float NoH, const vec3 h) {
-    float oneMinusNoHSquared = 1.0f - NoH * NoH;
-    float a = NoH * roughness;
-    float k = roughness / (oneMinusNoHSquared + a * a);
-    float d = k * k * (1.0f / M_PI);
-    return d;
+float clampedDot(vec3 x, vec3 y) {
+    return clamp(dot(x, y), 0.0f, 1.0f);
 }
 
-float V_SmithGGXCorrelated(float NoV, float NoL, float roughness) {
-    float a2 = roughness * roughness;
-    float GGXV = NoL * sqrt(NoV * NoV * (1.0f - a2) + a2);
-    float GGXL = NoV * sqrt(NoL * NoL * (1.0f - a2) + a2);
-    return 0.5f / (GGXV + GGXL);
+// IBL implementation based on: https://github.com/KhronosGroup/glTF-Sample-Viewer
+
+vec3 getIBLRadianceGGX(vec3 n, vec3 v, MaterialInputs material) {
+    float specularWeight = 1.0f;
+
+    float NdotV = clampedDot(n, v);
+    float lod = material.perceptualRoughness * float(4 - 1);
+    vec3 reflection = normalize(reflect(-v, n));
+
+    vec2 brdfSamplePoint = clamp(vec2(NdotV, material.perceptualRoughness), vec2(0.0f, 0.0f), vec2(1.0f, 1.0f));
+    vec2 f_ab = texture(uBRDFLookupTexture, brdfSamplePoint).rg;
+    vec4 specularSample = textureLod(uPrefilterTexture, reflection, lod);
+
+    vec3 specularLight = specularSample.rgb;
+
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
+    vec3 Fr = max(vec3(1.0f - material.perceptualRoughness), material.f0) - material.f0;
+    vec3 k_S = material.f0 + Fr * pow(1.0f - NdotV, 5.0f);
+    vec3 FssEss = k_S * f_ab.x + f_ab.y;
+
+    return specularWeight * specularLight * FssEss;
 }
 
-vec3 F_Schlick(float u, vec3 f0) {
-    float f = pow(1.0f - u, 5.0f);
-    return f + f0 * (1.0f - f);
-}
+vec3 getIBLRadianceLambertian(vec3 n, vec3 v, MaterialInputs material) {
+    float NdotV = clampedDot(n, v);
+    vec2 brdfSamplePoint = clamp(vec2(NdotV, material.perceptualRoughness), vec2(0.0f, 0.0f), vec2(1.0f, 1.0f));
+    vec2 f_ab = texture(uBRDFLookupTexture, brdfSamplePoint).rg;
 
-float Fd_Lambert() {
-    return 1.0f / M_PI;
-}
+    vec3 irradiance = texture(uIrradianceMap, n).rgb;
 
-vec3 calculateSpecular(WorldInputs world, MaterialInputs material) {
-    vec3 viewDir = normalize(uCameraPos - world.modelPosition);
-    vec3 lightDir = normalize(world.lightPosition - world.modelPosition);
-    vec3 h = normalize(viewDir + lightDir);
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
 
-    float NoV = abs(dot(material.normal, viewDir)) + 1e-5f;
-    float NoL = clamp(dot(material.normal, lightDir), 0.0f, 1.0f);
-    float NoH = clamp(dot(material.normal, h), 0.0f, 1.0f);
-    float LoH = clamp(dot(lightDir, h), 0.0f, 1.0f);
+    vec3 Fr = max(vec3(1.0f - material.perceptualRoughness), material.f0) - material.f0;
+    vec3 k_S = material.f0 + Fr * pow(1.0f - NdotV, 5.0f);
+    vec3 FssEss = material.specularWeight * k_S * f_ab.x + f_ab.y; // <--- GGX / specular light contribution (scale it down if the specularWeight is low)
 
-    float roughness = material.roughness * material.roughness;
+    // Multiple scattering, from Fdez-Aguera
+    float Ems = (1.0f - (f_ab.x + f_ab.y));
+    vec3 F_avg = material.specularWeight * (material.f0 + (1.0f - material.f0) / 21.0f);
+    vec3 FmsEms = Ems * FssEss * F_avg / (1.0f - F_avg * Ems);
+    vec3 k_D = material.baseColor * (1.0f - FssEss + FmsEms); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
 
-    float reflectance = 0.5f;
-    vec3 F0 = 0.16f * reflectance * reflectance * (1.0f - material.metallic) + material.albedo * material.metallic;
+    k_D *= 1.0f - material.metallic;
 
-    float D = D_GGX(roughness * roughness, NoH, h);
-    float V = V_SmithGGXCorrelated(NoV, NoL, roughness);
-    vec3 F = F_Schlick(LoH, F0);
+    irradiance = vec3(1.0f) - exp(-irradiance * material.environmentExposure);
 
-    return (D * V) * F;
-}
-
-vec3 calculateDiffuse(MaterialInputs material) {
-    vec3 diffuseColor = (1.0f - material.metallic) * material.albedo;
-    return diffuseColor * Fd_Lambert();
-}
-
-vec3 BRDF(WorldInputs world, MaterialInputs material) {
-    vec3 specular = calculateSpecular(world, material);
-    vec3 diffuse = calculateDiffuse(material);
-    return diffuse + specular;
-}
-
-//
-// Lighting
-//
-
-float calculateDirectionalLight(WorldInputs world, MaterialInputs material) {
-    vec3 lightDirection = normalize(world.lightPosition - world.modelPosition);
-    float lightIntensity = 5.0f;
-    float NoL = clamp(dot(material.normal, lightDirection), 0.0f, 1.0f);
-    float illuminance = lightIntensity * NoL;
-    return illuminance;
+    return (FmsEms + k_D) * irradiance;
 }
 
 void main(void) {
     WorldInputs world = collectWorldInputs();
     MaterialInputs material = collectMaterialInputs();
 
-    vec3 color = BRDF(world, material);
-    color *= calculateDirectionalLight(world, material);
+    vec3 N = material.normal;
+    vec3 V = normalize(uCameraPos - world.modelPosition);
 
-    // Add ambient occlusion.
-    color += 0.05f * material.albedo * material.ao;
+    vec3 specular = getIBLRadianceGGX(N, V, material);
+    vec3 diffuse = getIBLRadianceLambertian(N, V, material);
 
-    // Gamma correction.
-    color = color / (color + vec3(1.0f));
-    color = pow(color, vec3(1.0f / 2.2f));
-
-    outColor = vec4(color, 1);
+    outColor = vec4((diffuse + specular) * material.ao, 1);
 }

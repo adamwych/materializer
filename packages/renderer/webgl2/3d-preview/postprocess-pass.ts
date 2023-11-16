@@ -1,11 +1,9 @@
-import ShaderProgram from "../shader/program";
 import fxaaVertGlsl from "../../../../resources/glsl/fullscreen.vert.glsl?raw";
 import fxaaFragGlsl from "../../../../resources/glsl/preview/fxaa.fs?raw";
-import Framebuffer from "../framebuffer";
+import ShaderProgram from "../shader/program";
 
 export default class WebGL3dPreviewFxRenderPass {
     private fxaaShader: ShaderProgram;
-    private framebuffer: Framebuffer;
 
     constructor(
         private readonly gl: WebGL2RenderingContext,
@@ -13,17 +11,9 @@ export default class WebGL3dPreviewFxRenderPass {
         private readonly viewportHeight: number,
     ) {
         this.fxaaShader = new ShaderProgram(this.gl, fxaaVertGlsl, fxaaFragGlsl);
-        this.framebuffer = new Framebuffer(gl);
-        this.framebuffer.attachColorTexture(viewportWidth, viewportHeight);
-    }
-
-    public cleanUp() {
-        this.framebuffer.cleanUp();
     }
 
     public render(previousColorTexture: WebGLTexture, dstBuffer: ArrayBufferView) {
-        this.framebuffer.bind();
-
         this.gl.viewport(0, 0, this.viewportWidth, this.viewportHeight);
         this.gl.clearColor(0, 0, 0, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -50,7 +40,5 @@ export default class WebGL3dPreviewFxRenderPass {
 
             this.gl.bindVertexArray(null);
         });
-
-        this.framebuffer.unbind();
     }
 }

@@ -1,9 +1,8 @@
 export enum PbrTargetTextureType {
-    Albedo,
+    BaseColor,
     Normal,
     Height,
     Metallic,
     Roughness,
     AmbientOcclusion,
 }
-

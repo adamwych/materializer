@@ -1,0 +1,620 @@
+{
+    "entries": [
+        {
+            "id": 29,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 0,
+                        "x": 3712,
+                        "y": 4128
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 0,
+                        "x": 3456,
+                        "y": 4128
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:54.109Z"
+        },
+        {
+            "id": 28,
+            "name": "Move 7 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 0,
+                        "x": 3456,
+                        "y": 4128
+                    },
+                    {
+                        "nodeId": 1,
+                        "x": 4224,
+                        "y": 4000
+                    },
+                    {
+                        "nodeId": 2,
+                        "x": 3488,
+                        "y": 3776
+                    },
+                    {
+                        "nodeId": 3,
+                        "x": 3680,
+                        "y": 3808
+                    },
+                    {
+                        "nodeId": 4,
+                        "x": 3552,
+                        "y": 3936
+                    },
+                    {
+                        "nodeId": 5,
+                        "x": 3840,
+                        "y": 3840
+                    },
+                    {
+                        "nodeId": 6,
+                        "x": 4032,
+                        "y": 4000
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 0,
+                        "x": 3808,
+                        "y": 3936
+                    },
+                    {
+                        "nodeId": 1,
+                        "x": 4576,
+                        "y": 3808
+                    },
+                    {
+                        "nodeId": 2,
+                        "x": 3840,
+                        "y": 3584
+                    },
+                    {
+                        "nodeId": 3,
+                        "x": 4034,
+                        "y": 3608
+                    },
+                    {
+                        "nodeId": 4,
+                        "x": 3904,
+                        "y": 3744
+                    },
+                    {
+                        "nodeId": 5,
+                        "x": 4192,
+                        "y": 3648
+                    },
+                    {
+                        "nodeId": 6,
+                        "x": 4384,
+                        "y": 3808
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:53.116Z"
+        },
+        {
+            "id": 27,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 1,
+                        "x": 4576,
+                        "y": 3808
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 1,
+                        "x": 4160,
+                        "y": 3936
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:48.459Z"
+        },
+        {
+            "id": 26,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 1,
+                        "x": 4160,
+                        "y": 3936
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 1,
+                        "x": 4064,
+                        "y": 3936
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:46.531Z"
+        },
+        {
+            "id": 25,
+            "name": "Set Blend/mode parameter",
+            "redoCommand": ["material.setNodeParameter", 6, "mode", 2, true, false],
+            "undoCommand": ["material.setNodeParameter", 6, "mode", 0, true, false],
+            "addedAt": "2023-11-10T19:30:45.384Z"
+        },
+        {
+            "id": 24,
+            "name": "Set Noise/scale parameter",
+            "redoCommand": ["material.setNodeParameter", 4, "scale", 8.47, true, false],
+            "undoCommand": ["material.setNodeParameter", 4, "scale", 64, true, false],
+            "addedAt": "2023-11-10T19:30:43.589Z"
+        },
+        {
+            "id": 23,
+            "name": "Set Noise/blur parameter",
+            "redoCommand": ["material.setNodeParameter", 4, "blur", 128, true, false],
+            "undoCommand": ["material.setNodeParameter", 4, "blur", 4, true, false],
+            "addedAt": "2023-11-10T19:30:40.202Z"
+        },
+        {
+            "id": 22,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 4,
+                        "x": 3904,
+                        "y": 3744
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 4,
+                        "x": 3610,
+                        "y": 3690
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:38.716Z"
+        },
+        {
+            "id": 21,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 5,
+                        "x": 4192,
+                        "y": 3648
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 5,
+                        "x": 4192,
+                        "y": 3648
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:38.035Z"
+        },
+        {
+            "id": 20,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 6,
+                        "x": 4384,
+                        "y": 3808
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 6,
+                        "x": 4419,
+                        "y": 3839
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:37.129Z"
+        },
+        {
+            "id": 19,
+            "name": "Set Tile/offsetY parameter",
+            "redoCommand": ["material.setNodeParameter", 3, "offsetY", 1, true, false],
+            "undoCommand": ["material.setNodeParameter", 3, "offsetY", 0, true, false],
+            "addedAt": "2023-11-10T19:30:35.771Z"
+        },
+        {
+            "id": 18,
+            "name": "Set Tile/amountX parameter",
+            "redoCommand": ["material.setNodeParameter", 3, "amountX", 4, true, false],
+            "undoCommand": ["material.setNodeParameter", 3, "amountX", 1, true, false],
+            "addedAt": "2023-11-10T19:30:34.973Z"
+        },
+        {
+            "id": 17,
+            "name": "Set Tile/amountY parameter",
+            "redoCommand": ["material.setNodeParameter", 3, "amountY", 4, true, false],
+            "undoCommand": ["material.setNodeParameter", 3, "amountY", 1, true, false],
+            "addedAt": "2023-11-10T19:30:34.557Z"
+        },
+        {
+            "id": 16,
+            "name": "Set Tile/offsetX parameter",
+            "redoCommand": ["material.setNodeParameter", 3, "offsetX", 1, true, false],
+            "undoCommand": ["material.setNodeParameter", 3, "offsetX", 0, true, false],
+            "addedAt": "2023-11-10T19:30:34.007Z"
+        },
+        {
+            "id": 15,
+            "name": "Set Shape/rectHeight parameter",
+            "redoCommand": ["material.setNodeParameter", 2, "rectHeight", 0.38, true, false],
+            "undoCommand": ["material.setNodeParameter", 2, "rectHeight", 0.5, true, false],
+            "addedAt": "2023-11-10T19:30:32.223Z"
+        },
+        {
+            "id": 14,
+            "name": "Set Shape/rectWidth parameter",
+            "redoCommand": ["material.setNodeParameter", 2, "rectWidth", 0.89, true, false],
+            "undoCommand": ["material.setNodeParameter", 2, "rectWidth", 0.5, true, false],
+            "addedAt": "2023-11-10T19:30:31.078Z"
+        },
+        {
+            "id": 13,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 5,
+                        "x": 4192,
+                        "y": 3648
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 5,
+                        "x": 4237,
+                        "y": 3708
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:28.583Z"
+        },
+        {
+            "id": 12,
+            "name": "Connect color to background",
+            "redoCommand": [
+                "material.addEdge",
+                {
+                    "from": [4, "color"],
+                    "to": [6, "background"]
+                },
+                true,
+                false
+            ],
+            "undoCommand": [
+                "material.removeEdge",
+                {
+                    "from": [4, "color"],
+                    "to": [6, "background"]
+                },
+                true,
+                false
+            ],
+            "addedAt": "2023-11-10T19:30:27.933Z"
+        },
+        {
+            "id": 11,
+            "name": "Connect color to color",
+            "redoCommand": [
+                "material.addEdge",
+                {
+                    "from": [6, "color"],
+                    "to": [1, "color"]
+                },
+                true,
+                false
+            ],
+            "undoCommand": [
+                "material.removeEdge",
+                {
+                    "from": [6, "color"],
+                    "to": [1, "color"]
+                },
+                true,
+                false
+            ],
+            "addedAt": "2023-11-10T19:30:26.233Z"
+        },
+        {
+            "id": 10,
+            "name": "Disconnect color from color",
+            "redoCommand": [
+                "material.removeEdge",
+                {
+                    "from": [0, "color"],
+                    "to": [1, "color"]
+                },
+                false,
+                false
+            ],
+            "undoCommand": [
+                "material.addEdge",
+                {
+                    "from": [0, "color"],
+                    "to": [1, "color"]
+                },
+                false,
+                false
+            ],
+            "addedAt": "2023-11-10T19:30:26.231Z"
+        },
+        {
+            "id": 9,
+            "name": "Connect colorOut to foreground",
+            "redoCommand": [
+                "material.addEdge",
+                {
+                    "from": [5, "colorOut"],
+                    "to": [6, "foreground"]
+                },
+                true,
+                false
+            ],
+            "undoCommand": [
+                "material.removeEdge",
+                {
+                    "from": [5, "colorOut"],
+                    "to": [6, "foreground"]
+                },
+                true,
+                false
+            ],
+            "addedAt": "2023-11-10T19:30:24.942Z"
+        },
+        {
+            "id": 8,
+            "name": "Add \"Blend\" node",
+            "redoCommand": [
+                "material.addNode",
+                {
+                    "id": 6,
+                    "name": "Blend",
+                    "path": "materializer/blend",
+                    "x": 4419,
+                    "y": 3839,
+                    "parameters": {
+                        "mode": 0,
+                        "intensity": 1
+                    },
+                    "textureSize": 1024,
+                    "textureFilterMethod": 0
+                },
+                true,
+                false
+            ],
+            "undoCommand": ["material.removeNode", 6, true, false],
+            "addedAt": "2023-11-10T19:30:24.940Z"
+        },
+        {
+            "id": 7,
+            "name": "Connect color to colorIn",
+            "redoCommand": [
+                "material.addEdge",
+                {
+                    "from": [3, "color"],
+                    "to": [5, "colorIn"]
+                },
+                true,
+                false
+            ],
+            "undoCommand": [
+                "material.removeEdge",
+                {
+                    "from": [3, "color"],
+                    "to": [5, "colorIn"]
+                },
+                true,
+                false
+            ],
+            "addedAt": "2023-11-10T19:30:23.561Z"
+        },
+        {
+            "id": 6,
+            "name": "Add \"Invert\" node",
+            "redoCommand": [
+                "material.addNode",
+                {
+                    "id": 5,
+                    "name": "Invert",
+                    "path": "materializer/invert",
+                    "x": 4237,
+                    "y": 3708,
+                    "parameters": {},
+                    "textureSize": 1024,
+                    "textureFilterMethod": 0
+                },
+                true,
+                false
+            ],
+            "undoCommand": ["material.removeNode", 5, true, false],
+            "addedAt": "2023-11-10T19:30:23.559Z"
+        },
+        {
+            "id": 5,
+            "name": "Add \"Noise\" node",
+            "redoCommand": [
+                "material.addNode",
+                {
+                    "id": 4,
+                    "name": "Noise",
+                    "path": "materializer/noise",
+                    "x": 3610,
+                    "y": 3690,
+                    "parameters": {
+                        "scale": 64,
+                        "blur": 4
+                    },
+                    "textureSize": 1024,
+                    "textureFilterMethod": 0
+                },
+                true,
+                false
+            ],
+            "undoCommand": ["material.removeNode", 4, true, false],
+            "addedAt": "2023-11-10T19:30:20.100Z"
+        },
+        {
+            "id": 4,
+            "name": "Connect color to shape",
+            "redoCommand": [
+                "material.addEdge",
+                {
+                    "from": [2, "color"],
+                    "to": [3, "shape"]
+                },
+                true,
+                false
+            ],
+            "undoCommand": [
+                "material.removeEdge",
+                {
+                    "from": [2, "color"],
+                    "to": [3, "shape"]
+                },
+                true,
+                false
+            ],
+            "addedAt": "2023-11-10T19:30:18.712Z"
+        },
+        {
+            "id": 3,
+            "name": "Add \"Tile\" node",
+            "redoCommand": [
+                "material.addNode",
+                {
+                    "id": 3,
+                    "name": "Tile",
+                    "path": "materializer/tile",
+                    "x": 4034,
+                    "y": 3608,
+                    "parameters": {
+                        "amountX": 1,
+                        "amountY": 1,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    },
+                    "textureSize": 1024,
+                    "textureFilterMethod": 0
+                },
+                true,
+                false
+            ],
+            "undoCommand": ["material.removeNode", 3, true, false],
+            "addedAt": "2023-11-10T19:30:18.709Z"
+        },
+        {
+            "id": 2,
+            "name": "Move 1 node(s)",
+            "redoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 2,
+                        "x": 3840,
+                        "y": 3584
+                    }
+                ]
+            ],
+            "undoCommand": [
+                "material.moveNodesTo",
+                [
+                    {
+                        "nodeId": 2,
+                        "x": 3776,
+                        "y": 3638
+                    }
+                ]
+            ],
+            "addedAt": "2023-11-10T19:30:17.278Z"
+        },
+        {
+            "id": 1,
+            "name": "Add \"Shape\" node",
+            "redoCommand": [
+                "material.addNode",
+                {
+                    "id": 2,
+                    "name": "Shape",
+                    "path": "materializer/shape",
+                    "x": 3776,
+                    "y": 3638,
+                    "parameters": {
+                        "shape": 0,
+                        "rectWidth": 0.5,
+                        "rectHeight": 0.5,
+                        "circleRadius": 0.5,
+                        "triangleSize": 0.5
+                    },
+                    "textureSize": 1024,
+                    "textureFilterMethod": 0
+                },
+                true,
+                false
+            ],
+            "undoCommand": ["material.removeNode", 2, true, false],
+            "addedAt": "2023-11-10T19:30:16.995Z"
+        },
+        {
+            "id": 0,
+            "name": "Start",
+            "redoCommand": ["nop"],
+            "undoCommand": ["material.removeNode", 2, true, false],
+            "addedAt": "2023-11-10T19:30:16.995Z"
+        }
+    ],
+    "top": 29
+}

@@ -8,6 +8,7 @@ type Props = {
     icon?: IconTypes;
     shortcut?: string;
     autoClose?: boolean;
+    current?: boolean;
 
     onClick?(): void;
 };
@@ -32,7 +33,7 @@ export default function MenuButtonOption(props: Props) {
                         <Dynamic component={props.icon} size={16} />
                     </Show>
                     <div>
-                        <div>{props.label}</div>
+                        <div class="whitespace-nowrap">{props.label}</div>
 
                         <Show when={props.hint}>
                             <div class="text-gray-800 mt-1">{props.hint}</div>

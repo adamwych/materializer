@@ -19,7 +19,7 @@ export default function MaterialNodeInspectorRGBInput(
 
             <GrayscaleSlider
                 value={props.value()[0]}
-                onChange={(value) => props.onChange([value, 0, 0])}
+                onChange={(value) => props.onChange([value, value, value])}
                 onFocus={props.onFocus}
                 onBlur={props.onBlur}
             />

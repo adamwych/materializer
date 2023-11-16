@@ -8,5 +8,5 @@ uniform sampler2D uNodeTexture;
 out vec4 outColor;
 
 void main(void) {
-    outColor = texture(uNodeTexture, vTexCoords);
+    outColor = vec4(texture(uNodeTexture, vTexCoords).rgb, 1.0f);
 }

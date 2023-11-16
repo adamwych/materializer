@@ -1,8 +1,8 @@
 import { RenderWorkerCommand, RenderWorkerResponse } from "../commands";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
-import WebGLEditorUIRenderer from "./editor-ui-renderer";
 import WebGL3dPreviewRenderer from "./3d-preview/renderer";
+import WebGLEditorUIRenderer from "./editor-ui-renderer";
 import WebGLNodeRenderer from "./node-renderer";
 
 /**
@@ -46,15 +46,24 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             material = ev.data.material;
             canvas = ev.data.canvas;
 
-            const context = canvas.getContext("webgl2");
+            const context = canvas.getContext("webgl2", {
+                antialias: false,
+            });
             if (!context) {
                 self.postMessage(RenderWorkerResponse.WebGLContextNotAvailable);
                 return;
             }
 
             gl = context;
-            gl.clearColor(0, 0, 0, 1);
+            gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+
+            // Float textures are required to create cubemaps.
+            if (!gl.getExtension("EXT_color_buffer_float")) {
+                self.postMessage(RenderWorkerResponse.WebGLContextNotAvailable);
+                return;
+            }
 
             nodeRenderer = new WebGLNodeRenderer(canvas, gl);
             editorUIRenderer = new WebGLEditorUIRenderer(canvas, gl, nodeRenderer);
@@ -200,10 +209,11 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
         }
 
         case "set3dPreviewCanvas": {
-            envPreviewRenderer = new WebGL3dPreviewRenderer(ev.data.canvas, gl, nodeRenderer);
-
-            requestAnimationFrame(() => {
-                envPreviewRenderer.render(material);
+            const renderer = new WebGL3dPreviewRenderer(ev.data.canvas, gl, nodeRenderer);
+            renderer.initialize().then(() => {
+                renderer.render(material);
+                envPreviewRenderer = renderer;
+                self.postMessage(RenderWorkerResponse.OK);
             });
 
             break;
@@ -212,6 +222,7 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
         case "set3dPreviewSettings": {
             envPreviewRenderer?.updateSettings(ev.data.settings).then(() => {
                 envPreviewRenderer.render(material);
+                self.postMessage(RenderWorkerResponse.OK);
             });
 
             break;

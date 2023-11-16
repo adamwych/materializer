@@ -37,9 +37,10 @@ export function createDefaultMaterial(): Material {
                     name: "Solid color",
                     path: "materializer/solid-color",
                     x: EDITOR_GRAPH_WIDTH / 2 - 64 - 128,
-                    y: EDITOR_GRAPH_HEIGHT / 2 - 64,
+                    y: EDITOR_GRAPH_HEIGHT / 2 - 64 - 128,
                     parameters: {
-                        color: [0.15, 0.3, 1],
+                        //color: [0.15, 0.3, 1],
+                        color: [1, 1, 1],
                     },
                     textureSize: 1,
                     textureFilterMethod: TextureFilterMethod.Linear,
@@ -49,12 +50,72 @@ export function createDefaultMaterial(): Material {
                 1,
                 createMutable({
                     id: 1,
-                    name: "Albedo Output",
+                    name: "Base Color Output",
+                    path: "materializer/output",
+                    x: EDITOR_GRAPH_WIDTH / 2 - 64 + 128,
+                    y: EDITOR_GRAPH_HEIGHT / 2 - 64 - 128,
+                    parameters: {
+                        targetTexture: PbrTargetTextureType.BaseColor,
+                    },
+                    textureSize: 2048,
+                    textureFilterMethod: TextureFilterMethod.Linear,
+                }),
+            ],
+            [
+                2,
+                createMutable({
+                    id: 2,
+                    name: "Solid color",
+                    path: "materializer/solid-color",
+                    x: EDITOR_GRAPH_WIDTH / 2 - 64 - 128,
+                    y: EDITOR_GRAPH_HEIGHT / 2 - 64,
+                    parameters: {
+                        color: [1, 1, 1],
+                    },
+                    textureSize: 1,
+                    textureFilterMethod: TextureFilterMethod.Linear,
+                }),
+            ],
+            [
+                3,
+                createMutable({
+                    id: 3,
+                    name: "AO Output",
                     path: "materializer/output",
                     x: EDITOR_GRAPH_WIDTH / 2 - 64 + 128,
                     y: EDITOR_GRAPH_HEIGHT / 2 - 64,
                     parameters: {
-                        targetTexture: PbrTargetTextureType.Albedo,
+                        targetTexture: PbrTargetTextureType.AmbientOcclusion,
+                    },
+                    textureSize: 2048,
+                    textureFilterMethod: TextureFilterMethod.Linear,
+                }),
+            ],
+            [
+                4,
+                createMutable({
+                    id: 4,
+                    name: "Solid color",
+                    path: "materializer/solid-color",
+                    x: EDITOR_GRAPH_WIDTH / 2 - 64 - 128,
+                    y: EDITOR_GRAPH_HEIGHT / 2 - 64 + 128,
+                    parameters: {
+                        color: [0.8, 0.8, 0.8],
+                    },
+                    textureSize: 1,
+                    textureFilterMethod: TextureFilterMethod.Linear,
+                }),
+            ],
+            [
+                5,
+                createMutable({
+                    id: 5,
+                    name: "Roughness Output",
+                    path: "materializer/output",
+                    x: EDITOR_GRAPH_WIDTH / 2 - 64 + 128,
+                    y: EDITOR_GRAPH_HEIGHT / 2 - 64 + 128,
+                    parameters: {
+                        targetTexture: PbrTargetTextureType.Roughness,
                     },
                     textureSize: 2048,
                     textureFilterMethod: TextureFilterMethod.Linear,
@@ -65,6 +126,14 @@ export function createDefaultMaterial(): Material {
             {
                 from: [0, "color"],
                 to: [1, "color"],
+            },
+            {
+                from: [2, "color"],
+                to: [3, "color"],
+            },
+            {
+                from: [4, "color"],
+                to: [5, "color"],
             },
         ],
     };

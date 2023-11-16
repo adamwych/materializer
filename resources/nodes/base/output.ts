@@ -10,13 +10,13 @@ export default {
         targetTexture: {
             id: "targetTexture",
             name: "Target texture",
-            default: PbrTargetTextureType.Albedo,
+            default: PbrTargetTextureType.BaseColor,
             inputType: "select",
             inputProps: {
                 options: [
                     {
-                        label: "Albedo",
-                        value: PbrTargetTextureType.Albedo,
+                        label: "Base Color",
+                        value: PbrTargetTextureType.BaseColor,
                     },
                     {
                         label: "Normal",

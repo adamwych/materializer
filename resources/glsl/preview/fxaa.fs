@@ -220,4 +220,5 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec2 rcpFrame) {
 void main(void) {
     vec3 color = FxaaPixelShader(a_texCoord, uTexture, vec2(1.0f / uViewportWidth, 1.0f / uViewportHeight));
     outColor = vec4(color, 1.0f);
+    outColor = texture(uTexture, a_texCoord);
 }

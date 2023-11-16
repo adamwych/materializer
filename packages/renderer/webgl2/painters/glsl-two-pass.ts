@@ -52,7 +52,6 @@ export default class TwoPassGlslNodePainter implements WebGLNodePainter {
             node.node.textureSize,
             node.node.textureFilterMethod,
             false,
-            false,
         );
 
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);

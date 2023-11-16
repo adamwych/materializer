@@ -11,17 +11,17 @@ uniform sampler2D i_background;
 out vec4 out_color;
 
 void main(void) {
-    out_color = texture(i_background, a_texCoord);
+    vec3 color = texture(i_background, a_texCoord).rgb;
 
     if(p_mode == 0) {
-        out_color += texture(i_foreground, a_texCoord) * p_intensity;
+        color += texture(i_foreground, a_texCoord).rgb * p_intensity;
     } else if(p_mode == 1) {
-        out_color -= texture(i_foreground, a_texCoord) * p_intensity;
+        color -= texture(i_foreground, a_texCoord).rgb * p_intensity;
     } else if(p_mode == 2) {
-        out_color *= texture(i_foreground, a_texCoord) * p_intensity;
+        color *= texture(i_foreground, a_texCoord).rgb * p_intensity;
     } else if(p_mode == 3) {
-        out_color /= texture(i_foreground, a_texCoord) * p_intensity;
+        color /= texture(i_foreground, a_texCoord).rgb * p_intensity;
     }
 
-    out_color.a = 1.f;
+    out_color = vec4(color, 1);
 }
