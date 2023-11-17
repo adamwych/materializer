@@ -1,5 +1,6 @@
 import vertShaderCode from "../../../../resources/glsl/fullscreen.vert.glsl?raw";
 import { TwoPassGlslPainterInfo } from "../../../material/node-painter";
+import TextureFilterMethod from "../../../types/texture-filter";
 import BoundShaderProgram from "../shader/bound-program";
 import ShaderProgram from "../shader/program";
 import { WebGLNodePaintContext } from "./context";
@@ -13,12 +14,17 @@ import WebGLNodePainter from "./painter";
  */
 export default class TwoPassGlslNodePainter implements WebGLNodePainter {
     private readonly shaderProgram: ShaderProgram;
+    private readonly framebuffer: WebGLFramebuffer;
+    private texture!: WebGLTexture;
+    private textureSize = 0;
+    private textureFilter = TextureFilterMethod.Linear;
 
     constructor(
         private readonly gl: WebGL2RenderingContext,
         info: TwoPassGlslPainterInfo,
     ) {
         this.shaderProgram = new ShaderProgram(gl, vertShaderCode, info.fragmentShader);
+        this.framebuffer = gl.createFramebuffer()!;
     }
 
     public render(context: WebGLNodePaintContext): void {
@@ -44,22 +50,31 @@ export default class TwoPassGlslNodePainter implements WebGLNodePainter {
         const gl = this.gl;
         const { node, renderer } = context;
 
-        const fbo = gl.createFramebuffer()!;
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
 
-        const texture = renderer.createEmptyTexture(
-            node.node.textureSize,
-            node.node.textureSize,
-            node.node.textureFilterMethod,
-            false,
-        );
-
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        if (
+            node.node.textureSize !== this.textureSize ||
+            node.node.textureFilterMethod !== this.textureFilter
+        ) {
+            this.gl.deleteTexture(this.texture);
+            this.texture = renderer.createEmptyTexture(
+                node.node.textureSize,
+                node.node.textureSize,
+                node.node.textureFilterMethod,
+                false,
+            );
+            gl.framebufferTexture2D(
+                gl.FRAMEBUFFER,
+                gl.COLOR_ATTACHMENT0,
+                gl.TEXTURE_2D,
+                this.texture,
+                0,
+            );
+        }
 
         this.renderPass(0, program, context.inputTextures.get("in")!);
 
-        gl.deleteFramebuffer(fbo);
-        return texture;
+        return this.texture;
     }
 
     private renderPass(passIndex: number, program: BoundShaderProgram, texture: WebGLTexture) {

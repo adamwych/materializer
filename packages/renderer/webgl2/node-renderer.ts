@@ -322,6 +322,7 @@ export default class WebGLNodeRenderer {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.FLOAT, null);
         gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, mapFilterMethodToGL(filter));
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mapFilterMethodToMipmapGL(filter));
+        gl.generateMipmap(gl.TEXTURE_2D);
 
         if (repeat) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
