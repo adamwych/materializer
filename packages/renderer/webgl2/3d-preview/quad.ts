@@ -33,7 +33,7 @@ export default class WebGLQuadRenderer {
 
     public render() {
         this.gl.bindVertexArray(this.vao);
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 36);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         this.gl.bindVertexArray(null);
     }
 
