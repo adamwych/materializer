@@ -1,5 +1,5 @@
 import { useMaterialStore } from "../../../stores/material";
-import TextureFilterMethod from "../../../types/texture-filter";
+import TextureFilterMethod, { translateFilterMethod } from "../../../types/texture-filter";
 import TextInput from "../../components/input/text-input";
 import PanelSection from "../../components/panel/section";
 import SelectOption from "../../components/select/option";
@@ -29,19 +29,15 @@ export default function InspectorMaterialParameters() {
 
                 <InspectorPanelField label="Default texture filter">
                     <Select
-                        label={
-                            material.defaultTextureFilter === TextureFilterMethod.Linear
-                                ? "Linear (smooth)"
-                                : "Nearest (pixelated)"
-                        }
+                        label={translateFilterMethod(material.defaultTextureFilter)}
                         value={material.defaultTextureFilter}
                         onChange={materialStore.setDefaultTextureFilter}
                     >
                         <SelectOption value={TextureFilterMethod.Linear}>
-                            Linear (smooth)
+                            {translateFilterMethod(TextureFilterMethod.Linear)}
                         </SelectOption>
                         <SelectOption value={TextureFilterMethod.Nearest}>
-                            Nearest (pixelated)
+                            {translateFilterMethod(TextureFilterMethod.Nearest)}
                         </SelectOption>
                     </Select>
                 </InspectorPanelField>

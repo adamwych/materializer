@@ -3,6 +3,10 @@ enum TextureFilterMethod {
     Nearest = 1,
 }
 
+export function translateFilterMethod(method: TextureFilterMethod) {
+    return method === TextureFilterMethod.Linear ? "Linear (smooth)" : "Nearest (pixelated)";
+}
+
 export function mapFilterMethodToGL(method: TextureFilterMethod) {
     return method === TextureFilterMethod.Linear ? 0x2601 : 0x2600;
 }

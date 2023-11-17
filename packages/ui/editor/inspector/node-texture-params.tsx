@@ -2,7 +2,7 @@ import { Show } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { MaterialNode } from "../../../material/node";
 import { useMaterialStore } from "../../../stores/material";
-import TextureFilterMethod from "../../../types/texture-filter";
+import TextureFilterMethod, { translateFilterMethod } from "../../../types/texture-filter";
 import PanelSection from "../../components/panel/section";
 import SelectOption from "../../components/select/option";
 import Select from "../../components/select/select";
@@ -40,19 +40,15 @@ export default function InspectorNodeTextureParameters(props: Props) {
 
                 <InspectorPanelField label="Filtering">
                     <Select
-                        label={
-                            props.node.textureFilterMethod === TextureFilterMethod.Linear
-                                ? "Linear (smooth)"
-                                : "Nearest (pixelated)"
-                        }
+                        label={translateFilterMethod(props.node.textureFilterMethod)}
                         value={props.node.textureFilterMethod}
                         onChange={(v) => materialStore.setNodeTextureFilterMethod(props.node.id, v)}
                     >
                         <SelectOption value={TextureFilterMethod.Linear}>
-                            Linear (smooth)
+                            {translateFilterMethod(TextureFilterMethod.Linear)}
                         </SelectOption>
                         <SelectOption value={TextureFilterMethod.Nearest}>
-                            Nearest (pixelated)
+                            {translateFilterMethod(TextureFilterMethod.Nearest)}
                         </SelectOption>
                     </Select>
                 </InspectorPanelField>
