@@ -16,7 +16,7 @@ import { EditorGesturesHandler } from "./canvas/interaction/gestures";
 import { EditorHistoryProvider } from "./canvas/interaction/history";
 import { EditorInteractionManager } from "./canvas/interaction/manager";
 import { EditorSelectionManager } from "./canvas/interaction/selection";
-import PreviewPanel from "./preview-panel";
+import PreviewPanel from "./preview/panel";
 import HistoryPanel from "./history-panel";
 import InspectorPanel from "./inspector/panel";
 import EditorSidebar from "./sidebar";

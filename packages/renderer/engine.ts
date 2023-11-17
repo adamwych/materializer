@@ -13,6 +13,8 @@ import { Preview3dSettings } from "./preview-3d";
 import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
 import createRenderCommandQueue, { RenderCommandQueue } from "./command-queue";
+import { PreviewMode } from "./preview";
+import { Preview2dSettings } from "./preview-2d";
 
 // A re-type of `Worker`, because the original doesn't support specifying message type...
 export interface RenderWorker extends Omit<Worker, "postMessage"> {
@@ -213,18 +215,25 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
         },
 
         /**
-         * Sets the canvas to which 3D preview will be rendered.
+         * Sets the canvas to which preview will be rendered.
          *
          * @param canvas
          */
-        async set3dPreviewCanvas(canvas: OffscreenCanvas) {
+        async setPreviewCanvas(canvas: OffscreenCanvas) {
             await commandQueue?.enqueueAndWaitForResponse(
                 {
-                    command: "set3dPreviewCanvas",
+                    command: "setPreviewCanvas",
                     canvas,
                 },
                 [canvas],
             );
+        },
+
+        async setPreviewMode(mode: PreviewMode) {
+            await commandQueue?.enqueueAndWaitForResponse({
+                command: "setPreviewMode",
+                mode,
+            });
         },
 
         async update3dPreviewSettings(settings: Partial<Preview3dSettings>) {
@@ -237,6 +246,20 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
         update3dPreviewSettingsImmediate(settings: Partial<Preview3dSettings>) {
             commandQueue?.enqueue({
                 command: "set3dPreviewSettings",
+                settings,
+            });
+        },
+
+        async update2dPreviewSettings(settings: Partial<Preview2dSettings>) {
+            await commandQueue?.enqueueAndWaitForResponse({
+                command: "set2dPreviewSettings",
+                settings,
+            });
+        },
+
+        update2dPreviewSettingsImmediate(settings: Partial<Preview2dSettings>) {
+            commandQueue?.enqueue({
+                command: "set2dPreviewSettings",
                 settings,
             });
         },

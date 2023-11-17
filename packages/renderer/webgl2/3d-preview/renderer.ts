@@ -13,8 +13,9 @@ import WebGL3dPreviewPbrEnvironmentMap from "./environment-map";
 import WebGL3dPreviewModel from "./model";
 import WebGL3dPreviewPbrRenderPass from "./pbr-pass";
 import WebGL3dPreviewSkyboxRenderPass from "./skybox-pass";
+import IWebGLPreviewRenderer from "../preview-renderer";
 
-export default class WebGL3dPreviewRenderer {
+export default class WebGL3dPreviewRenderer implements IWebGLPreviewRenderer {
     private readonly context: OffscreenCanvasRenderingContext2D;
 
     private model?: WebGL3dPreviewModel;

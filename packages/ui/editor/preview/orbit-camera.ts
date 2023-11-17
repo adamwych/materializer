@@ -1,8 +1,8 @@
-import { Preview3dSettings } from "../../renderer/preview-3d";
-import { clamp, toRadians } from "../../utils/math";
+import { Preview3dSettings } from "../../../renderer/preview-3d";
+import { clamp, toRadians } from "../../../utils/math";
 import * as glm from "gl-matrix";
 
-export default class Preview3dCamera {
+export default class PreviewOrbitCamera {
     private rotationX = toRadians(90);
     private rotationY = toRadians(0);
     private scale = 2.5;
@@ -24,6 +24,13 @@ export default class Preview3dCamera {
             cameraProjection: this.updateProjectionMatrix(),
             cameraView: this.updateViewMatrix(),
         };
+    }
+
+    public reset(): Partial<Preview3dSettings> {
+        this.rotationX = toRadians(90);
+        this.rotationY = toRadians(0);
+        this.scale = 2.5;
+        return this.createSettings();
     }
 
     public rotate(amountX: number, amountY: number): Partial<Preview3dSettings> {

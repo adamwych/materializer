@@ -3,22 +3,26 @@ import {
     RiOthersBox3Fill,
     RiOthersLightbulbFill,
     RiSystemLoader2Fill,
+    RiSystemRefreshLine,
 } from "solid-icons/ri";
 import { createSignal, onMount } from "solid-js";
-import { useRenderEngine } from "../../renderer/engine";
+import { useRenderEngine } from "../../../renderer/engine";
+import { PreviewMode } from "../../../renderer/preview";
 import {
     Preview3dEnvironmentMap,
     Preview3dShape,
     get3dPreviewEnvironmentMapUrl,
     get3dPreviewShapeGltf,
-} from "../../renderer/preview-3d";
-import cn from "../../utils/cn";
-import makeDragListener from "../../utils/makeDragListener";
-import Button from "../components/button/button";
-import MenuButton from "../components/button/menu-button";
-import MenuButtonOption from "../components/button/menu-button-option";
-import PanelSection from "../components/panel/section";
-import Preview3dCamera from "./preview-camera";
+} from "../../../renderer/preview-3d";
+import cn from "../../../utils/cn";
+import makeDragListener from "../../../utils/makeDragListener";
+import Button from "../../components/button/button";
+import ButtonGroup from "../../components/button/button-group";
+import MenuButton from "../../components/button/menu-button";
+import MenuButtonOption from "../../components/button/menu-button-option";
+import PanelSection from "../../components/panel/section";
+import Preview2dCamera from "./2d-camera";
+import PreviewOrbitCamera from "./orbit-camera";
 
 const ENVIRONMENT_MAPS: Array<[string, Preview3dEnvironmentMap]> = [
     ["Wasteland Clouds", Preview3dEnvironmentMap.WastelandClouds],
@@ -38,33 +42,49 @@ const SHAPES: Array<[string, Preview3dShape]> = [
 export default function PreviewPanel() {
     let panelSectionElement: HTMLElement;
     const renderer = useRenderEngine()!;
-    const camera = new Preview3dCamera(340, 340);
+    const orbitCamera = new PreviewOrbitCamera(340, 340);
+    const camera2d = new Preview2dCamera(340, 340);
     const [fullscreen, setFullscreen] = createSignal(false);
     const [loading, setLoading] = createSignal(true);
+    const [is3D, setIs3D] = createSignal(true);
+    const [resetCameraVisible, setResetCameraVisible] = createSignal(false);
 
     function initialize(canvas: HTMLCanvasElement) {
         requestAnimationFrame(() => {
-            renderer.set3dPreviewCanvas(canvas.transferControlToOffscreen()).then(() => {
-                renderer.update3dPreviewSettingsImmediate(camera.createSettings());
+            renderer.setPreviewCanvas(canvas.transferControlToOffscreen()).then(() => {
+                renderer.update2dPreviewSettingsImmediate(camera2d.createSettings());
+                renderer.update3dPreviewSettingsImmediate(orbitCamera.createSettings());
                 setLoading(false);
             });
         });
     }
 
+    function resetCamera() {
+        renderer.update2dPreviewSettings(camera2d.reset());
+        setResetCameraVisible(false);
+    }
+
     function onPointerDown() {
         makeDragListener((ev) => {
-            const updateFn = fullscreen()
-                ? renderer.update3dPreviewSettings
-                : renderer.update3dPreviewSettingsImmediate;
-            updateFn(camera.rotate(ev.movementX / 100, ev.movementY / 100));
+            if (is3D()) {
+                const updateFn = fullscreen()
+                    ? renderer.update3dPreviewSettings
+                    : renderer.update3dPreviewSettingsImmediate;
+                updateFn(orbitCamera.rotate(ev.movementX / 100, ev.movementY / 100));
+            } else {
+                renderer.update2dPreviewSettings(camera2d.translate(ev.movementX, ev.movementY));
+                setResetCameraVisible(true);
+            }
         });
     }
 
     function onWheel(ev: WheelEvent) {
-        const updateFn = fullscreen()
-            ? renderer.update3dPreviewSettings
-            : renderer.update3dPreviewSettingsImmediate;
-        updateFn(camera.zoom(ev.deltaY > 0 ? 1.2 : 1 / 1.2));
+        if (is3D()) {
+            const updateFn = fullscreen()
+                ? renderer.update3dPreviewSettings
+                : renderer.update3dPreviewSettingsImmediate;
+            updateFn(orbitCamera.zoom(ev.deltaY > 0 ? 1.2 : 1 / 1.2));
+        }
     }
 
     function setShape(shape: Preview3dShape) {
@@ -92,11 +112,23 @@ export default function PreviewPanel() {
     function toggleFullscreen() {
         if (fullscreen()) {
             setFullscreen(false);
-            renderer.update3dPreviewSettings(camera.resize(340, 340));
+            renderer.update3dPreviewSettings(orbitCamera.resize(340, 340));
         } else {
             setFullscreen(true);
-            renderer.update3dPreviewSettings(camera.resize(window.innerWidth, window.innerHeight));
+            renderer.update3dPreviewSettings(
+                orbitCamera.resize(window.innerWidth, window.innerHeight),
+            );
         }
+    }
+
+    function set2DPreviewMode() {
+        setIs3D(false);
+        renderer.setPreviewMode(PreviewMode.TwoD);
+    }
+
+    function set3DPreviewMode() {
+        setIs3D(true);
+        renderer.setPreviewMode(PreviewMode.ThreeD);
     }
 
     return (
@@ -105,6 +137,14 @@ export default function PreviewPanel() {
             class={cn(fullscreen() ? "fixed top-0 left-0 w-full h-full z-50" : "relative")}
             label="Preview"
             titleButtons={[
+                <ButtonGroup>
+                    <Button size="small" hold={!is3D()} onClick={set2DPreviewMode}>
+                        2D
+                    </Button>
+                    <Button size="small" hold={is3D()} onClick={set3DPreviewMode}>
+                        3D
+                    </Button>
+                </ButtonGroup>,
                 <MenuButton size="small" icon={RiOthersLightbulbFill}>
                     {ENVIRONMENT_MAPS.map(([label, value]) => (
                         <MenuButtonOption label={label} onClick={() => setEnvironmentMap(value)} />
@@ -121,6 +161,12 @@ export default function PreviewPanel() {
             {loading() && (
                 <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10">
                     <RiSystemLoader2Fill class="animate-spin" size={24} />
+                </div>
+            )}
+
+            {!is3D() && resetCameraVisible() && (
+                <div class="absolute top-12 right-0 m-3 z-10 animate-fade-in">
+                    <Button size="small" icon={RiSystemRefreshLine} onClick={resetCamera} />
                 </div>
             )}
 

@@ -1,9 +1,12 @@
 import { RenderWorkerCommand, RenderWorkerResponse } from "../commands";
+import { PreviewMode } from "../preview";
 import RenderJobScheduler from "../scheduler";
 import { MaterialSnapshot } from "../types";
+import WebGL2dPreviewRenderer from "./2d-preview/renderer";
 import WebGL3dPreviewRenderer from "./3d-preview/renderer";
 import WebGLEditorUIRenderer from "./editor-ui-renderer";
 import WebGLNodeRenderer from "./node-renderer";
+import IWebGLPreviewRenderer from "./preview-renderer";
 
 /**
  * Currently the only available render worker uses WebGL2, which unfortunately does
@@ -25,7 +28,9 @@ let gl: WebGL2RenderingContext;
 let material: MaterialSnapshot;
 let nodeRenderer: WebGLNodeRenderer;
 let editorUIRenderer: WebGLEditorUIRenderer;
-let envPreviewRenderer: WebGL3dPreviewRenderer;
+let preview3dRenderer: WebGL3dPreviewRenderer;
+let preview2dRenderer: WebGL2dPreviewRenderer;
+let previewRenderer: IWebGLPreviewRenderer;
 let jobScheduler: RenderJobScheduler;
 
 function renderQueuedNodes(nodeIds: Array<number>) {
@@ -37,10 +42,10 @@ function renderQueuedNodes(nodeIds: Array<number>) {
     });
 
     editorUIRenderer.render(material);
-    envPreviewRenderer?.render(material);
+    previewRenderer?.render(material);
 }
 
-self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
+self.onmessage = async (ev: MessageEvent<RenderWorkerCommand>) => {
     switch (ev.data.command) {
         case "initialize": {
             material = ev.data.material;
@@ -208,20 +213,45 @@ self.onmessage = (ev: MessageEvent<RenderWorkerCommand>) => {
             break;
         }
 
-        case "set3dPreviewCanvas": {
-            const renderer = new WebGL3dPreviewRenderer(ev.data.canvas, gl, nodeRenderer);
-            renderer.initialize().then(() => {
-                renderer.render(material);
-                envPreviewRenderer = renderer;
+        case "setPreviewCanvas": {
+            preview2dRenderer = new WebGL2dPreviewRenderer(ev.data.canvas, gl, nodeRenderer);
+            await preview2dRenderer.initialize();
+
+            preview3dRenderer = new WebGL3dPreviewRenderer(ev.data.canvas, gl, nodeRenderer);
+            await preview3dRenderer.initialize();
+            preview3dRenderer.render(material);
+
+            previewRenderer = preview3dRenderer;
+
+            self.postMessage(RenderWorkerResponse.OK);
+            break;
+        }
+
+        case "setPreviewMode": {
+            if (ev.data.mode === PreviewMode.TwoD) {
+                previewRenderer = preview2dRenderer;
+            } else {
+                previewRenderer = preview3dRenderer;
+            }
+
+            previewRenderer.render(material);
+
+            self.postMessage(RenderWorkerResponse.OK);
+            break;
+        }
+
+        case "set3dPreviewSettings": {
+            preview3dRenderer?.updateSettings(ev.data.settings).then(() => {
+                preview3dRenderer.render(material);
                 self.postMessage(RenderWorkerResponse.OK);
             });
 
             break;
         }
 
-        case "set3dPreviewSettings": {
-            envPreviewRenderer?.updateSettings(ev.data.settings).then(() => {
-                envPreviewRenderer.render(material);
+        case "set2dPreviewSettings": {
+            preview2dRenderer?.updateSettings(ev.data.settings).then(() => {
+                preview2dRenderer.render(material);
                 self.postMessage(RenderWorkerResponse.OK);
             });
 

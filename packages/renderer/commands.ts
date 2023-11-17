@@ -1,5 +1,7 @@
 import { MaterialGraphEdge } from "../material/graph";
 import TextureFilterMethod from "../types/texture-filter";
+import { PreviewMode } from "./preview";
+import { Preview2dSettings } from "./preview-2d";
 import { Preview3dSettings } from "./preview-3d";
 import { MaterialNodeSnapshot, MaterialSnapshot, MinimalMaterialNodeSnapshot } from "./types";
 
@@ -43,14 +45,24 @@ export type SetEditorUITransformCommand = {
     scale: number;
 };
 
-export type Set3dPreviewCanvasCommand = {
-    command: "set3dPreviewCanvas";
+export type SetPreviewCanvasCommand = {
+    command: "setPreviewCanvas";
     canvas: OffscreenCanvas;
+};
+
+export type SetPreviewModeCommand = {
+    command: "setPreviewMode";
+    mode: PreviewMode;
 };
 
 export type Set3dPreviewSettingsCommand = {
     command: "set3dPreviewSettings";
     settings: Partial<Preview3dSettings>;
+};
+
+export type Set2dPreviewSettingsCommand = {
+    command: "set2dPreviewSettings";
+    settings: Partial<Preview2dSettings>;
 };
 
 export type RenderWorkerCommand =
@@ -60,8 +72,10 @@ export type RenderWorkerCommand =
     | RenderNodeAndGetImageCommand
     | SetEditorUIViewportSizeCommand
     | SetEditorUITransformCommand
-    | Set3dPreviewCanvasCommand
-    | Set3dPreviewSettingsCommand;
+    | SetPreviewCanvasCommand
+    | SetPreviewModeCommand
+    | Set3dPreviewSettingsCommand
+    | Set2dPreviewSettingsCommand;
 
 export enum RenderWorkerResponse {
     OK = 0,

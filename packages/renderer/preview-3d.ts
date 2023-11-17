@@ -1,15 +1,14 @@
 import { GLTF } from "@gltf-transform/core";
+import glm from "gl-matrix";
+import littleParisUnderTowerHdr from "../../resources/hdri/little_paris_under_tower_2k.hdr?url";
+import meadowHdr from "../../resources/hdri/meadow_2_2k.hdr?url";
+import rustigKoppieHdr from "../../resources/hdri/rustig_koppie_puresky_2k.hdr?url";
+import wastelandCloudsHdr from "../../resources/hdri/wasteland_clouds_puresky_2k.hdr?url";
 import cubeGltf from "../../resources/models/cube.gltf?raw";
 import cubeHiRes from "../../resources/models/cube_2k.gltf?raw";
 import planeGltf from "../../resources/models/plane.gltf?raw";
 import plane2kGltf from "../../resources/models/plane_2k.gltf?raw";
 import sphereGltf from "../../resources/models/sphere.gltf?raw";
-import meadowHdr from "../../resources/hdri/meadow_2_2k.hdr?url";
-import littleParisUnderTowerHdr from "../../resources/hdri/little_paris_under_tower_2k.hdr?url";
-import wastelandCloudsHdr from "../../resources/hdri/wasteland_clouds_puresky_2k.hdr?url";
-import rustigKoppieHdr from "../../resources/hdri/rustig_koppie_puresky_2k.hdr?url";
-
-import glm from "gl-matrix";
 
 export enum Preview3dShape {
     Plane,

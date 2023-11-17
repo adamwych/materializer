@@ -36,6 +36,11 @@ export default class ShaderProgram {
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            throw new Error(gl.getProgramInfoLog(program)!);
+        }
+
         gl.deleteShader(vertexShader);
         gl.deleteShader(fragmentShader);
         this.program = program;

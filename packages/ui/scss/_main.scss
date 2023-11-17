@@ -34,15 +34,19 @@ textarea {
     }
 
     > :first-child {
-        @apply rounded-md border-r border-gray-100;
+        @apply rounded-md;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }
 
     > :last-child {
-        @apply rounded-md border-l border-gray-100;
+        @apply rounded-md;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
+    }
+
+    > :not(:first-child):not(:last-child) {
+        @apply border-x border-gray-100;
     }
 }
 

@@ -2,8 +2,8 @@ import { XY_QUAD_VERTICES } from "../../quads";
 import ShaderProgram from "../shader/program";
 
 export default class WebGLQuadRenderer {
-    private vao: WebGLVertexArrayObject;
-    private vbo: WebGLBuffer;
+    private readonly vao: WebGLVertexArrayObject;
+    private readonly vbo: WebGLBuffer;
 
     constructor(private readonly gl: WebGL2RenderingContext) {
         this.vbo = gl.createBuffer()!;
@@ -18,9 +18,9 @@ export default class WebGLQuadRenderer {
         gl.bindVertexArray(this.vao);
 
         gl.enableVertexAttribArray(0);
-        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 8 * 4, 0);
+        gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 5 * 4, 0);
         gl.enableVertexAttribArray(1);
-        gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 8 * 4, 3 * 4);
+        gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 5 * 4, 3 * 4);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         gl.bindVertexArray(null);
