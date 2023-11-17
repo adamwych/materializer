@@ -15,6 +15,7 @@ import floor from "../../resources/nodes/utilities/floor";
 import invert from "../../resources/nodes/utilities/invert";
 import passthrough from "../../resources/nodes/utilities/pass-through";
 import perlinNoise from "../../resources/nodes/noises/perlin";
+import voronoi from "../../resources/nodes/noises/voronoi";
 import { MaterialNodeBlueprint, MaterialNodeBlueprintsPackage } from "../material/node";
 
 const BUILTIN_NODES_PACKAGE: MaterialNodeBlueprintsPackage = new Map<string, MaterialNodeBlueprint>(
@@ -29,6 +30,7 @@ const BUILTIN_NODES_PACKAGE: MaterialNodeBlueprintsPackage = new Map<string, Mat
 
         ["perlin-noise", perlinNoise],
         ["anisotropic-noise", anisotropicNoise],
+        ["voronoi", voronoi],
 
         ["gaussian-blur", gaussianBlur],
 
