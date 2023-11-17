@@ -1,4 +1,5 @@
 import { createContextProvider } from "@solid-primitives/context";
+import { createEmitter } from "@solid-primitives/event-bus";
 import { onCleanup } from "solid-js";
 import { unwrap } from "solid-js/store";
 import { Material } from "../material/material";
@@ -8,13 +9,13 @@ import { useNodeBlueprintsStore } from "../stores/blueprints";
 import { useMaterialStore } from "../stores/material";
 import TextureFilterMethod from "../types/texture-filter";
 import { mapDictionary as mapMap } from "../utils/map";
+import createRenderCommandQueue, { RenderCommandQueue } from "./command-queue";
 import { RenderWorkerCommand, RenderWorkerResponse } from "./commands";
+import { PreviewMode } from "./preview";
+import { Preview2dSettings } from "./preview-2d";
 import { Preview3dSettings } from "./preview-3d";
 import { MaterialNodeSnapshot, MinimalMaterialNodeSnapshot, WebGL2RenderWorker } from "./types";
 import WebGL2RenderWorkerImpl from "./webgl2/worker?worker";
-import createRenderCommandQueue, { RenderCommandQueue } from "./command-queue";
-import { PreviewMode } from "./preview";
-import { Preview2dSettings } from "./preview-2d";
 
 // A re-type of `Worker`, because the original doesn't support specifying message type...
 export interface RenderWorker extends Omit<Worker, "postMessage"> {
@@ -36,6 +37,7 @@ export interface RenderWorker extends Omit<Worker, "postMessage"> {
  * a re-render of the modified node and its entire chain.
  */
 export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() => {
+    const events = createEmitter<{ previewCanvasReady: object }>();
     const materialStore = useMaterialStore()!;
     const blueprintStore = useNodeBlueprintsStore()!;
     let worker: RenderWorker | undefined;
@@ -227,6 +229,8 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 },
                 [canvas],
             );
+
+            events.emit("previewCanvasReady", {});
         },
 
         async setPreviewMode(mode: PreviewMode) {
@@ -263,5 +267,7 @@ export const [RenderEngineProvider, useRenderEngine] = createContextProvider(() 
                 settings,
             });
         },
+
+        events,
     };
 });

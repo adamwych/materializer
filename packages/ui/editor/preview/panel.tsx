@@ -2,7 +2,6 @@ import {
     RiMediaFullscreenFill,
     RiOthersBox3Fill,
     RiOthersLightbulbFill,
-    RiSystemLoader2Fill,
     RiSystemRefreshLine,
 } from "solid-icons/ri";
 import { createSignal, onMount } from "solid-js";
@@ -20,6 +19,7 @@ import Button from "../../components/button/button";
 import ButtonGroup from "../../components/button/button-group";
 import MenuButton from "../../components/button/menu-button";
 import MenuButtonOption from "../../components/button/menu-button-option";
+import FillLoader from "../../components/loader/fill-loader";
 import PanelSection from "../../components/panel/section";
 import Preview2dCamera from "./2d-camera";
 import PreviewOrbitCamera from "./orbit-camera";
@@ -158,11 +158,7 @@ export default function PreviewPanel() {
                 <Button icon={RiMediaFullscreenFill} size="small" onClick={toggleFullscreen} />,
             ]}
         >
-            {loading() && (
-                <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10">
-                    <RiSystemLoader2Fill class="animate-spin" size={24} />
-                </div>
-            )}
+            {loading() && <FillLoader />}
 
             {!is3D() && resetCameraVisible() && (
                 <div class="absolute top-12 right-0 m-3 z-10 animate-fade-in">

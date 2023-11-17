@@ -1,21 +1,25 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer";
-import { createEffect, onMount } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 import { useRenderEngine } from "../../../renderer/engine";
-import { useWorkspaceStore } from "../../../stores/workspace";
-import { useEditorCameraState } from "./interaction/camera";
 import { WebGL2RenderWorker } from "../../../renderer/types";
+import { useWorkspaceStore } from "../../../stores/workspace";
+import FillLoader from "../../components/loader/fill-loader";
+import { useEditorCameraState } from "./interaction/camera";
 
 export default function EditorNodeThumbnailsCanvas() {
     const workspaceManager = useWorkspaceStore()!;
-    const renderEngine = useRenderEngine()!;
+    const renderer = useRenderEngine()!;
     const cameraState = useEditorCameraState()!;
+    const [waitingForPreviewCanvas, setWaitingForPreviewCanvas] = createSignal(true);
     let sizeElement!: HTMLDivElement;
     let worker: WebGL2RenderWorker;
 
     function initialize(canvasElement: HTMLCanvasElement) {
         const material = workspaceManager.getActiveMaterial()!;
 
-        renderEngine
+        renderer.events.on("previewCanvasReady", () => setWaitingForPreviewCanvas(false));
+
+        renderer
             .initializeWebGLWorker(canvasElement.transferControlToOffscreen(), material, true)
             .then((w) => {
                 worker = w;
@@ -46,6 +50,8 @@ export default function EditorNodeThumbnailsCanvas() {
                 is used to measure the width and height instead.
             */}
             <div ref={sizeElement} class="absolute w-full h-full" />
+
+            {waitingForPreviewCanvas() && <FillLoader />}
 
             <canvas
                 ref={(e) => onMount(() => initialize(e))}
