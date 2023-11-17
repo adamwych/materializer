@@ -47,10 +47,6 @@ export default function generateCubeMap(
         );
     }
 
-    if (mipmap) {
-        gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
-    }
-
     // ===
     const projectionMatrix = glm.mat4.perspective(glm.mat4.create(), toRadians(90), 1, 0.1, 10);
     const views = [
