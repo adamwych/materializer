@@ -153,7 +153,7 @@ export default class WebGL3dPreviewRenderer {
             this.environmentMap!,
         );
         this.skyboxRenderPass.render(
-            this.environmentMap!.getPrefilterMapTexture(),
+            this.environmentMap!.getCubeMapTexture(),
             this.cameraProjection,
             this.cameraView,
         );
