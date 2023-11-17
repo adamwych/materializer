@@ -48,7 +48,14 @@ export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) 
 
     function onBlur() {
         const newValue = structuredClone(unwrap(props.value()));
-        history.pushNodeParameterValueChanged(props.node, props.parameter.id, newValue, startValue);
+        if (newValue !== startValue) {
+            history.pushNodeParameterValueChanged(
+                props.node,
+                props.parameter.id,
+                newValue,
+                startValue,
+            );
+        }
     }
 
     return (
