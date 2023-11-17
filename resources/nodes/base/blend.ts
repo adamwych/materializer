@@ -6,6 +6,7 @@ export default {
     id: "blend",
     name: "Blend",
     groupName: "Base",
+    aliases: ["mix"],
     parameters: {
         mode: {
             id: "mode",

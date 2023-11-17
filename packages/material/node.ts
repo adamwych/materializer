@@ -69,6 +69,9 @@ export type MaterialNodeBlueprint = {
      */
     groupName: string;
 
+    /** Extra keywords that can be used to search for this blueprint. */
+    aliases?: Array<string>;
+
     /** List of parameters, that the node accepts. */
     parameters: Record<string, MaterialNodeParameterInfo>;
 

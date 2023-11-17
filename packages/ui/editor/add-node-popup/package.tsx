@@ -16,7 +16,8 @@ export default function EditorAddNodePopupPackage(props: Props) {
         for (const [path, spec] of props.package.entries()) {
             const group = groups.get(spec.groupName) ?? new Map<string, MaterialNodeBlueprint>();
 
-            if (spec.name.toLowerCase().includes(props.searchQuery)) {
+            const aliases = [...(spec.aliases ?? []), spec.name].map((x) => x.toLowerCase());
+            if (aliases.some((alias) => alias.includes(props.searchQuery))) {
                 group.set(path, spec);
             }
 
