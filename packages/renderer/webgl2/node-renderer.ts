@@ -3,6 +3,7 @@ import TextureFilterMethod, {
     mapFilterMethodToGL,
     mapFilterMethodToMipmapGL,
 } from "../../types/texture-filter";
+import { clamp } from "../../utils/math";
 import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
 import SinglePassGlslNodePainter from "./painters/glsl-single-pass";
 import TwoPassGlslNodePainter from "./painters/glsl-two-pass";
@@ -285,23 +286,20 @@ export default class WebGLNodeRenderer {
             );
         }
 
-        const pixels = new Uint8Array(outputWidth * outputHeight * 4);
+        const pixels = new Float32Array(outputWidth * outputHeight * 4);
         this.gl.readBuffer(this.gl.COLOR_ATTACHMENT0);
-        this.gl.readPixels(
-            0,
-            0,
-            outputWidth,
-            outputHeight,
-            this.gl.RGBA,
-            this.gl.UNSIGNED_BYTE,
-            pixels,
-        );
+        this.gl.readPixels(0, 0, outputWidth, outputHeight, this.gl.RGBA, this.gl.FLOAT, pixels);
+
+        const pixelsRgba8 = new Uint8Array(pixels.length);
+        for (let i = 0; i < pixels.length; i++) {
+            pixelsRgba8[i] = clamp(pixels[i], 0, 1) * 255;
+        }
 
         // Restore default framebuffer.
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.deleteFramebuffer(outputFramebuffer);
 
-        return new ImageData(new Uint8ClampedArray(pixels), outputWidth, outputHeight);
+        return new ImageData(new Uint8ClampedArray(pixelsRgba8), outputWidth, outputHeight);
     }
 
     /**
