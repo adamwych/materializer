@@ -1,4 +1,3 @@
-import { RiSystemRefreshLine } from "solid-icons/ri";
 import { Accessor, Component, ParentProps, Show } from "solid-js";
 import { unwrap } from "solid-js/store";
 import {
@@ -7,7 +6,6 @@ import {
     ParameterInputType,
 } from "../../../material/node-parameter.ts";
 import { MaterialNode } from "../../../material/node.ts";
-import Button from "../../components/button/button.tsx";
 import { useEditorHistory } from "../canvas/interaction/history.ts";
 import InspectorPanelField from "./field.tsx";
 import MaterialNodeInspectorNumberInput from "./inputs/number.tsx";
@@ -59,17 +57,7 @@ export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) 
     }
 
     return (
-        <InspectorPanelField
-            label={props.parameter.name}
-            titleButtons={[
-                <Button
-                    hint="Reset to default"
-                    icon={RiSystemRefreshLine}
-                    size="tiny"
-                    onClick={props.onResetToDefault}
-                />,
-            ]}
-        >
+        <InspectorPanelField label={props.parameter.name} onReset={props.onResetToDefault}>
             <Show when={InputComponent}>
                 <InputComponent
                     parameter={props.parameter}

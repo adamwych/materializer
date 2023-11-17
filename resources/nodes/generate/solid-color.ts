@@ -12,7 +12,7 @@ export default {
             inputType: "rgb",
             inputProps: {},
             valueType: "vec3",
-            default: [0.75, 0.4, 0.5],
+            default: [1, 1, 1],
         },
     },
     inputs: {},
