@@ -51,9 +51,9 @@ export default function PreviewPanel() {
 
     function initialize(canvas: HTMLCanvasElement) {
         requestAnimationFrame(() => {
-            renderer.setPreviewCanvas(canvas.transferControlToOffscreen()).then(() => {
-                renderer.update2dPreviewSettingsImmediate(camera2d.createSettings());
-                renderer.update3dPreviewSettingsImmediate(orbitCamera.createSettings());
+            renderer.setPreviewCanvas(canvas.transferControlToOffscreen()).then(async () => {
+                await renderer.update2dPreviewSettings(camera2d.createSettings());
+                await renderer.update3dPreviewSettings(orbitCamera.createSettings());
                 setLoading(false);
             });
         });
