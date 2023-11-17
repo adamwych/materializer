@@ -1,6 +1,8 @@
+import { DocumentEventListener } from "@solid-primitives/event-listener";
+import { RiArrowsArrowDropDownLine } from "solid-icons/ri";
 import { Show, createSignal } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { RiArrowsArrowDropDownLine } from "solid-icons/ri";
+import hasParentWithCondition from "../../../utils/hasParentWithCondition.ts";
 import { SelectContextProvider } from "./context.ts";
 
 type Props<V> = {
@@ -14,6 +16,7 @@ type Props<V> = {
 
 export default function Select<V>(props: Props<V>) {
     const [optionsVisible, setOptionsVisible] = createSignal(false);
+    let rootElement: HTMLDivElement;
 
     function open() {
         setOptionsVisible(true);
@@ -33,8 +36,19 @@ export default function Select<V>(props: Props<V>) {
         }
     }
 
+    function onDocumentMouseDown(ev: MouseEvent) {
+        const clickedInsideSelect = hasParentWithCondition(
+            ev.target as Element,
+            (element) => element === rootElement,
+        );
+
+        if (!clickedInsideSelect) {
+            close();
+        }
+    }
+
     return (
-        <div class="relative w-full">
+        <div ref={rootElement!} class="relative w-full">
             <div
                 class={`bg-gray-0 active:bg-gray-100 border border-gray-200 h-[35px] ${
                     optionsVisible() ? "rounded-t-md" : "rounded-md"
@@ -49,6 +63,8 @@ export default function Select<V>(props: Props<V>) {
 
             <SelectContextProvider onChange={props.onChange} onClose={close}>
                 <Show when={optionsVisible()}>
+                    <DocumentEventListener onMousedown={onDocumentMouseDown} />
+
                     <div class="absolute w-full z-10 border border-gray-200 -mt-[1px] rounded-b-md overflow-hidden">
                         {props.children}
                     </div>
