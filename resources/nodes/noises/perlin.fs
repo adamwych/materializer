@@ -3,8 +3,7 @@ precision highp float;
 
 in vec2 a_texCoord;
 
-uniform float p_offsetX;
-uniform float p_offsetY;
+uniform vec2 p_offset;
 uniform float p_sharpness;
 uniform float p_scale;
 uniform int p_levels;
@@ -39,7 +38,7 @@ void main(void) {
     out_color = vec4(0, 0, 0, 1);
 
     vec2 uv = a_texCoord;
-    uv += vec2(p_offsetX, p_offsetY);
+    uv += p_offset;
     uv *= p_scale;
 
     float n = 0.0f;

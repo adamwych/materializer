@@ -5,45 +5,23 @@ export default {
     name: "Tile",
     groupName: "Layout",
     parameters: {
-        amountX: {
-            id: "amountX",
-            name: "Amount X",
-            default: 1,
+        amount: {
+            id: "amount",
+            name: "Amount X/Y",
+            default: [1, 1],
             inputType: "number",
-            valueType: "int",
+            valueType: "ivec2",
             inputProps: {
                 min: 1,
                 max: 16,
             },
         },
-        amountY: {
-            id: "amountY",
-            name: "Amount Y",
-            default: 1,
+        offset: {
+            id: "offset",
+            name: "Offset X/Y",
+            default: [0, 0],
             inputType: "number",
-            valueType: "int",
-            inputProps: {
-                min: 1,
-                max: 16,
-            },
-        },
-        offsetX: {
-            id: "offsetX",
-            name: "Offset X",
-            default: 0,
-            inputType: "number",
-            valueType: "float",
-            inputProps: {
-                min: 0,
-                max: 1,
-            },
-        },
-        offsetY: {
-            id: "offsetY",
-            name: "Offset Y",
-            default: 0,
-            inputType: "number",
-            valueType: "float",
+            valueType: "vec2",
             inputProps: {
                 min: 0,
                 max: 1,

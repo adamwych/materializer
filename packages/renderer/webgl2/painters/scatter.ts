@@ -9,8 +9,7 @@ export default class ScatterNodePainter extends PatternNodePainter {
 
         const randomnessSeed = node.parameters["seed"] as number;
         const size = (node.parameters["size"] as number) * 2048;
-        const spreadX = node.parameters["spreadX"] as number;
-        const spreadY = node.parameters["spreadY"] as number;
+        const spread = node.parameters["spread"] as [number, number];
         const randomRotation = node.parameters["randomRotation"] as number;
         const randomScale = (node.parameters["randomScale"] as number) / 2048;
 
@@ -22,7 +21,7 @@ export default class ScatterNodePainter extends PatternNodePainter {
             const scale = size / 2048 + rng() * randomScale - randomScale / 2;
             elements.push({
                 rotation: rng() * randomRotation,
-                position: [rng() * spreadX - spreadX / 2, rng() * spreadY - spreadY / 2, 0],
+                position: [rng() * spread[0] - spread[0] / 2, rng() * spread[1] - spread[1] / 2, 0],
                 scale: [scale, scale],
             });
         }

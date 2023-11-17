@@ -1,5 +1,5 @@
 export type ParameterInputType = "number" | "rgb" | "select";
-export type ParameterValueType = "int" | "float" | "vec3";
+export type ParameterValueType = "int" | "float" | "vec2" | "vec3" | "ivec2";
 
 type MakeParameterInputInfo<
     InputType extends ParameterInputType,
@@ -23,8 +23,8 @@ type MakeParameterInputInfo<
 export type NumberParameterInputInfo = MakeParameterInputInfo<
     "number",
     { min: number; max: number; step?: number },
-    number,
-    "int" | "float"
+    number | Array<number>,
+    "int" | "float" | "vec2" | "vec3" | "ivec2"
 >;
 
 export type RgbParameterInputInfo = MakeParameterInputInfo<

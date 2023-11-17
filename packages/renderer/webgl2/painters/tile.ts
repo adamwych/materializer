@@ -6,10 +6,12 @@ export default class TileNodePainter extends PatternNodePainter {
         const node = snapshot.node;
         const elements: Array<PatternElement> = [];
 
-        const amountX = Math.floor(node.parameters["amountX"] as number);
-        const amountY = Math.floor(node.parameters["amountY"] as number);
-        const extraOffsetX = (node.parameters["offsetX"] as number) / amountX;
-        const extraOffsetY = (node.parameters["offsetY"] as number) / amountY;
+        const amountXY = node.parameters["amount"] as [number, number];
+        const amountX = Math.floor(amountXY[0]);
+        const amountY = Math.floor(amountXY[1]);
+        const extraOffsetXY = node.parameters["offset"] as [number, number];
+        const extraOffsetX = extraOffsetXY[0] / amountX;
+        const extraOffsetY = extraOffsetXY[1] / amountY;
         const scale = 1 / Math.max(amountX, amountY);
 
         const toAddY = Math.ceil(extraOffsetY * amountY * amountY + 1);

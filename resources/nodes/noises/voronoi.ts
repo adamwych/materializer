@@ -6,21 +6,13 @@ export default {
     name: "Voronoi",
     groupName: "Noises",
     parameters: {
-        offsetX: {
-            id: "offsetX",
-            name: "Offset X",
+        offset: {
+            id: "offset",
+            name: "Offset X/Y",
             inputType: "number",
             inputProps: { min: 0, max: 1 },
-            valueType: "float",
-            default: 0,
-        },
-        offsetY: {
-            id: "offsetY",
-            name: "Offset Y",
-            inputType: "number",
-            inputProps: { min: 0, max: 1 },
-            valueType: "float",
-            default: 0,
+            valueType: "vec2",
+            default: [0, 0],
         },
         scale: {
             id: "scale",

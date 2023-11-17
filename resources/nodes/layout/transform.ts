@@ -6,27 +6,16 @@ export default {
     name: "Transform",
     groupName: "Layout",
     parameters: {
-        offsetX: {
-            id: "offsetX",
-            name: "Offset X",
-            default: 0,
+        offset: {
+            id: "offset",
+            name: "Offset X/Y",
+            default: [0, 0],
             inputType: "number",
             inputProps: {
                 min: -1,
                 max: 1,
             },
-            valueType: "float",
-        },
-        offsetY: {
-            id: "offsetY",
-            name: "Offset Y",
-            default: 0,
-            inputType: "number",
-            inputProps: {
-                min: -1,
-                max: 1,
-            },
-            valueType: "float",
+            valueType: "vec2",
         },
         rotation: {
             id: "rotation",
@@ -39,27 +28,16 @@ export default {
             },
             valueType: "float",
         },
-        scaleX: {
-            id: "scaleX",
-            name: "Scale X",
-            default: 1,
+        scale: {
+            id: "scale",
+            name: "Scale X/Y",
+            default: [1, 1],
             inputType: "number",
             inputProps: {
                 min: 0,
                 max: 2,
             },
-            valueType: "float",
-        },
-        scaleY: {
-            id: "scaleY",
-            name: "Scale Y",
-            default: 1,
-            inputType: "number",
-            inputProps: {
-                min: 0,
-                max: 2,
-            },
-            valueType: "float",
+            valueType: "vec2",
         },
         wrapMode: {
             id: "wrapMode",

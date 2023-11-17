@@ -28,23 +28,12 @@ export default {
                 max: 1,
             },
         },
-        spreadX: {
-            id: "spreadX",
-            name: "Spread X",
-            default: 1,
+        spread: {
+            id: "spread",
+            name: "Spread X/Y",
+            default: [1, 1],
             inputType: "number",
-            valueType: "float",
-            inputProps: {
-                min: 0,
-                max: 4,
-            },
-        },
-        spreadY: {
-            id: "spreadY",
-            name: "Spread Y",
-            default: 1,
-            inputType: "number",
-            valueType: "float",
+            valueType: "vec2",
             inputProps: {
                 min: 0,
                 max: 4,

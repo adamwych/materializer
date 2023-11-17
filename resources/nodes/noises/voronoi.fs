@@ -3,8 +3,7 @@ precision highp float;
 
 in vec2 a_texCoord;
 
-uniform float p_offsetX;
-uniform float p_offsetY;
+uniform vec2 p_offset;
 uniform float p_scale;
 uniform float p_limit;
 
@@ -54,7 +53,7 @@ float voronoiDistance(vec2 x) {
 }
 
 void main(void) {
-    vec2 uv = (a_texCoord + vec2(p_offsetX, p_offsetY)) * p_scale;
+    vec2 uv = (a_texCoord + p_offset) * p_scale;
 
     float m_dist = voronoiDistance(uv);
     m_dist = smoothstep(0.0f, p_limit, m_dist);
