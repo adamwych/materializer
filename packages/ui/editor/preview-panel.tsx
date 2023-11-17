@@ -35,7 +35,7 @@ const SHAPES: Array<[string, Preview3dShape]> = [
     ["Sphere", Preview3dShape.Sphere],
 ];
 
-export default function EditorEnvironmentPreviewPanel() {
+export default function PreviewPanel() {
     let panelSectionElement: HTMLElement;
     const renderer = useRenderEngine()!;
     const camera = new Preview3dCamera(340, 340);
