@@ -23,6 +23,9 @@ export type Material = {
 
     /** List of connections between nodes. */
     edges: Array<MaterialGraphEdge>;
+
+    defaultTextureFilter: TextureFilterMethod;
+    defaultTextureSize: number;
 };
 
 export function createDefaultMaterial(): Material {
@@ -136,5 +139,7 @@ export function createDefaultMaterial(): Material {
                 to: [5, "color"],
             },
         ],
+        defaultTextureFilter: TextureFilterMethod.Linear,
+        defaultTextureSize: 1024,
     };
 }

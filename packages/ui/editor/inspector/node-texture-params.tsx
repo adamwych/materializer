@@ -1,12 +1,14 @@
 import { Show } from "solid-js";
+import { unwrap } from "solid-js/store";
 import { MaterialNode } from "../../../material/node";
 import { useMaterialStore } from "../../../stores/material";
 import TextureFilterMethod from "../../../types/texture-filter";
 import PanelSection from "../../components/panel/section";
 import SelectOption from "../../components/select/option";
 import Select from "../../components/select/select";
+import { useEditorHistory } from "../canvas/interaction/history";
 import InspectorPanelField from "./field";
-import InspectorNodeTextureSizeParameter from "./node-texture-size-param";
+import HorizontalTextureSizeSlider from "./node-texture-size-param";
 
 type Props = {
     node: MaterialNode;
@@ -14,24 +16,44 @@ type Props = {
 
 export default function InspectorNodeTextureParameters(props: Props) {
     const materialStore = useMaterialStore()!;
+    const history = useEditorHistory()!;
+
+    function onTextureSizeSliderBlur(startValue: number) {
+        const newValue = unwrap(props.node.textureSize);
+        history.pushNodeTextureSizeChanged(props.node, newValue, startValue);
+    }
 
     return (
         <Show when={props.node.path !== "materializer/output"}>
             <PanelSection label="Texture">
-                <InspectorNodeTextureSizeParameter node={props.node} />
+                {props.node.path !== "materializer/solid-color" && (
+                    <InspectorPanelField label="Size">
+                        <HorizontalTextureSizeSlider
+                            value={props.node.textureSize}
+                            onChange={(value) =>
+                                materialStore.setNodeTextureSize(props.node.id, value, true, false)
+                            }
+                            onBlur={onTextureSizeSliderBlur}
+                        />
+                    </InspectorPanelField>
+                )}
 
                 <InspectorPanelField label="Filtering">
                     <Select
                         label={
                             props.node.textureFilterMethod === TextureFilterMethod.Linear
-                                ? "Linear"
-                                : "Nearest"
+                                ? "Linear (smooth)"
+                                : "Nearest (pixelated)"
                         }
                         value={props.node.textureFilterMethod}
                         onChange={(v) => materialStore.setNodeTextureFilterMethod(props.node.id, v)}
                     >
-                        <SelectOption value={TextureFilterMethod.Linear}>Linear</SelectOption>
-                        <SelectOption value={TextureFilterMethod.Nearest}>Nearest</SelectOption>
+                        <SelectOption value={TextureFilterMethod.Linear}>
+                            Linear (smooth)
+                        </SelectOption>
+                        <SelectOption value={TextureFilterMethod.Nearest}>
+                            Nearest (pixelated)
+                        </SelectOption>
                     </Select>
                 </InspectorPanelField>
             </PanelSection>

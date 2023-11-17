@@ -81,7 +81,7 @@ export type MaterialNodeBlueprint = {
     /** Details about the painter that can render this node. */
     painter: MaterialNodePainterInfo;
 
-    preferredTextureSize: number;
+    preferredTextureSize?: number;
 };
 
 export type MaterialNodeBlueprintsPackage = Map<string, MaterialNodeBlueprint>;

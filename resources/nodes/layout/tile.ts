@@ -67,5 +67,4 @@ export default {
     painter: {
         type: "tile",
     },
-    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;

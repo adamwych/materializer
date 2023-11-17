@@ -25,6 +25,8 @@ export type SerializedMaterial = {
     name: string;
     nodes: Array<SerializedMaterialNode>;
     connections: Array<SerializedMaterialGraphEdge>;
+    defaultTextureSize: number;
+    defaultTextureFiltering: TextureFilterMethod;
     savedAt: number;
 };
 
@@ -57,6 +59,8 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
                 textureFilterMethod: node.textureFilterMethod,
             })),
             connections: structuredClone(unwrap(material.edges)),
+            defaultTextureSize: material.defaultTextureSize,
+            defaultTextureFiltering: material.defaultTextureFilter,
             savedAt: new Date().getTime(),
         };
     }
@@ -88,6 +92,8 @@ export const [UserDataStorageProvider, useUserDataStorage] = createContextProvid
             name: material.name,
             nodes,
             edges: structuredClone(material.connections),
+            defaultTextureSize: material.defaultTextureSize,
+            defaultTextureFilter: material.defaultTextureFiltering,
         };
     }
 

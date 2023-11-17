@@ -1,53 +1,37 @@
 import { unwrap } from "solid-js/store";
-import { MaterialNode } from "../../../material/node";
-import { useMaterialStore } from "../../../stores/material";
 import HorizontalSlider from "../../components/slider/horizontalSlider";
-import { useEditorHistory } from "../canvas/interaction/history";
-import InspectorPanelField from "./field";
 
 type Props = {
-    node: MaterialNode;
+    value: number;
+    onChange(value: number): void;
+    onBlur?(startValue: number): void;
 };
 
-export default function InspectorNodeTextureSizeParameter(props: Props) {
-    const materialStore = useMaterialStore()!;
-    const history = useEditorHistory()!;
+export default function HorizontalTextureSizeSlider(props: Props) {
     let startValue: number;
 
-    function onSliderPointerDown() {
-        startValue = unwrap(props.node.textureSize);
+    function onFocus() {
+        startValue = unwrap(props.value);
     }
 
-    function onSliderPointerUp() {
-        const newValue = unwrap(props.node.textureSize);
-        history.pushNodeTextureSizeChanged(props.node, newValue, startValue);
+    function onBlur() {
+        props.onBlur?.(startValue);
     }
 
     return (
-        <InspectorPanelField label="Size">
-            <div class="flex items-center justify-between">
-                <span class="w-[96px] text-sm">
-                    {props.node.textureSize}x{props.node.textureSize}
-                </span>
-                <HorizontalSlider
-                    min={1}
-                    max={2048}
-                    step={props.node.textureSize < 128 ? 16 : 32}
-                    value={props.node.textureSize}
-                    onChange={(v) =>
-                        materialStore.setNodeTextureSize(props.node.id, v, true, false)
-                    }
-                    onPointerDown={onSliderPointerDown}
-                    onPointerUp={onSliderPointerUp}
-                />
-            </div>
-
-            {props.node.path === "materializer/solid-color" && (
-                <div class="text-xs text-gray-800 mt-2">
-                    <strong>Note:</strong> Increasing texture size of a 'Solid color' node does not
-                    bring any benefits and will waste your GPU's memory.
-                </div>
-            )}
-        </InspectorPanelField>
+        <div class="flex items-center justify-between">
+            <span class="w-[96px] text-sm">
+                {props.value}x{props.value}
+            </span>
+            <HorizontalSlider
+                min={1}
+                max={2048}
+                step={props.value < 128 ? 16 : 32}
+                value={props.value}
+                onChange={props.onChange}
+                onPointerDown={onFocus}
+                onPointerUp={onBlur}
+            />
+        </div>
     );
 }

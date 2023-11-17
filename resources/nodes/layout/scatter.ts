@@ -115,5 +115,4 @@ export default {
     painter: {
         type: "scatter",
     },
-    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;

@@ -94,5 +94,4 @@ export default {
         type: "glsl",
         fragmentShader: glsl,
     },
-    preferredTextureSize: 1024,
 } satisfies MaterialNodeBlueprint;

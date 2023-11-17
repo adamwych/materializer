@@ -132,8 +132,8 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
                 x,
                 y,
                 parameters: makeDefaultBlueprintParameters(blueprint),
-                textureSize: blueprint.preferredTextureSize,
-                textureFilterMethod: TextureFilterMethod.Linear,
+                textureSize: blueprint.preferredTextureSize ?? material.defaultTextureSize,
+                textureFilterMethod: material.defaultTextureFilter,
             };
 
             this.addNode(node, emitEvent, pushToHistory);
@@ -506,6 +506,31 @@ export const [MaterialProvider, useMaterialStore] = createContextProvider(() => 
             });
 
             return Array.from(addedNodes.values());
+        },
+
+        /**
+         * Sets the texture size, that will be used for newly added nodes.
+         * If a node specifies a preferred texture size, then it will be used instead.
+         * Setting this value does not influence existing nodes.
+         *
+         * @param size
+         */
+        setDefaultTextureSize(size: number) {
+            modifyMaterial((material) => {
+                material.defaultTextureSize = size;
+            });
+        },
+
+        /**
+         * Sets the texture filter method, that will be used for newly added nodes.
+         * Setting this value does not influence existing nodes.
+         *
+         * @param filter
+         */
+        setDefaultTextureFilter(filter: TextureFilterMethod) {
+            modifyMaterial((material) => {
+                material.defaultTextureFilter = filter;
+            });
         },
 
         /**
