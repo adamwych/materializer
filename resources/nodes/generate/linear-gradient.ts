@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./linear-gradient.glsl?raw";
+import glsl from "./linear-gradient.fs?raw";
 
 export default {
     id: "gradient",

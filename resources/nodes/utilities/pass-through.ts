@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./pass-through.glsl?raw";
+import glsl from "./pass-through.fs?raw";
 
 export default {
     id: "passthrough",

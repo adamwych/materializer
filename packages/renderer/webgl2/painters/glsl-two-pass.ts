@@ -1,4 +1,4 @@
-import vertShaderCode from "../../../../resources/glsl/fullscreen.vert.glsl?raw";
+import vertShaderCode from "../../../../resources/glsl/fullscreen.vs?raw";
 import { TwoPassGlslPainterInfo } from "../../../material/node-painter";
 import TextureFilterMethod from "../../../types/texture-filter";
 import BoundShaderProgram from "../shader/bound-program";

@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./solid-color.glsl?raw";
+import glsl from "./solid-color.fs?raw";
 
 export default {
     id: "solid-color",

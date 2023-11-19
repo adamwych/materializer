@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./floor.glsl?raw";
+import glsl from "./floor.fs?raw";
 
 export default {
     id: "floor",

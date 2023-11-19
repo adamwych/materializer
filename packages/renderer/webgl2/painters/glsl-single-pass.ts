@@ -1,4 +1,4 @@
-import vertShaderCode from "../../../../resources/glsl/fullscreen.vert.glsl?raw";
+import vertShaderCode from "../../../../resources/glsl/fullscreen.vs?raw";
 import { GlslPainterInfo } from "../../../material/node-painter";
 import ShaderProgram from "../shader/program";
 import { WebGLNodePaintContext } from "./context";

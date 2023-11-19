@@ -1,6 +1,6 @@
 import * as glMatrix from "gl-matrix";
-import fragShaderCode from "../../../../resources/glsl/fullscreen-instanced.frag.glsl?raw";
-import vertShaderCode from "../../../../resources/glsl/fullscreen-instanced.vert.glsl?raw";
+import fragShaderCode from "../../../../resources/glsl/fullscreen-instanced.fs?raw";
+import vertShaderCode from "../../../../resources/glsl/fullscreen-instanced.vs?raw";
 import BlendMode from "../../../types/blend-mode";
 import { XY_QUAD_VERTICES } from "../../quads";
 import { MaterialNodeSnapshot } from "../../types";

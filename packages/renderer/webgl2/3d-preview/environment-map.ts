@@ -1,5 +1,5 @@
 import hdrjs from "hdr.js";
-import fullscreenQuadVertGlsl from "../../../../resources/glsl/fullscreen.vert.glsl?raw";
+import fullscreenQuadVertGlsl from "../../../../resources/glsl/fullscreen.vs?raw";
 import brdfLookupFragGlsl from "../../../../resources/glsl/preview/brdf-lookup.fs?raw";
 import hdrToCubemapFragGlsl from "../../../../resources/glsl/preview/hdr-to-cubemap.fs?raw";
 import hdrToCubemapVertGlsl from "../../../../resources/glsl/preview/hdr-to-cubemap.vs?raw";

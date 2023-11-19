@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./anisotropic.glsl?raw";
+import glsl from "./anisotropic.fs?raw";
 
 export default {
     id: "anisotropic-noise",

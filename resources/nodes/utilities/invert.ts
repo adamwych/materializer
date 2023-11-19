@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./invert.glsl?raw";
+import glsl from "./invert.fs?raw";
 
 export default {
     id: "invert",

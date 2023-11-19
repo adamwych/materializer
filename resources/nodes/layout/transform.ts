@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./transform.glsl?raw";
+import glsl from "./transform.fs?raw";
 
 export default {
     id: "transform",

@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./gaussian.glsl?raw";
+import glsl from "./gaussian.fs?raw";
 
 export default {
     id: "gaussian-blur",

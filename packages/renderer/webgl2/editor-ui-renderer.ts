@@ -1,6 +1,6 @@
 import * as glMatrix from "gl-matrix";
-import fragGlsl from "../../../resources/glsl/editor-ui.frag.glsl?raw";
-import vertGlsl from "../../../resources/glsl/editor-ui.vert.glsl?raw";
+import fragGlsl from "../../../resources/glsl/editor-ui.fs?raw";
+import vertGlsl from "../../../resources/glsl/editor-ui.vs?raw";
 import { XY_QUAD_VERTICES } from "../quads";
 import { MaterialNodeSnapshot, MaterialSnapshot } from "../types";
 import WebGLNodeRenderer from "./node-renderer";

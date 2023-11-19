@@ -1,6 +1,6 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
 import { PbrTargetTextureType } from "../../../packages/types/pbr";
-import glsl from "./output.glsl?raw";
+import glsl from "./output.fs?raw";
 
 export default {
     id: "output",

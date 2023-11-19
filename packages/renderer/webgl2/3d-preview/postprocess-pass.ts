@@ -1,4 +1,4 @@
-import fxaaVertGlsl from "../../../../resources/glsl/fullscreen.vert.glsl?raw";
+import fxaaVertGlsl from "../../../../resources/glsl/fullscreen.vs?raw";
 import fxaaFragGlsl from "../../../../resources/glsl/preview/fxaa.fs?raw";
 import ShaderProgram from "../shader/program";
 
