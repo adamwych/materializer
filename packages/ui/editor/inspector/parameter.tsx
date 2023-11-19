@@ -39,6 +39,12 @@ export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) 
     const InputComponent = InputComponents[props.parameter.inputType];
     const history = useEditorHistory()!;
     let startValue: V;
+    let didChange = false;
+
+    function onChange(value: V) {
+        didChange = true;
+        props.onChange(props.node.id, value);
+    }
 
     function onFocus() {
         startValue = structuredClone(unwrap(props.value()));
@@ -46,7 +52,11 @@ export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) 
 
     function onBlur() {
         const newValue = structuredClone(unwrap(props.value()));
-        if (newValue !== startValue) {
+
+        // Note: Checking (newValue !== startValue) doesn't always work,
+        // because apparently `onFocus` and `onChange` might be called at the same
+        // frame (`onFocus` is then called after `onChange`). Very hard to reproduce.
+        if (didChange) {
             history.pushNodeParameterValueChanged(
                 props.node,
                 props.parameter.id,
@@ -54,6 +64,8 @@ export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) 
                 startValue,
             );
         }
+
+        didChange = false;
     }
 
     return (
@@ -62,7 +74,7 @@ export default function InspectorNodeParameter<V>(props: ParentProps<Props<V>>) 
                 <InputComponent
                     parameter={props.parameter}
                     value={props.value}
-                    onChange={(v) => props.onChange(props.node.id, v)}
+                    onChange={onChange}
                     onFocus={onFocus}
                     onBlur={onBlur}
                 />
