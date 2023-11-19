@@ -6,8 +6,11 @@ in vec2 a_texCoord;
 uniform int p_shape;
 uniform float p_rectWidth;
 uniform float p_rectHeight;
+uniform float p_rectRoundness;
 uniform float p_circleRadius;
 uniform float p_triangleSize;
+uniform float p_outline;
+uniform float p_cutoff;
 
 out vec4 out_color;
 
@@ -18,8 +21,9 @@ out vec4 out_color;
 // SDFs adapted from https://iquilezles.org/
 
 float sdfRect(vec2 uv, vec2 size) {
+    size -= vec2(p_rectRoundness);
     vec2 d = abs(uv) - size;
-    return length(max(d, 0.0f)) + min(max(d.x, d.y), 0.0f);
+    return (length(max(d, 0.0f)) + min(max(d.x, d.y), 0.0f)) - p_rectRoundness;
 }
 
 float sdfCircle(vec2 uv, float radius) {
@@ -34,7 +38,7 @@ float sdfTriangle(vec2 uv, float r) {
         uv = vec2(uv.x - k * uv.y, -k * uv.x - uv.y) / 2.0f;
     }
     uv.x -= clamp(uv.x, -2.0f * r, 0.0f);
-    return -length(uv) * sign(uv.y);
+    return (-length(uv) * sign(uv.y));
 }
 
 float shape(vec2 uv) {
@@ -51,7 +55,17 @@ float shape(vec2 uv) {
 }
 
 void main(void) {
-    float d = step(0.0f, shape(a_texCoord - vec2(0.5f, 0.5f)));
-    out_color = vec4(1.0f - d);
-    out_color.a = 1.0f;
+    float d = shape(a_texCoord - vec2(0.5f, 0.5f));
+
+    if(p_outline > 0.0f) {
+        float d2 = d * 100.0f;
+        if(d2 <= p_outline) {
+            d2 = 0.0f;
+        }
+        d = d2 - d;
+    }
+
+    d = 1.0f - smoothstep(0.0f, p_cutoff, d);
+
+    out_color = vec4(vec3(d), 1.0f);
 }

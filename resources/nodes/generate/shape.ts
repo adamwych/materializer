@@ -1,5 +1,5 @@
 import { MaterialNodeBlueprint } from "../../../packages/material/node";
-import glsl from "./shape.glsl?raw";
+import glsl from "./shape.fs?raw";
 
 export default {
     id: "shape",
@@ -44,6 +44,18 @@ export default {
             },
             when: "params.shape === 0",
         },
+        rectRoundness: {
+            id: "rectRoundness",
+            name: "Roundness",
+            default: 0,
+            inputType: "number",
+            valueType: "float",
+            inputProps: {
+                min: 0,
+                max: 1,
+            },
+            when: "params.shape === 0",
+        },
         circleRadius: {
             id: "circleRadius",
             name: "Radius",
@@ -67,6 +79,28 @@ export default {
                 max: 1,
             },
             when: "params.shape === 2",
+        },
+        cutoff: {
+            id: "cutoff",
+            name: "Cutoff",
+            default: 0,
+            inputType: "number",
+            valueType: "float",
+            inputProps: {
+                min: 0,
+                max: 1,
+            },
+        },
+        outline: {
+            id: "outline",
+            name: "Outline Thickness",
+            default: 0,
+            inputType: "number",
+            valueType: "float",
+            inputProps: {
+                min: 0,
+                max: 1,
+            },
         },
     },
     inputs: {},
