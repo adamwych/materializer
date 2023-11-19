@@ -29,12 +29,12 @@ export default function HorizontalSlider(props: SliderProps) {
             }
         },
         () => {
-            props.onPointerUp?.();
+            props.onBlur?.();
         },
     );
 
     function onPointerDown(ev: PointerEvent) {
-        props.onPointerDown?.();
+        props.onFocus?.();
         registerDragListener(ev);
     }
 

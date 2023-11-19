@@ -21,8 +21,8 @@ export default function ColorWheelChannelSlider(props: {
                 value={props.value}
                 color={props.color}
                 onChange={props.onChange}
-                onPointerDown={props.onFocus}
-                onPointerUp={props.onBlur}
+                onFocus={props.onFocus}
+                onBlur={props.onBlur}
             />
 
             <span class="text-center text-sm" style={{ width: "30px" }}>

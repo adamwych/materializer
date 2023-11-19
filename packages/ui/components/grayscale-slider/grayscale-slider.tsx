@@ -33,8 +33,8 @@ export default function GrayscaleSlider(props: Props) {
                     max={1}
                     value={props.value}
                     onChange={props.onChange}
-                    onPointerDown={props.onFocus}
-                    onPointerUp={props.onBlur}
+                    onFocus={props.onFocus}
+                    onBlur={props.onBlur}
                 />
             </div>
             <div class="w-[26px] text-center">{Math.round(props.value * 255)}</div>

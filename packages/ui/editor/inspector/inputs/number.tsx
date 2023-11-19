@@ -49,8 +49,8 @@ export default function MaterialNodeInspectorNumberInput(
                     step={props.parameter.inputProps.step ?? 0.01}
                     value={value()}
                     onChange={(value) => onChange(isFloat ? value : Math.round(value))}
-                    onPointerDown={props.onFocus}
-                    onPointerUp={props.onBlur}
+                    onFocus={props.onFocus}
+                    onBlur={props.onBlur}
                 />
             </div>
         );

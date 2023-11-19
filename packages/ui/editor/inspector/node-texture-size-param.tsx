@@ -29,8 +29,8 @@ export default function HorizontalTextureSizeSlider(props: Props) {
                 step={props.value < 128 ? 16 : 32}
                 value={props.value}
                 onChange={props.onChange}
-                onPointerDown={onFocus}
-                onPointerUp={onBlur}
+                onFocus={onFocus}
+                onBlur={onBlur}
             />
         </div>
     );

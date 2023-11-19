@@ -17,8 +17,8 @@ export type SliderProps = {
 
     disabled?: boolean;
 
-    onPointerDown?(): void;
-    onPointerUp?(): void;
+    onFocus?(): void;
+    onBlur?(): void;
 
     /**
      * Called whenever the value is changed.

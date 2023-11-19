@@ -29,12 +29,12 @@ export default function VerticalSlider(props: SliderProps) {
             }
         },
         () => {
-            props.onPointerUp?.();
+            props.onBlur?.();
         },
     );
 
     function onPointerDown(ev: PointerEvent) {
-        props.onPointerDown?.();
+        props.onFocus?.();
         registerDragListener(ev);
     }
 
